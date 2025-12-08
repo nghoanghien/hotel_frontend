@@ -1,592 +1,390 @@
-import { Restaurant, RestaurantStatus, RestaurantCategory } from '@repo/models';
+import { Hotel, HotelStatus, HotelCategory } from '@repo/models';
 
-// Mock restaurant data with various categories
-export const MOCK_RESTAURANTS: Restaurant[] = [
-  // Fish & Seafood
+// Mock hotel data with Vietnamese destinations as categories
+export const MOCK_HOTELS: Hotel[] = [
+  // Đà Lạt
   {
-    id: 'rest-001',
-    name: 'Ocean Pearl Restaurant',
-    address: '123 Coastal Avenue, Marina District',
-    latitude: 10.7769,
-    longitude: 106.7009,
-    contactPhone: '+84 28 3824 1234',
-    category: {
-      id: 'cat-001',
-      name: 'FISH & SEAFOOD',
-      slug: 'fish-seafood',
-      description: 'Fresh catches from the ocean',
+    id: 'hotel-dl-001',
+    name: 'Hôtel Colline',
+    address: {
+      street: '10 Phan Bội Châu',
+      ward: 'Phường 1',
+      district: 'Thành phố Đà Lạt',
+      province: 'Lâm Đồng'
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=800&q=80',
-    description: 'A premium seafood dining experience with the finest ocean selections',
+    latitude: 11.9429,
+    longitude: 108.4372,
+    contactPhone: '+84 263 366 5588',
+    category: {
+      id: 'cat-dalat',
+      name: 'Đà Lạt',
+      slug: 'da-lat',
+      description: 'Thành phố ngàn hoa',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1544663363-22c6082dd9e6?q=80&w=1762&auto=format&fit=crop', // Hotel view (example)
+    description: 'Nằm ngay trung tâm Đà Lạt, Hôtel Colline nổi bật như một biệt thự cổ điển Châu Âu pha lẫn nét hiện đại, mang đến trải nghiệm nghỉ dưỡng đẳng cấp.',
     rating: 4.8,
   },
   {
-    id: 'rest-002',
-    name: 'Blue Lagoon Seafood',
-    address: '456 Harbor Street, Port District',
-    latitude: 10.7823,
-    longitude: 106.7012,
-    contactPhone: '+84 28 3824 5678',
-    category: {
-      id: 'cat-001',
-      name: 'FISH & SEAFOOD',
-      slug: 'fish-seafood',
-      description: 'Fresh catches from the ocean',
+    id: 'hotel-dl-002',
+    name: 'Dalat Palace Heritage Hotel',
+    address: {
+      street: '02 Trần Phú',
+      ward: 'Phường 3',
+      district: 'Thành phố Đà Lạt',
+      province: 'Lâm Đồng'
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=800&q=80',
-    description: 'Authentic seafood dishes with Mediterranean flavors and local touches',
-    rating: 4.6,
-  },
-  {
-    id: 'rest-003',
-    name: 'Prawn & Lobster Cocktail',
-    address: '789 Seaside Boulevard, Beach Area',
-    latitude: 10.7891,
-    longitude: 106.7045,
-    contactPhone: '+84 28 3824 9012',
+    latitude: 11.9355,
+    longitude: 108.4332,
+    contactPhone: '+84 263 3825 444',
     category: {
-      id: 'cat-001',
-      name: 'FISH & SEAFOOD',
-      slug: 'fish-seafood',
-      description: 'Fresh catches from the ocean',
+      id: 'cat-dalat',
+      name: 'Đà Lạt',
+      slug: 'da-lat',
+      description: 'Thành phố ngàn hoa',
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1625937329935-d5e5cd1f2b0f?w=800&q=80',
-    description: 'Experience the authentic flavors of raw fish without having to splurge at restaurants',
-    rating: 4.9,
-  },
-
-  {
-    id: 'rest-019',
-    name: 'Sea Breeze Tavern',
-    address: '101 Coral Street, Marina District',
-    latitude: 10.7905,
-    longitude: 106.7031,
-    contactPhone: '+84 28 3824 1212',
-    category: {
-      id: 'cat-001',
-      name: 'FISH & SEAFOOD',
-      slug: 'fish-seafood',
-      description: 'Fresh catches from the ocean',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80',
-    description: 'Casual seaside dining with daily fresh catches',
-    rating: 4.4,
-  },
-  {
-    id: 'rest-020',
-    name: 'Poseidon Seafood Market',
-    address: '202 Ocean Plaza, Port District',
-    latitude: 10.7921,
-    longitude: 106.7022,
-    contactPhone: '+84 28 3824 1313',
-    category: {
-      id: 'cat-001',
-      name: 'FISH & SEAFOOD',
-      slug: 'fish-seafood',
-      description: 'Fresh catches from the ocean',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1514986888952-8cd320577b1e?w=800&q=80',
-    description: 'Seafood market and eatery featuring grilled and raw selections',
-    rating: 4.6,
-  },
-  // Sushi & Sashimi
-  {
-    id: 'rest-004',
-    name: 'Tokyo Sushi House',
-    address: '321 Japanese Street, Central District',
-    latitude: 10.7701,
-    longitude: 106.6978,
-    contactPhone: '+84 28 3825 3456',
-    category: {
-      id: 'cat-002',
-      name: 'SUSHI & SASHIMI',
-      slug: 'sushi-sashimi',
-      description: 'Authentic Japanese sushi and sashimi',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&q=80',
-    description: 'Traditional sushi experience with the finest ingredients and skilled chefs',
-    rating: 4.7,
-  },
-  {
-    id: 'rest-005',
-    name: 'Sakura Sashimi Bar',
-    address: '654 Zen Avenue, Cultural Quarter',
-    latitude: 10.7734,
-    longitude: 106.6989,
-    contactPhone: '+84 28 3825 7890',
-    category: {
-      id: 'cat-002',
-      name: 'SUSHI & SASHIMI',
-      slug: 'sushi-sashimi',
-      description: 'Authentic Japanese sushi and sashimi',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=800&q=80',
-    description: 'Experience the authentic flavors of raw fish without having to splurge at restaurants',
-    rating: 4.5,
-  },
-  {
-    id: 'rest-006',
-    name: 'Wasabi Premium',
-    address: '987 Rising Sun Road, Business District',
-    latitude: 10.7756,
-    longitude: 106.7023,
-    contactPhone: '+84 28 3825 2345',
-    category: {
-      id: 'cat-002',
-      name: 'SUSHI & SASHIMI',
-      slug: 'sushi-sashimi',
-      description: 'Authentic Japanese sushi and sashimi',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=800&q=80',
-    description: 'Premium omakase experience with seasonal selections',
-    rating: 4.9,
-  },
-
-  {
-    id: 'rest-021',
-    name: 'Kimura Omakase',
-    address: '159 Artisan Lane, Central District',
-    latitude: 10.7713,
-    longitude: 106.6982,
-    contactPhone: '+84 28 3825 1590',
-    category: {
-      id: 'cat-002',
-      name: 'SUSHI & SASHIMI',
-      slug: 'sushi-sashimi',
-      description: 'Authentic Japanese sushi and sashimi',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1545235617-9465d2cb5233?w=800&q=80',
-    description: 'Chef-led omakase with seasonal fish selections',
-    rating: 4.8,
-  },
-  {
-    id: 'rest-022',
-    name: 'Nori Handroll Bar',
-    address: '246 Bamboo Street, Cultural Quarter',
-    latitude: 10.7742,
-    longitude: 106.6993,
-    contactPhone: '+84 28 3825 2468',
-    category: {
-      id: 'cat-002',
-      name: 'SUSHI & SASHIMI',
-      slug: 'sushi-sashimi',
-      description: 'Authentic Japanese sushi and sashimi',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1562158070-365a0e90f975?w=800&q=80',
-    description: 'Modern handroll bar with fresh nori and warm sushi rice',
-    rating: 4.6,
-  },
-  // Barbecue
-  {
-    id: 'rest-007',
-    name: 'Smokey BBQ Pit',
-    address: '111 Grill Street, Food District',
-    latitude: 10.7812,
-    longitude: 106.6956,
-    contactPhone: '+84 28 3826 1111',
-    category: {
-      id: 'cat-003',
-      name: 'BARBECUE',
-      slug: 'barbecue',
-      description: 'Grilled to perfection',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80',
-    description: 'Slow-cooked BBQ with authentic American flavors and secret sauces',
-    rating: 4.7,
-  },
-  {
-    id: 'rest-008',
-    name: 'Korean BBQ Palace',
-    address: '222 Fire Lane, Entertainment Area',
-    latitude: 10.7845,
-    longitude: 106.6967,
-    contactPhone: '+84 28 3826 2222',
-    category: {
-      id: 'cat-003',
-      name: 'BARBECUE',
-      slug: 'barbecue',
-      description: 'Grilled to perfection',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
-    description: 'Interactive Korean BBQ dining with premium cuts and banchan',
-    rating: 4.6,
-  },
-  {
-    id: 'rest-009',
-    name: 'The Charcoal Grill',
-    address: '333 Flame Avenue, Culinary District',
-    latitude: 10.7867,
-    longitude: 106.6978,
-    contactPhone: '+84 28 3826 3333',
-    category: {
-      id: 'cat-003',
-      name: 'BARBECUE',
-      slug: 'barbecue',
-      description: 'Grilled to perfection',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80',
-    description: 'Wood-fired BBQ specializing in ribs, brisket, and grilled vegetables',
-    rating: 4.8,
-  },
-
-  {
-    id: 'rest-023',
-    name: 'Texas Smokehouse',
-    address: '444 Pitmaster Road, Food District',
-    latitude: 10.7829,
-    longitude: 106.6961,
-    contactPhone: '+84 28 3826 4440',
-    category: {
-      id: 'cat-003',
-      name: 'BARBECUE',
-      slug: 'barbecue',
-      description: 'Grilled to perfection',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1559561854-7dfc4d60d8de?w=800&q=80',
-    description: 'Authentic Texas-style BBQ with slow-smoked meats and house sides',
-    rating: 4.5,
-  },
-  {
-    id: 'rest-024',
-    name: 'Yakitori Alley',
-    address: '555 Skewer Street, Entertainment Area',
-    latitude: 10.7852,
-    longitude: 106.6972,
-    contactPhone: '+84 28 3826 5550',
-    category: {
-      id: 'cat-003',
-      name: 'BARBECUE',
-      slug: 'barbecue',
-      description: 'Grilled to perfection',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1529692236671-71df3162de89?w=800&q=80',
-    description: 'Japanese yakitori grilled over binchotan with specialty sauces',
-    rating: 4.7,
-  },
-  // Desserts
-  {
-    id: 'rest-010',
-    name: 'Sweet Dreams Patisserie',
-    address: '444 Sugar Lane, Shopping District',
-    latitude: 10.7745,
-    longitude: 106.7034,
-    contactPhone: '+84 28 3827 4444',
-    category: {
-      id: 'cat-004',
-      name: 'DESSERTS',
-      slug: 'desserts',
-      description: 'Sweet indulgences',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=800&q=80',
-    description: 'French-inspired pastries and desserts crafted with artisanal techniques',
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1770&auto=format&fit=crop', // Luxury hotel interior
+    description: 'Khách sạn di sản 5 sao sang trọng nhìn ra Hồ Xuân Hương, kết hợp giữa phong cách thuộc địa Pháp và tiện nghi hiện đại.',
     rating: 4.9,
   },
   {
-    id: 'rest-011',
-    name: 'Gelato Italiano',
-    address: '555 Cream Street, Tourist Area',
-    latitude: 10.7778,
-    longitude: 106.7045,
-    contactPhone: '+84 28 3827 5555',
-    category: {
-      id: 'cat-004',
-      name: 'DESSERTS',
-      slug: 'desserts',
-      description: 'Sweet indulgences',
+    id: 'hotel-dl-003',
+    name: 'Swiss-Belresort Tuyen Lam',
+    address: {
+      street: 'Khu du lịch Hồ Tuyền Lâm',
+      ward: 'Phường 3',
+      district: 'Thành phố Đà Lạt',
+      province: 'Lâm Đồng'
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&q=80',
-    description: 'Authentic Italian gelato made fresh daily with natural ingredients',
+    latitude: 11.8892,
+    longitude: 108.4116,
+    contactPhone: '+84 263 3799 799',
+    category: {
+      id: 'cat-dalat',
+      name: 'Đà Lạt',
+      slug: 'da-lat',
+      description: 'Thành phố ngàn hoa',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1571896349842-6e5a68735df6?q=80&w=1760&auto=format&fit=crop', // Resort with pool
+    description: 'Khu nghỉ dưỡng được bao quanh bởi rừng thông và hồ nước, mang kiến trúc Anglo-Normand độc đáo như một lâu đài giữa rừng.',
     rating: 4.7,
-  },
-  {
-    id: 'rest-012',
-    name: 'The Chocolate Factory',
-    address: '666 Cocoa Boulevard, Family District',
-    latitude: 10.7801,
-    longitude: 106.7056,
-    contactPhone: '+84 28 3827 6666',
-    category: {
-      id: 'cat-004',
-      name: 'DESSERTS',
-      slug: 'desserts',
-      description: 'Sweet indulgences',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=800&q=80',
-    description: 'Handcrafted chocolates and decadent desserts for chocolate lovers',
-    rating: 4.8,
   },
 
+  // Vũng Tàu
   {
-    id: 'rest-025',
-    name: 'Cheesecake Corner',
-    address: '777 Velvet Lane, Shopping District',
-    latitude: 10.7752,
-    longitude: 106.7042,
-    contactPhone: '+84 28 3827 7770',
-    category: {
-      id: 'cat-004',
-      name: 'DESSERTS',
-      slug: 'desserts',
-      description: 'Sweet indulgences',
+    id: 'hotel-vt-001',
+    name: 'The Imperial Hotel Vung Tau',
+    address: {
+      street: '159 Thùy Vân',
+      ward: 'Phường Thắng Tam',
+      district: 'Thành phố Vũng Tàu',
+      province: 'Bà Rịa - Vũng Tàu'
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1542826438-8f3298c2d73e?w=800&q=80',
-    description: 'Classic cheesecakes and seasonal flavors made in-house',
-    rating: 4.6,
-  },
-  {
-    id: 'rest-026',
-    name: 'Macaron Boutique',
-    address: '888 Parisian Plaza, Tourist Area',
-    latitude: 10.7786,
-    longitude: 106.7052,
-    contactPhone: '+84 28 3827 8880',
+    latitude: 10.3458,
+    longitude: 107.0844,
+    contactPhone: '+84 254 362 8888',
     category: {
-      id: 'cat-004',
-      name: 'DESSERTS',
-      slug: 'desserts',
-      description: 'Sweet indulgences',
+      id: 'cat-vungtau',
+      name: 'Vũng Tàu',
+      slug: 'vung-tau',
+      description: 'Thành phố biển năng động',
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&q=80',
-    description: 'Colorful French macarons and delicate pâtisserie',
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1770&auto=format&fit=crop', // Beach resort
+    description: 'Khách sạn 5 sao duy nhất ở Bãi Sau lấy cảm hứng kiến trúc phục hưng Victoria, sở hữu bãi biển riêng và câu lạc bộ biển.',
     rating: 4.8,
   },
-  // Pasta
   {
-    id: 'rest-013',
-    name: 'La Pasta Bella',
-    address: '777 Italian Way, Historic Quarter',
-    latitude: 10.7689,
-    longitude: 106.7001,
-    contactPhone: '+84 28 3828 7777',
-    category: {
-      id: 'cat-005',
-      name: 'PASTA',
-      slug: 'pasta',
-      description: 'Fresh Italian pasta',
+    id: 'hotel-vt-002',
+    name: 'Pullman Vung Tau',
+    address: {
+      street: '15 Thi Sách',
+      ward: 'Phường Thắng Tam',
+      district: 'Thành phố Vũng Tàu',
+      province: 'Bà Rịa - Vũng Tàu'
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80',
-    description: 'Homemade pasta prepared daily with traditional Italian recipes',
-    rating: 4.6,
-  },
-  {
-    id: 'rest-014',
-    name: 'Trattoria Romano',
-    address: '888 Rome Street, Little Italy',
-    latitude: 10.7712,
-    longitude: 106.7012,
-    contactPhone: '+84 28 3828 8888',
+    latitude: 10.3499,
+    longitude: 107.0862,
+    contactPhone: '+84 254 355 1777',
     category: {
-      id: 'cat-005',
-      name: 'PASTA',
-      slug: 'pasta',
-      description: 'Fresh Italian pasta',
+      id: 'cat-vungtau',
+      name: 'Vũng Tàu',
+      slug: 'vung-tau',
+      description: 'Thành phố biển năng động',
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1556761223-4c4282c73f77?w=800&q=80',
-    description: 'Classic Roman pasta dishes in a cozy, family-friendly atmosphere',
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1506059612708-99d6c258160e?q=80&w=1769&auto=format&fit=crop', // Modern hotel with pool
+    description: 'Địa điểm lý tưởng cho nghỉ dưỡng và công tác, với thiết kế hiện đại, tiện nghi sang trọng và gần các điểm vui chơi giải trí.',
     rating: 4.7,
   },
   {
-    id: 'rest-015',
-    name: 'Nonna\'s Kitchen',
-    address: '999 Tuscany Road, Wine District',
-    latitude: 10.7734,
-    longitude: 106.7023,
-    contactPhone: '+84 28 3828 9999',
-    category: {
-      id: 'cat-005',
-      name: 'PASTA',
-      slug: 'pasta',
-      description: 'Fresh Italian pasta',
+    id: 'hotel-vt-003',
+    name: 'Malibu Hotel',
+    address: {
+      street: '263 Lê Hồng Phong',
+      ward: 'Phường Thắng Tam',
+      district: 'Thành phố Vũng Tàu',
+      province: 'Bà Rịa - Vũng Tàu'
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&q=80',
-    description: 'Grandmother\'s recipes passed down through generations',
+    latitude: 10.3521,
+    longitude: 107.0815,
+    contactPhone: '+84 254 357 7779',
+    category: {
+      id: 'cat-vungtau',
+      name: 'Vũng Tàu',
+      slug: 'vung-tau',
+      description: 'Thành phố biển năng động',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1512918760513-95965df0562a?q=80&w=1766&auto=format&fit=crop', // Infinity Pool view
+    description: 'Nổi bật với hồ bơi vô cực trên tầng cao, Malibu Hotel mang đến không gian nghỉ dưỡng sành điệu và tầm nhìn toàn cảnh thành phố.',
+    rating: 4.6,
+  },
+
+  // Huế
+  {
+    id: 'hotel-hue-001',
+    name: 'Azerai La Residence Hue',
+    address: {
+      street: '05 Lê Lợi',
+      ward: 'Vĩnh Ninh',
+      district: 'Thành phố Huế',
+      province: 'Thừa Thiên Huế'
+    },
+    latitude: 16.4619,
+    longitude: 107.5938,
+    contactPhone: '+84 234 3837 475',
+    category: {
+      id: 'cat-hue',
+      name: 'Huế',
+      slug: 'hue',
+      description: 'Cố đô mộng mơ',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1774&auto=format&fit=crop', // Colonial architecture
+    description: 'Một biệt thự dòng Art Deco bên dòng sông Hương thơ mộng, mang đến vẻ đẹp hoài cổ và sự thanh bình tuyệt đối.',
     rating: 4.9,
   },
-
   {
-    id: 'rest-027',
-    name: 'Al Dente Studio',
-    address: '111 Handmade Way, Little Italy',
-    latitude: 10.7698,
-    longitude: 106.7005,
-    contactPhone: '+84 28 3828 1110',
-    category: {
-      id: 'cat-005',
-      name: 'PASTA',
-      slug: 'pasta',
-      description: 'Fresh Italian pasta',
+    id: 'hotel-hue-002',
+    name: 'Silk Path Grand Hue Hotel',
+    address: {
+      street: '02 Lê Lợi',
+      ward: 'Vĩnh Ninh',
+      district: 'Thành phố Huế',
+      province: 'Thừa Thiên Huế'
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=800&q=80',
-    description: 'House-made pasta with regional Italian sauces',
-    rating: 4.5,
-  },
-  {
-    id: 'rest-028',
-    name: 'Pesto & Parm',
-    address: '222 Ligurian Street, Historic Quarter',
-    latitude: 10.7725,
-    longitude: 106.7015,
-    contactPhone: '+84 28 3828 2220',
+    latitude: 16.4625,
+    longitude: 107.5950,
+    contactPhone: '+84 234 3822 555',
     category: {
-      id: 'cat-005',
-      name: 'PASTA',
-      slug: 'pasta',
-      description: 'Fresh Italian pasta',
+      id: 'cat-hue',
+      name: 'Huế',
+      slug: 'hue',
+      description: 'Cố đô mộng mơ',
     },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1521389508051-d7ffb5dc8c08?w=800&q=80',
-    description: 'Traditional pesto, Parmigiano, and seasonal pasta specials',
-    rating: 4.7,
-  },
-  // Breakfast
-  {
-    id: 'rest-016',
-    name: 'Morning Glory Cafe',
-    address: '101 Sunrise Avenue, Park District',
-    latitude: 10.7823,
-    longitude: 106.7089,
-    contactPhone: '+84 28 3829 1010',
-    category: {
-      id: 'cat-006',
-      name: 'BREAKFAST',
-      slug: 'breakfast',
-      description: 'Start your day right',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&q=80',
-    description: 'All-day breakfast with fresh ingredients and comfort food classics',
-    rating: 4.5,
-  },
-
-  {
-    id: 'rest-029',
-    name: 'Sunrise Bistro',
-    address: '404 Morning Star Road, Park District',
-    latitude: 10.7834,
-    longitude: 106.7092,
-    contactPhone: '+84 28 3829 4040',
-    category: {
-      id: 'cat-006',
-      name: 'BREAKFAST',
-      slug: 'breakfast',
-      description: 'Start your day right',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&q=80',
-    description: 'Healthy bowls, eggs, and specialty coffee to start the day',
-    rating: 4.6,
-  },
-  {
-    id: 'rest-030',
-    name: 'Bagel Barn',
-    address: '505 Dough Street, Downtown',
-    latitude: 10.7875,
-    longitude: 106.7102,
-    contactPhone: '+84 28 3829 5050',
-    category: {
-      id: 'cat-006',
-      name: 'BREAKFAST',
-      slug: 'breakfast',
-      description: 'Start your day right',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1546525848-3ce03ca516f6?w=800&q=80',
-    description: 'Freshly baked bagels with spreads and breakfast sandwiches',
-    rating: 4.5,
-  },
-  {
-    id: 'rest-017',
-    name: 'The Breakfast Club',
-    address: '202 Early Bird Lane, Residential Area',
-    latitude: 10.7856,
-    longitude: 106.7098,
-    contactPhone: '+84 28 3829 2020',
-    category: {
-      id: 'cat-006',
-      name: 'BREAKFAST',
-      slug: 'breakfast',
-      description: 'Start your day right',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&q=80',
-    description: 'Trendy brunch spot with creative morning dishes and specialty coffee',
-    rating: 4.7,
-  },
-  {
-    id: 'rest-018',
-    name: 'Pancake Paradise',
-    address: '303 Waffle Street, Downtown',
-    latitude: 10.7889,
-    longitude: 106.7107,
-    contactPhone: '+84 28 3829 3030',
-    category: {
-      id: 'cat-006',
-      name: 'BREAKFAST',
-      slug: 'breakfast',
-      description: 'Start your day right',
-    },
-    status: RestaurantStatus.ACTIVE,
-    imageUrl: 'https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=800&q=80',
-    description: 'Fluffy pancakes, waffles, and breakfast delights in a cozy setting',
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?q=80&w=1770&auto=format&fit=crop', // Royal style hotel
+    description: 'Kết hợp hài hòa giữa kiến trúc cung đình Huế và tiện nghi hiện đại, tạo nên không gian nghỉ dưỡng vương giả.',
     rating: 4.8,
+  },
+  {
+    id: 'hotel-hue-003',
+    name: 'Melia Vinpearl Hue',
+    address: {
+      street: '50A Hùng Vương',
+      ward: 'Phú Nhuận',
+      district: 'Thành phố Huế',
+      province: 'Thừa Thiên Huế'
+    },
+    latitude: 16.4589,
+    longitude: 107.5932,
+    contactPhone: '+84 234 368 8888',
+    category: {
+      id: 'cat-hue',
+      name: 'Huế',
+      slug: 'hue',
+      description: 'Cố đô mộng mơ',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1594951478799-19c277cb7e42?q=80&w=1770&auto=format&fit=crop', // Modern skyscraper hotel
+    description: 'Tòa tháp khách sạn cao nhất thành phố Huế, mang đến tầm nhìn toàn cảnh sông Hương và núi Ngự tuyệt đẹp.',
+    rating: 4.8,
+  },
+
+  // Nha Trang
+  {
+    id: 'hotel-nt-001',
+    name: 'InterContinental Nha Trang',
+    address: {
+      street: '32 - 34 Trần Phú',
+      ward: 'Lộc Thọ',
+      district: 'Thành phố Nha Trang',
+      province: 'Khánh Hòa'
+    },
+    latitude: 12.2388,
+    longitude: 109.1967,
+    contactPhone: '+84 258 3887 777',
+    category: {
+      id: 'cat-nhatrang',
+      name: 'Nha Trang',
+      slug: 'nha-trang',
+      description: 'Vịnh biển đẹp nhất thế giới',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1455587734955-081b22074882?q=80&w=1920&auto=format&fit=crop', // Beachfront hotel
+    description: 'Khách sạn sang trọng nằm ngay trên đường Trần Phú, hướng tầm nhìn bao quát toàn bộ vịnh Nha Trang xinh đẹp.',
+    rating: 4.9,
+  },
+  {
+    id: 'hotel-nt-002',
+    name: 'Amiana Resort Nha Trang',
+    address: {
+      street: 'Phạm Văn Đồng',
+      ward: 'Vĩnh Hòa',
+      district: 'Thành phố Nha Trang',
+      province: 'Khánh Hòa'
+    },
+    latitude: 12.2965,
+    longitude: 109.2065,
+    contactPhone: '+84 258 355 3333',
+    category: {
+      id: 'cat-nhatrang',
+      name: 'Nha Trang',
+      slug: 'nha-trang',
+      description: 'Vịnh biển đẹp nhất thế giới',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1620619767323-b95a89183081?q=80&w=1770&auto=format&fit=crop', // Secluded resort
+    description: 'Khu nghỉ dưỡng 5 sao yên tĩnh với bãi biển riêng và hồ bơi nước mặn tự nhiên lớn nhất Việt Nam.',
+    rating: 4.8,
+  },
+  {
+    id: 'hotel-nt-003',
+    name: 'Sheraton Nha Trang',
+    address: {
+      street: '26-28 Trần Phú',
+      ward: 'Lộc Thọ',
+      district: 'Thành phố Nha Trang',
+      province: 'Khánh Hòa'
+    },
+    latitude: 12.2415,
+    longitude: 109.1972,
+    contactPhone: '+84 258 388 0000',
+    category: {
+      id: 'cat-nhatrang',
+      name: 'Nha Trang',
+      slug: 'nha-trang',
+      description: 'Vịnh biển đẹp nhất thế giới',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1563811771046-ba984ff30900?q=80&w=1770&auto=format&fit=crop', // Infinity pool
+    description: 'Khách sạn 5 sao quốc tế đầu tiên tại Nha Trang, nổi tiếng với hồ bơi vô cực và trường dạy nấu ăn.',
+    rating: 4.7,
+  },
+
+  // Quy Nhơn
+  {
+    id: 'hotel-qn-001',
+    name: 'Anantara Quy Nhon Villas',
+    address: {
+      street: 'Cầu Bãi Dại',
+      ward: 'Ghềnh Ráng',
+      district: 'Thành phố Quy Nhơn',
+      province: 'Bình Định'
+    },
+    latitude: 13.7225,
+    longitude: 109.2195,
+    contactPhone: '+84 256 3848 888',
+    category: {
+      id: 'cat-quynhon',
+      name: 'Quy Nhơn',
+      slug: 'quy-nhon',
+      description: 'Nắng gió miền Trung',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=1925&auto=format&fit=crop', // Tranquil villa
+    description: 'Các biệt thự hướng biển sang trọng nép mình trong vịnh nhỏ riêng tư, mang đến sự thư giãn tuyệt đối.',
+    rating: 4.9,
+  },
+  {
+    id: 'hotel-qn-002',
+    name: 'FLC Luxury Hotel Quy Nhon',
+    address: {
+      street: 'Khu 4, Nhơn Lý',
+      ward: 'Nhơn Lý',
+      district: 'Thành phố Quy Nhơn',
+      province: 'Bình Định'
+    },
+    latitude: 13.9685,
+    longitude: 109.2785,
+    contactPhone: '+84 256 626 6666',
+    category: {
+      id: 'cat-quynhon',
+      name: 'Quy Nhơn',
+      slug: 'quy-nhon',
+      description: 'Nắng gió miền Trung',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1549294413-26f195200c16?q=80&w=1964&auto=format&fit=crop',
+    description: 'Khách sạn ven biển độc đáo với kiến trúc hình rồng uốn lượn, nằm trong quần thể FLC Quy Nhơn Beach & Golf Resort.',
+    rating: 4.7,
+  },
+  {
+    id: 'hotel-qn-003',
+    name: 'Avani Quy Nhon Resort',
+    address: {
+      street: 'Ghenh Rang',
+      ward: 'Ghềnh Ráng',
+      district: 'Thành phố Quy Nhơn',
+      province: 'Bình Định'
+    },
+    latitude: 13.7312,
+    longitude: 109.2188,
+    contactPhone: '+84 256 3840 132',
+    category: {
+      id: 'cat-quynhon',
+      name: 'Quy Nhơn',
+      slug: 'quy-nhon',
+      description: 'Nắng gió miền Trung',
+    },
+    status: HotelStatus.ACTIVE,
+    imageUrl: 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?q=80&w=1932&auto=format&fit=crop', // Seaside resort
+    description: 'Khu nghỉ dưỡng từng đoạt giải thưởng với spa trên vách đá và bãi biển cát vàng riêng biệt.',
+    rating: 4.6,
   },
 ];
 
-// Helper function to get unique categories from restaurants
-export const getUniqueCategories = (): RestaurantCategory[] => {
-  const categoryMap = new Map<string, RestaurantCategory>();
-  
-  MOCK_RESTAURANTS.forEach(restaurant => {
-    if (!categoryMap.has(restaurant.category.id)) {
-      categoryMap.set(restaurant.category.id, restaurant.category);
+// Helper function to get unique categories from hotels
+export const getUniqueCategories = (): HotelCategory[] => {
+  const categoryMap = new Map<string, HotelCategory>();
+
+  MOCK_HOTELS.forEach(hotel => {
+    if (!categoryMap.has(hotel.category.id)) {
+      categoryMap.set(hotel.category.id, hotel.category);
     }
   });
-  
+
   return Array.from(categoryMap.values());
 };
 
-// Helper function to get restaurants by category
-export const getRestaurantsByCategory = (categoryId: string): Restaurant[] => {
-  return MOCK_RESTAURANTS.filter(restaurant => restaurant.category.id === categoryId);
+// Helper function to get hotels by category
+export const getHotelsByCategory = (categoryId: string): Hotel[] => {
+  return MOCK_HOTELS.filter(hotel => hotel.category.id === categoryId);
 };
 
 // Helper function to get category background images
 export const getCategoryBackgroundImage = (categorySlug: string): string => {
   const backgrounds: Record<string, string> = {
-    'fish-seafood': 'https://images.unsplash.com/photo-1535473895227-bdecb20fb157?w=1920&q=80',
-    'sushi-sashimi': 'https://images.unsplash.com/photo-1579027989536-b7b1f875659b?w=1920&q=80',
-    'barbecue': 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=1920&q=80',
-    'desserts': 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=1920&q=80',
-    'pasta': 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=1920&q=80',
-    'breakfast': 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=1920&q=80',
+    'da-lat': 'https://images.unsplash.com/photo-1508233620467-f79f1e317a05?q=80&w=1974&auto=format&fit=crop', // Da Lat landscape
+    'vung-tau': 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1770&auto=format&fit=crop', // Vung Tau beach
+    'hue': 'https://images.unsplash.com/photo-1585066928795-46654212a9d8?q=80&w=1920&auto=format&fit=crop', // Hue Imperial City Gate
+    'nha-trang': 'https://images.unsplash.com/photo-1534008897995-27a23e859048?q=80&w=1974&auto=format&fit=crop', // Nha Trang bay
+    'quy-nhon': 'https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=1925&auto=format&fit=crop', // Quy Nhon Ky Co Beach
   };
-  
-  return backgrounds[categorySlug] || backgrounds['fish-seafood'];
+
+  return backgrounds[categorySlug] || backgrounds['da-lat'];
 };
-
-
-

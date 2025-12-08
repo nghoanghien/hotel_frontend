@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from '@repo/ui/motion';
 import CategoryScroller from '@/features/home/components/CategoryScroller';
 import dynamic from 'next/dynamic';
-const RestaurantSlider = dynamic(() => import('@/features/home/components/RestaurantSlider'), { ssr: false });
+const HotelSlider = dynamic(() => import('@/features/home/components/RestaurantSlider'), { ssr: false });
 import BackgroundTransition from '@/features/home/components/BackgroundTransition';
 import { useHomePage } from '@/features/home/hooks/useHomePage';
 import { useState, useEffect } from 'react';
@@ -21,15 +21,15 @@ export default function HomePage() {
     categories,
     activeCategoryIndex,
     activeCategory,
-    restaurantsInCategory,
-    activeRestaurantIndex,
+    hotelsInCategory,
+    activeHotelIndex,
     backgroundImage,
     handleCategoryChange,
-    handleRestaurantChange,
+    handleHotelChange,
   } = useHomePage();
-  
+
   const [showAllCategories, setShowAllCategories] = useState(false);
-  
+
   const {
     searchResults,
     isSearching,
@@ -53,7 +53,7 @@ export default function HomePage() {
         {!isSearchMode && (
           <motion.div
             initial={{ y: 0 }}
-            exit={{ 
+            exit={{
               y: '-100vh',
               transition: { duration: 0.6, ease: [0.33, 1, 0.68, 1], delay: 0.1 }
             }}
@@ -117,7 +117,7 @@ export default function HomePage() {
               />
             </motion.section>
 
-            {/* Restaurant Slider Section */}
+            {/* Hotel Slider Section */}
             <motion.section
               initial={{ opacity: 0, y: 80 }}
               animate={{ opacity: 1, y: 0 }}
@@ -133,10 +133,10 @@ export default function HomePage() {
                   transition={{ duration: 0.08, ease: [0.33, 1, 0.68, 1] }}
                   className="w-full"
                 >
-                  <RestaurantSlider
-                    restaurants={restaurantsInCategory}
-                    activeIndex={activeRestaurantIndex}
-                    onRestaurantChange={handleRestaurantChange}
+                  <HotelSlider
+                    hotels={hotelsInCategory}
+                    activeIndex={activeHotelIndex}
+                    onHotelChange={handleHotelChange}
                   />
                 </motion.div>
               </AnimatePresence>
@@ -148,8 +148,8 @@ export default function HomePage() {
       {/* Search Results - always render when in search mode, pre-rendered behind */}
       <AnimatePresence>
         {isSearchMode && (
-          <SearchResults 
-            results={searchResults} 
+          <SearchResults
+            results={searchResults}
             searchQuery={searchQuery}
             isLoading={isSearching}
           />

@@ -1,29 +1,35 @@
-// Restaurant Status Enum
-export enum RestaurantStatus {
+// Hotel Status Enum
+export enum HotelStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   CLOSED = 'CLOSED',
   PENDING = 'PENDING',
 }
 
-// Restaurant Category Interface
-export interface RestaurantCategory {
+// Hotel Category Interface
+export interface HotelCategory {
   id: string;
   name: string;
   slug: string;
   description?: string;
+  imageUrl?: string;
 }
 
-// Restaurant Interface - Main model for restaurant data
-export interface Restaurant {
+// Hotel Interface - Main model for hotel data
+export interface Hotel {
   id: string;
   name: string;
-  address: string;
+  address: { // Tách địa chỉ chi tiết
+    street: string;
+    ward: string;
+    district: string;
+    province: string;
+  };
   latitude: number;
   longitude: number;
   contactPhone: string;
-  category: RestaurantCategory;
-  status: RestaurantStatus;
+  category: HotelCategory;
+  status: HotelStatus;
   imageUrl?: string;
   description?: string;
   rating?: number;

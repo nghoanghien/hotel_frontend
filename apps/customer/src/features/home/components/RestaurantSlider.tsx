@@ -1,38 +1,38 @@
 'use client';
 
 import { motion, AnimatePresence, PanInfo } from '@repo/ui/motion';
-import { Restaurant } from '@repo/models';
+import { Hotel } from '@repo/models';
 import { ChevronLeft, ChevronRight } from '@repo/ui/icons';
 import { ImageWithFallback } from '@repo/ui';
 
-interface RestaurantSliderProps {
-  restaurants: Restaurant[];
+interface HotelSliderProps {
+  hotels: Hotel[];
   activeIndex: number;
-  onRestaurantChange: (index: number) => void;
+  onHotelChange: (index: number) => void;
 }
 
-export default function RestaurantSlider({
-  restaurants,
+export default function HotelSlider({
+  hotels,
   activeIndex,
-  onRestaurantChange,
-}: RestaurantSliderProps) {
+  onHotelChange,
+}: HotelSliderProps) {
   const handlePrevious = () => {
-    const newIndex = activeIndex === 0 ? restaurants.length - 1 : activeIndex - 1;
-    onRestaurantChange(newIndex);
+    const newIndex = activeIndex === 0 ? hotels.length - 1 : activeIndex - 1;
+    onHotelChange(newIndex);
   };
 
   const handleNext = () => {
-    const newIndex = activeIndex === restaurants.length - 1 ? 0 : activeIndex + 1;
-    onRestaurantChange(newIndex);
+    const newIndex = activeIndex === hotels.length - 1 ? 0 : activeIndex + 1;
+    onHotelChange(newIndex);
   };
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     const dragDistance = info.offset.x;
     const velocity = info.velocity.x;
-    
+
     const momentumDistance = velocity * 0.08;
     const totalDistance = dragDistance + momentumDistance;
-    
+
     if (Math.abs(totalDistance) > 40) {
       if (totalDistance > 0) {
         handlePrevious();
@@ -43,27 +43,27 @@ export default function RestaurantSlider({
   };
 
   // Get 3 visible items with circular indexing
-  const getVisibleRestaurants = () => {
+  const getVisibleHotels = () => {
     const visible = [];
-    const total = restaurants.length;
-    
+    const total = hotels.length;
+
     for (let i = -1; i <= 1; i++) {
       let index = activeIndex + i;
-      
+
       if (index < 0) index = total + index;
       if (index >= total) index = index - total;
-      
+
       visible.push({
-        restaurant: restaurants[index],
+        hotel: hotels[index],
         position: i === -1 ? 'left' : i === 0 ? 'center' : 'right',
         actualIndex: index,
       });
     }
-    
+
     return visible;
   };
 
-  const visibleRestaurants = getVisibleRestaurants();
+  const visibleHotels = getVisibleHotels();
 
   return (
     <div className="relative w-full max-w-7xl mx-auto">
@@ -87,7 +87,7 @@ export default function RestaurantSlider({
           >
             <AnimatePresence mode="popLayout">
               <div className="flex items-start justify-center gap-4 w-full">
-                {visibleRestaurants.map(({ restaurant, position, actualIndex }) => {
+                {visibleHotels.map(({ hotel, position, actualIndex }) => {
                   const isCenter = position === 'center';
                   const centerWidth = 340;
                   const sideWidth = 290;
@@ -96,8 +96,8 @@ export default function RestaurantSlider({
 
                   return (
                     <motion.div
-                      key={`${restaurant.id}-${actualIndex}`}
-                      layoutId={`restaurant-card-${restaurant.id}`}
+                      key={`${hotel.id}-${actualIndex}`}
+                      layoutId={`hotel-card-${hotel.id}`}
                       layout
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{
@@ -108,7 +108,7 @@ export default function RestaurantSlider({
                       exit={{ scale: 0.9, opacity: 0 }}
                       transition={{ duration: 0.35, ease: [0.33, 1, 0.68, 1] }}
                       onClick={() =>
-                        !isCenter && onRestaurantChange(actualIndex)
+                        !isCenter && onHotelChange(actualIndex)
                       }
                       className={`${isCenter ? "" : "cursor-pointer"} flex-shrink-0 origin-top`}
                       style={{
@@ -122,8 +122,8 @@ export default function RestaurantSlider({
                           style={{ height: `${imageHeight}px` }}
                         >
                           <ImageWithFallback
-                            src={restaurant.imageUrl ?? 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800'}
-                            alt={restaurant.name}
+                            src={hotel.imageUrl ?? 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800'}
+                            alt={hotel.name}
                             fill
                             className="object-cover"
                           />
@@ -131,7 +131,7 @@ export default function RestaurantSlider({
                         <AnimatePresence mode="wait">
                           {isCenter && (
                             <motion.div
-                              key={`info-${restaurant.id}`}
+                              key={`info-${hotel.id}`}
                               initial={{ opacity: 0, y: 15 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -15 }}
@@ -148,10 +148,13 @@ export default function RestaurantSlider({
                                   letterSpacing: "-0.01em",
                                 }}
                               >
-                                {restaurant.name}
+                                {hotel.name}
                               </h3>
                               <p className="text-[12px] text-gray-300 leading-relaxed mb-4 line-clamp-3">
-                                {restaurant.description}
+                                {hotel.description}
+                              </p>
+                              <p className="text-[11px] text-[var(--primary)] mb-4 font-semibold uppercase tracking-wider">
+                                {hotel.address.district}, {hotel.address.province}
                               </p>
                               <motion.button
                                 whileHover={{

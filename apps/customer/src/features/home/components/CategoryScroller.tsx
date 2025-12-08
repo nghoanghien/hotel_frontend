@@ -1,11 +1,9 @@
-'use client';
-
 import { motion, useMotionValue, useTransform } from '@repo/ui/motion';
-import { RestaurantCategory } from '@repo/models';
+import { HotelCategory } from '@repo/models';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 interface CategoryScrollerProps {
-  categories: RestaurantCategory[];
+  categories: HotelCategory[];
   activeIndex: number;
   onCategoryChange: (index: number) => void;
 }
@@ -23,30 +21,30 @@ export default function CategoryScroller({
   const [rulerFixedY, setRulerFixedY] = useState<number | null>(null);
   const aligningRef = useRef(false);
   const rafIdRef = useRef<number | null>(null);
-  
-  
+
+
 
   const itemSpacing = 60;
-  
+
   // Create infinite loop by triplicating categories
   const infiniteCategories = [...categories, ...categories, ...categories];
   const centerOffset = categories.length; // Start from middle set
-  
+
   // Calculate scale based on distance from screen center
   const calculateScales = () => {
     const screenCenter = typeof window !== 'undefined' ? window.innerWidth / 2 : 0;
     const newScales: number[] = [];
-    
+
     itemRefs.current.forEach((element) => {
       if (!element) {
         newScales.push(1.0);
         return;
       }
-      
+
       const elementRect = element.getBoundingClientRect();
       const elementCenter = elementRect.left + elementRect.width / 2;
       const distanceFromCenter = Math.abs(elementCenter - screenCenter);
-      
+
       // Scale items within 200px of center
       if (distanceFromCenter < 200) {
         const scaleFactor = 1 - (distanceFromCenter / 200);
@@ -55,10 +53,10 @@ export default function CategoryScroller({
         newScales.push(1.0);
       }
     });
-    
+
     setScales(newScales);
   };
-  
+
   // Update scales during drag
   useEffect(() => {
     if (!isDragging) return;
@@ -67,7 +65,7 @@ export default function CategoryScroller({
     });
     return unsubscribe;
   }, [x, isDragging]);
-  
+
   // Auto snap to center when activeIndex changes
   const alignActiveToViewportCenter = useCallback(() => {
     const activeDisplayIndex = centerOffset + activeIndex;
@@ -119,32 +117,32 @@ export default function CategoryScroller({
 
   const handleDragEnd = () => {
     setIsDragging(false);
-    
+
     if (!containerRef.current) return;
-    
+
     const screenCenter = typeof window !== 'undefined' ? window.innerWidth / 2 : 0;
-    
+
     // Find which category is closest to screen center
     let closestIndex = activeIndex;
     let minDistance = Infinity;
-    
+
     itemRefs.current.forEach((element, displayIndex) => {
       if (!element) return;
-      
+
       const actualIndex = displayIndex % categories.length;
       // Only consider the middle set to avoid duplicates
       if (displayIndex < centerOffset || displayIndex >= centerOffset + categories.length) return;
-      
+
       const elementRect = element.getBoundingClientRect();
       const elementCenter = elementRect.left + elementRect.width / 2;
       const distance = Math.abs(elementCenter - screenCenter);
-      
+
       if (distance < minDistance) {
         minDistance = distance;
         closestIndex = actualIndex;
       }
     });
-    
+
     if (closestIndex !== activeIndex) {
       onCategoryChange(closestIndex);
     } else {
@@ -154,7 +152,7 @@ export default function CategoryScroller({
 
   const handleCategoryClick = (displayIndex: number) => {
     if (isDragging) return;
-    
+
     // Map display index to actual category index
     const actualIndex = displayIndex % categories.length;
     if (actualIndex !== activeIndex) {
@@ -166,7 +164,7 @@ export default function CategoryScroller({
   const rulerX = useTransform(x, (latest) => latest * 1.5);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="relative w-full overflow-hidden"
       style={{ height: '240px' }}
@@ -183,7 +181,7 @@ export default function CategoryScroller({
           <ChevronLeft className="w-7 h-7 text-white/90" />
         </motion.button>
       </div> */}
-      
+
       {/* <div className="absolute right-6 top-1/2 -translate-y-1/2 z-40">
         <motion.button
           whileHover={{ scale: 1.08, backgroundColor: 'rgba(255,255,255,0.15)' }}
@@ -216,7 +214,7 @@ export default function CategoryScroller({
         <motion.div
           drag="x"
           dragElastic={0.05}
-          dragTransition={{ 
+          dragTransition={{
             power: 0.12,
             timeConstant: 200,
           }}
@@ -229,10 +227,10 @@ export default function CategoryScroller({
             {infiniteCategories.map((category, displayIndex) => {
               // Calculate which is the "active" one in the infinite loop
               const actualIndex = displayIndex % categories.length;
-              const isActive = actualIndex === activeIndex && 
-                               displayIndex >= centerOffset && 
-                               displayIndex < centerOffset + categories.length;
-              
+              const isActive = actualIndex === activeIndex &&
+                displayIndex >= centerOffset &&
+                displayIndex < centerOffset + categories.length;
+
               // Get scale from calculated scales
               const scale = scales[displayIndex] || 1.0;
               const opacity = 0.7 + ((scale - 1.0) / 0.5) * 0.6; // Opacity from 0.4 to 1.0
@@ -252,7 +250,7 @@ export default function CategoryScroller({
                     duration: 0.1,
                     ease: [0.33, 1, 0.68, 1],
                   }}
-                  style={{ 
+                  style={{
                     cursor: isActive ? 'default' : 'pointer',
                     width: 'fit-content',
                     flexShrink: 0,
@@ -305,7 +303,7 @@ export default function CategoryScroller({
 
       <div className="absolute inset-0 flex items-end justify-center pointer-events-none z-10 transform translate-y-8">
         <div className="absolute inset-x-0 bottom-0 h-12 rounded-t-md z-0" />
-        <motion.div 
+        <motion.div
           style={{ x: rulerX }}
           className="relative h-12 z-10"
         >
