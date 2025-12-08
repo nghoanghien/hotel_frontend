@@ -11,15 +11,15 @@ interface BenefitsSectionProps {
 export default function BenefitsSection({ visible, onGetStarted }: BenefitsSectionProps) {
   const benefits = [
     {
-      title: "Giao Hàng Siêu Nhanh",
-      description: "Đặt món và nhận trong vòng 25-30 phút",
+      title: "Đặt Phòng Cực Nhanh",
+      description: "Xác nhận đặt phòng và nhận mã trong 30 giây",
       gradient: "from-emerald-400 to-teal-500",
-      stat: "25-30",
-      unit: "phút",
+      stat: "30",
+      unit: "giây",
     },
     {
-      title: "Ưu Đãi Hấp Dẫn",
-      description: "Giảm giá lên đến 50% cho đơn hàng đầu tiên",
+      title: "Ưu Đãi Mỗi Ngày",
+      description: "Giảm giá đến 50% cho thành viên mới",
       gradient: "from-orange-400 to-red-500",
       stat: "50%",
       unit: "giảm giá",
@@ -31,14 +31,13 @@ export default function BenefitsSection({ visible, onGetStarted }: BenefitsSecti
       <div className="container mx-auto px-6 md:px-12 lg:px-20">
         {/* Title Section */}
         <div
-          className={`flex flex-col md:flex-row justify-between py-4 mb-8 transition-all duration-1000 ${
-            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-          }`}
+          className={`flex flex-col md:flex-row justify-between py-4 mb-8 transition-all duration-1000 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+            }`}
         >
           <div className="max-w-2xl">
             <div className="flex items-center gap-2">
               <div className="text-5xl font-bold text-[var(--primary)]">
-                <span className="text-white font-semibold">Ưu Điểm </span>Eatzy
+                <span className="text-white font-semibold">Ưu Điểm </span>Hotelzy
               </div>
               <div className="relative w-7 h-7 transform rotate-45 rounded-md flex items-center justify-center hover:rotate-90 transition-all duration-300">
                 <div className="absolute inset-0 rounded-md bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)]"></div>
@@ -73,9 +72,8 @@ export default function BenefitsSection({ visible, onGetStarted }: BenefitsSecti
           {benefits.map((benefit, index) => (
             <div
               key={index}
-              className={`relative group cursor-pointer transition-all duration-1000 ${
-                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-40"
-              }`}
+              className={`relative group cursor-pointer transition-all duration-1000 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-40"
+                }`}
               style={{ transitionDelay: `${index * 200}ms` }}
             >
               <div className="relative rounded-3xl overflow-hidden shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:scale-[1.02] h-full min-h-[400px]">
@@ -123,9 +121,8 @@ export default function BenefitsSection({ visible, onGetStarted }: BenefitsSecti
 
         {/* CTA */}
         <div
-          className={`mt-12 text-center transition-all duration-1000 delay-400 ${
-            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-          }`}
+          className={`mt-12 text-center transition-all duration-1000 delay-400 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+            }`}
         >
           <Button
             variant="primary"

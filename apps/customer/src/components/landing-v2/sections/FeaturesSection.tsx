@@ -15,9 +15,8 @@ export default function FeaturesSection({ visible, onExplore }: FeaturesSectionP
       <div className="container mx-auto px-4 sm:px-6">
         {/* Title */}
         <div
-          className={`mb-12 transition-all duration-1000 ${
-            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-          }`}
+          className={`mb-12 transition-all duration-1000 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+            }`}
         >
           <h2 className="text-4xl md:text-6xl font-bold text-center md:text-left mb-4 text-white group cursor-default">
             <span className="text-white inline-block relative">
@@ -25,12 +24,12 @@ export default function FeaturesSection({ visible, onExplore }: FeaturesSectionP
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[var(--primary)] group-hover:w-full transition-all duration-700"></span>
             </span>{" "}
             <span className="text-[var(--primary)] inline-block relative">
-              Eatzy?
+              Hotelzy?
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-700 delay-300"></span>
             </span>
           </h2>
           <p className="text-white/80 text-xl mt-4">
-            Nền tảng giao đồ ăn hàng đầu với trải nghiệm tuyệt vời cho người dùng
+            Nền tảng đặt phòng hàng đầu với trải nghiệm tuyệt vời, giá tốt nhất và dịch vụ tận tâm
           </p>
         </div>
 
@@ -39,9 +38,8 @@ export default function FeaturesSection({ visible, onExplore }: FeaturesSectionP
 
         {/* CTA Button */}
         <div
-          className={`mt-12 flex justify-center transition-all duration-1000 delay-500 ${
-            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-          }`}
+          className={`mt-12 flex justify-center transition-all duration-1000 delay-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+            }`}
         >
           <Button
             variant="primary"

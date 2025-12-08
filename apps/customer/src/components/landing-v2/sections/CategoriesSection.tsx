@@ -19,40 +19,40 @@ export default function CategoriesSection({ visible }: CategoriesSectionProps) {
 
   const categories = [
     {
-      name: "Cơm & Bún",
-      emoji: "🍚",
+      name: "Khách Sạn Sang Trọng",
+      emoji: "🏨",
       gradient: "from-emerald-400 to-teal-500",
-      description: "Các món cơm và bún truyền thống",
+      description: "Trải nghiệm đẳng cấp 5 sao quốc tế",
     },
     {
-      name: "Đồ Ăn Nhanh",
-      emoji: "🍔",
+      name: "Resort Nghỉ Dưỡng",
+      emoji: "🏖️",
       gradient: "from-yellow-400 to-orange-500",
-      description: "Burger, pizza, gà rán...",
+      description: "Thư giãn bên bãi biển tuyệt đẹp",
     },
     {
-      name: "Món Á",
-      emoji: "🍜",
+      name: "Biệt Thự & Villa",
+      emoji: "🏡",
       gradient: "from-red-400 to-pink-500",
-      description: "Phở, mì, sushi, dimsum...",
+      description: "Không gian riêng tư cho gia đình",
     },
     {
-      name: "Đồ Uống",
-      emoji: "🥤",
+      name: "Căn Hộ Dịch Vụ",
+      emoji: "🏢",
       gradient: "from-blue-400 to-cyan-500",
-      description: "Trà sữa, cà phê, nước ép...",
+      description: "Tiện nghi như chính ngôi nhà bạn",
     },
     {
-      name: "Tráng Miệng",
-      emoji: "🍰",
+      name: "Homestay",
+      emoji: "🛖",
       gradient: "from-purple-400 to-pink-500",
-      description: "Bánh ngọt, kem, chè...",
+      description: "Gần gũi với thiên nhiên & văn hóa",
     },
     {
-      name: "Lẩu & Nướng",
-      emoji: "🍲",
+      name: "Khách Sạn Giá Tốt",
+      emoji: "🏷️",
       gradient: "from-orange-400 to-red-500",
-      description: "Lẩu, nướng BBQ, hotpot...",
+      description: "Tiết kiệm chi phí, đầy đủ tiện nghi",
     },
   ];
 
@@ -61,16 +61,15 @@ export default function CategoriesSection({ visible }: CategoriesSectionProps) {
       <div className="container mx-auto px-6 md:px-12 lg:px-24">
         {/* Title */}
         <div
-          className={`text-center mb-16 transition-all duration-1000 ${
-            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-          }`}
+          className={`text-center mb-16 transition-all duration-1000 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+            }`}
         >
           <h2 className="text-3xl md:text-5xl font-light text-white mb-4">
-            Khám Phá - <span className="text-[var(--primary)] font-semibold">Danh Mục Phong Phú</span>
+            Khám Phá - <span className="text-[var(--primary)] font-semibold">Điểm Đến Tuyệt Vời</span>
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] mx-auto my-4 rounded-full"></div>
           <p className="text-white/80 text-xl font-light max-w-3xl mx-auto mb-8">
-            Hàng nghìn món ăn đa dạng từ các nhà hàng uy tín, phục vụ mọi khẩu vị của bạn
+            Đa dạng các loại hình lưu trú tại những điểm đến hấp dẫn nhất, đáp ứng mọi nhu cầu của bạn
           </p>
         </div>
 
@@ -79,9 +78,8 @@ export default function CategoriesSection({ visible }: CategoriesSectionProps) {
           {categories.map((category, index) => (
             <div
               key={index}
-              className={`relative bg-white/40 backdrop-blur-md rounded-3xl overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl hover:bg-white/60 hover:scale-[1.02] cursor-pointer ${
-                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
-              }`}
+              className={`relative bg-white/40 backdrop-blur-md rounded-3xl overflow-hidden shadow-lg transition-all duration-500 hover:shadow-2xl hover:bg-white/60 hover:scale-[1.02] cursor-pointer ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+                }`}
               style={{
                 transitionDelay: `${index * 100}ms`,
                 transform: `translateY(-${parallax * (0.02 + index * 0.006)}px)`,
