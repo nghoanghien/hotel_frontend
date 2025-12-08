@@ -1,6 +1,6 @@
 "use client";
 
-import { Utensils } from "../icons";
+import { BedDouble } from "../icons";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface LoadingOverlayProps {
@@ -36,7 +36,7 @@ export default function LoadingOverlay({ isLoading, message = "Đang tải..." }
               <div className="relative">
                 <div className="w-20 h-20 border-4 border-white/20 rounded-full" />
                 <div className="absolute inset-0 w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                <Utensils className="absolute inset-0 m-auto text-white" size={26} />
+                <BedDouble className="absolute inset-0 m-auto text-white" size={26} />
               </div>
               <div className="text-white/80 font-medium animate-pulse">{message}</div>
             </div>

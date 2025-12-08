@@ -31,7 +31,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
-      <BackgroundTransition imageUrl={getCategoryBackgroundImage("sushi-sashimi")} categoryName="" />
+      <BackgroundTransition imageUrl="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1920&auto=format&fit=crop" categoryName="" />
       {/* LoginPageContent - like RoleCard, always renders when active */}
       {isLoginPage && <LoginPageContent />}
 
