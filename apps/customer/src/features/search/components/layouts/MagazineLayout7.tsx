@@ -1,88 +1,57 @@
 import { motion } from '@repo/ui/motion';
-import type { Restaurant, Dish, MenuCategory } from '@repo/types';
-import { ImageWithFallback } from '@repo/ui';
+import type { Hotel } from '@repo/types';
+import { Star, MapPin, Users } from '@repo/ui/icons';
 import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
-import { useRouter } from 'next/navigation';
+import { ImageWithFallback } from '@repo/ui';
 import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function MagazineLayout7({ restaurant, dishes }: { restaurant: Restaurant; dishes: Dish[]; menuCategories: MenuCategory[]; }) {
-  const cols = dishes.slice(0, 3);
+interface Props {
+  hotel: Hotel;
+}
+
+export default function MagazineLayout7({ hotel }: Props) {
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
   const { show } = useLoading();
   const router = useRouter();
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
-  
-  return (
-    <motion.section 
-      className="bg-[#F5F5F5] overflow-hidden shadow-sm mb-16 p-12"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      {/* Header */}
-      <div className="text-[11px] text-[#888] flex justify-between mb-3 uppercase tracking-wider">
-        <span>menuboard</span>
-        <span>Specialties</span>
-      </div>
-      
-      {/* Main Title */}
-      <h2 className="text-[40px] font-bold text-[#2C2C2C] text-center mb-2 tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>
-        {restaurant.name}
-      </h2>
-      <p className="text-[13px] text-[#666] text-center mb-10">
-        {restaurant.description}
-      </p>
 
-      <div
-        ref={setRefs}
-        onMouseLeave={clearHover}
-        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết quán'); router.push(`/restaurants/${restaurant.slug}`); }, 300); }}
-        className="relative grid grid-cols-1 md:grid-cols-3 gap-0 cursor-pointer"
-      >
-        <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
-        <TapRippleOverlay ripple={ripple} />
-        {cols.map((dish, index) => (
-          <motion.div
-            key={dish.id}
-            onMouseEnter={(e) => moveHighlight(e, { borderRadius: 12, backgroundColor: '#EAE0CC', opacity: 1, scaleEnabled: true, scale: 1.12 })}
-            className="flex flex-col items-center relative z-10 cursor-pointer"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-          >
-            {/* Image Container - Vertical Rectangle */}
-            <div className="w-full px-4 mb-4">
-              <div className="relative overflow-hidden rounded-lg shadow-md" style={{ height: '380px' }}>
-                <ImageWithFallback
-                  src={dish.imageUrl}
-                  alt={dish.name}
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-500"
-                />
+  return (
+    <motion.article initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="mb-16 px-4">
+      <div className="max-w-[1100px] mx-auto">
+        <div ref={setRefs} onMouseLeave={clearHover} onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết khách sạn'); router.push(`/hotels/${hotel.slug}`); }, 300); }} className="relative bg-white border-2 border-gray-200 rounded-3xl overflow-hidden cursor-pointer">
+          <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
+          <TapRippleOverlay ripple={ripple} />
+          <div className="relative aspect-[21/9] overflow-hidden" onMouseEnter={(e) => moveHighlight(e, { borderRadius: 0, backgroundColor: '#fef3c7', opacity: 0.3, scaleEnabled: false })}>
+            <ImageWithFallback src={hotel.imageUrls[0]} alt={hotel.name} fill className="object-cover" />
+          </div>
+          <div className="p-8">
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h2 className="text-4xl font-bold mb-3" style={{ fontFamily: 'serif' }}>{hotel.name}</h2>
+                <div className="flex items-center gap-3 mb-4">
+                  {[...Array(5)].map((_, i) => (<Star key={i} className={`w-5 h-5 ${i < hotel.rating ? 'fill-amber-500 text-amber-500' : 'text-gray-300'}`} />))}
+                  <span className="text-gray-600">({hotel.reviewCount} đánh giá)</span>
+                </div>
+                <div className="flex items-start gap-2 text-gray-600 mb-6">
+                  <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">{hotel.address.fullAddress}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {hotel.amenities.slice(0, 8).map(a => (<div key={a.id} className="flex items-center gap-2 text-sm text-gray-700"><div className="w-2 h-2 rounded-full bg-amber-500" /><span>{a.name}</span></div>))}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Loại phòng</div>
+                <div className="space-y-4">
+                  {hotel.roomTypes.map(room => (<div key={room.id} className="flex items-center justify-between pb-3 border-b border-gray-200 last:border-0"><div><div className="font-semibold text-gray-900">{room.name}</div><div className="text-xs text-gray-500">{room.area}m² · {room.maxGuests} khách</div></div><div className="text-right"><div className="font-bold text-amber-600">{(room.price / 1000).toFixed(0)}K</div><div className="text-xs text-gray-500">/đêm</div></div></div>))}
+                </div>
               </div>
             </div>
-
-            {/* Text Content on Beige Background */}
-            <div 
-              className="w-full px-6 py-8 text-center"
-              style={{ backgroundColor: '#EAE0CC' }}
-            >
-              <h3 className="text-[18px] font-bold text-[#2C2C2C] mb-3 leading-tight">
-                {dish.name}
-              </h3>
-              <p className="text-[13px] text-[#5A4A3A] leading-relaxed">
-                {dish.description}
-              </p>
-            </div>
-          </motion.div>
-        ))}
+          </div>
+        </div>
       </div>
-
-      {/* Footer */}
-      <div className="text-[10px] text-[#999] text-right mt-8 uppercase tracking-wider">
-        Gourmet Magazine · Page 36
-      </div>
-    </motion.section>
+    </motion.article>
   );
 }

@@ -1,6 +1,6 @@
 import { motion } from '@repo/ui/motion';
 import { useEffect, useState, useRef } from 'react';
-import type { RestaurantWithMenu } from '../hooks/useSearch';
+import type { HotelSearchResult } from '../hooks/useSearch';
 import MagazineLayout1 from './layouts/MagazineLayout1';
 import MagazineLayout2 from './layouts/MagazineLayout2';
 import MagazineLayout3 from './layouts/MagazineLayout3';
@@ -13,7 +13,7 @@ import MagazineLayout9 from './layouts/MagazineLayout9';
 import MagazineLayout10 from './layouts/MagazineLayout10';
 
 interface Props {
-  results: RestaurantWithMenu[];
+  results: HotelSearchResult[];
   searchQuery: string;
   isLoading?: boolean;
 }
@@ -29,7 +29,7 @@ export default function SearchResults({ results, searchQuery, isLoading = false 
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY;
-          
+
           if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
             setIsHeaderVisible(false);
           } else if (currentScrollY < lastScrollY.current) {
@@ -51,38 +51,38 @@ export default function SearchResults({ results, searchQuery, isLoading = false 
   // Notify parent about scroll state
   useEffect(() => {
     // Dispatch custom event for header visibility
-    window.dispatchEvent(new CustomEvent('searchHeaderVisibility', { 
-      detail: { visible: isHeaderVisible } 
+    window.dispatchEvent(new CustomEvent('searchHeaderVisibility', {
+      detail: { visible: isHeaderVisible }
     }));
   }, [isHeaderVisible]);
 
-  const renderLayout = (item: RestaurantWithMenu) => {
-    const { restaurant, dishes, menuCategories, layoutType } = item;
-    const props = { restaurant, dishes, menuCategories };
+  const renderLayout = (item: HotelSearchResult) => {
+    const { hotel, layoutType } = item;
+    const props = { hotel };
 
     switch (layoutType) {
       case 1:
-        return <MagazineLayout1 key={restaurant.id} {...props} />;
+        return <MagazineLayout1 key={hotel.id} {...props} />;
       case 2:
-        return <MagazineLayout2 key={restaurant.id} {...props} />;
+        return <MagazineLayout2 key={hotel.id} {...props} />;
       case 3:
-        return <MagazineLayout3 key={restaurant.id} {...props} />;
+        return <MagazineLayout3 key={hotel.id} {...props} />;
       case 4:
-        return <MagazineLayout4 key={restaurant.id} {...props} />;
+        return <MagazineLayout4 key={hotel.id} {...props} />;
       case 5:
-        return <MagazineLayout5 key={restaurant.id} {...props} />;
+        return <MagazineLayout5 key={hotel.id} {...props} />;
       case 6:
-        return <MagazineLayout6 key={restaurant.id} {...props} />;
+        return <MagazineLayout6 key={hotel.id} {...props} />;
       case 7:
-        return <MagazineLayout7 key={restaurant.id} {...props} />;
+        return <MagazineLayout7 key={hotel.id} {...props} />;
       case 8:
-        return <MagazineLayout8 key={restaurant.id} {...props} />;
+        return <MagazineLayout8 key={hotel.id} {...props} />;
       case 9:
-        return <MagazineLayout9 key={restaurant.id} {...props} />;
+        return <MagazineLayout9 key={hotel.id} {...props} />;
       case 10:
-        return <MagazineLayout10 key={restaurant.id} {...props} />;
+        return <MagazineLayout10 key={hotel.id} {...props} />;
       default:
-        return <MagazineLayout1 key={restaurant.id} {...props} />;
+        return <MagazineLayout1 key={hotel.id} {...props} />;
     }
   };
 
@@ -104,11 +104,11 @@ export default function SearchResults({ results, searchQuery, isLoading = false 
             className="mb-12"
           >
             <h1 className="text-5xl font-bold text-gray-900 mb-3">
-              Search Results
+              Kết quả tìm kiếm
             </h1>
             <p className="text-xl text-gray-600">
-              Found <span className="font-bold text-amber-600">{results.length}</span> restaurant
-              {results.length !== 1 ? 's' : ''} matching{' '}
+              Tìm thấy <span className="font-bold text-amber-600">{results.length}</span> khách sạn
+              {' '}phù hợp với{' '}
               <span className="font-bold text-gray-900">&quot;{searchQuery}&quot;</span>
             </p>
           </motion.div>

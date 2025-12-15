@@ -154,4 +154,6 @@ export type DriverActiveOrder = {
   distanceKm?: number;
 };
 
+export * from './hotel';
+
 export { };

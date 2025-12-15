@@ -1,92 +1,48 @@
 import { motion } from '@repo/ui/motion';
-import type { Restaurant, Dish, MenuCategory } from '@repo/types';
-import { ImageWithFallback } from '@repo/ui';
+import type { Hotel } from '@repo/types';
+import { Star, MapPin } from '@repo/ui/icons';
 import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
-import { useRouter } from 'next/navigation';
+import { ImageWithFallback } from '@repo/ui';
 import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function MagazineLayout8({ restaurant, dishes }: { restaurant: Restaurant; dishes: Dish[]; menuCategories: MenuCategory[]; }) {
-  const grid = dishes.slice(0, 4);
+interface Props {
+  hotel: Hotel;
+}
+
+export default function MagazineLayout8({ hotel }: Props) {
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
   const { show } = useLoading();
   const router = useRouter();
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
-  
+
   return (
-    <motion.section 
-      className="overflow-hidden shadow-sm mb-16 p-12" 
-      style={{ backgroundColor: '#F5E6D3' }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      {/* Header Section */}
-      <div className="flex justify-between items-center text-[#8B7355] mb-3 text-[11px] uppercase tracking-widest font-medium">
-        <span>Food & Drinks</span>
-        <span>Curated Selection</span>
-      </div>
-      
-      {/* Main Title */}
-      <div className="text-center mb-10">
-        <h1 className="text-[42px] font-bold text-[#2C2416] tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>
-          {restaurant.name}
-        </h1>
-      </div>
-
-      <div
-        ref={setRefs}
-        onMouseLeave={clearHover}
-        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết quán'); router.push(`/restaurants/${restaurant.slug}`); }, 300); }}
-        className="relative grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 cursor-pointer"
-      >
-        <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
-        <TapRippleOverlay ripple={ripple} />
-        {grid.map((dish, index) => (
-          <motion.div 
-            key={dish.id} 
-            onMouseEnter={(e) => moveHighlight(e, { borderRadius: 24, backgroundColor: '#ffffff', opacity: 1, scaleEnabled: true, scale: 1.12 })}
-            className="group relative z-10 cursor-pointer"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-          >
-            {/* Dish Title */}
-            <h3 className="text-[28px] font-semibold text-[#2C2416] mb-3 tracking-wide" style={{ fontFamily: 'Georgia, serif' }}>
-              {dish.name}
-            </h3>
-            
-            {/* Star Rating */}
-            <div className="flex gap-1 mb-3">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} className="text-[#D4A574] text-[14px]">★</span>
-              ))}
+    <motion.article initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="mb-16 px-4">
+      <div className="max-w-[1200px] mx-auto">
+        <div ref={setRefs} onMouseLeave={clearHover} onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết khách sạn'); router.push(`/hotels/${hotel.slug}`); }, 300); }} className="relative cursor-pointer">
+          <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
+          <TapRippleOverlay ripple={ripple} />
+          <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-7 row-span-2 relative aspect-[4/5] rounded-3xl overflow-hidden" onMouseEnter={(e) => moveHighlight(e, { borderRadius: 24, backgroundColor: '#fef3c7', opacity: 0.4, scaleEnabled: true, scale: 1.03 })}>
+              <ImageWithFallback src={hotel.imageUrls[0]} alt={hotel.name} fill className="object-cover" />
             </div>
-
-            {/* Image Container */}
-            <div className="relative aspect-[4/3] overflow-hidden rounded-tr-[64px] rounded-bl-[64px] mb-4 bg-white shadow-md">
-              <ImageWithFallback 
-                src={dish.imageUrl} 
-                alt={dish.name} 
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+            <div className="col-span-5 bg-gray-50 rounded-3xl p-6">
+              <div className="text-xs uppercase tracking-wider text-gray-400 mb-2">{hotel.categories[0]?.name}</div>
+              <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: 'serif' }}>{hotel.name}</h2>
+              <div className="flex items-center gap-2 mb-4">
+                {[...Array(5)].map((_, i) => (<Star key={i} className={`w-4 h-4 ${i < hotel.rating ? 'fill-amber-500 text-amber-500' : 'text-gray-300'}`} />))}
+                <span className="text-sm text-gray-500">({hotel.reviewCount})</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-4"><MapPin className="w-4 h-4" /><span className="line-clamp-1">{hotel.address.city}</span></div>
+              <div className="bg-white rounded-2xl p-4"><div className="text-xs text-gray-500 mb-1">Giá từ</div><div className="text-3xl font-bold text-amber-600">{(Math.min(...hotel.roomTypes.map(r => r.price)) / 1000).toFixed(0)}K<span className="text-lg text-gray-500">/đêm</span></div></div>
             </div>
-
-            {/* Description */}
-            <p className="text-[13px] leading-relaxed text-[#5A4A3A] font-light">
-              {dish.description}
-            </p>
-          </motion.div>
-        ))}
+            <div className="col-span-5 grid grid-cols-2 gap-4">
+              {hotel.imageUrls.slice(1, 3).map((img, idx) => (<div key={idx} className="relative aspect-square rounded-2xl overflow-hidden" onMouseEnter={(e) => moveHighlight(e, { borderRadius: 16, backgroundColor: '#fef3c7', opacity: 0.4, scaleEnabled: true, scale: 1.05 })}><ImageWithFallback src={img} alt={`${hotel.name} - ${idx + 2}`} fill className="object-cover" /></div>))}
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* Footer Decoration */}
-      <div className="mt-12 pt-8 border-t border-[#D4A574]/30 text-center">
-        <p className="text-[11px] text-[#8B7355] uppercase tracking-widest">
-          {restaurant.name} • {restaurant.address}
-        </p>
-      </div>
-    </motion.section>
+    </motion.article>
   );
 }
