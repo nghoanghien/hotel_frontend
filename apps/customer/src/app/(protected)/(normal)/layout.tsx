@@ -2,16 +2,14 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import HomeHeader from "@/features/home/components/HomeHeader";
-import CartOverlay from "@/features/cart/components/CartOverlay";
 import ProtectedMenuOverlay from "@/features/navigation/components/ProtectedMenuOverlay";
 import dynamic from "next/dynamic";
-const CurrentOrdersDrawer = dynamic(() => import("@/features/orders/components/CurrentOrdersDrawer"), { ssr: false });
+const CurrentBookingsDrawer = dynamic(() => import("@/features/orders/components/CurrentBookingsDrawer"), { ssr: false });
 import SearchOverlay from "@/features/search/components/SearchOverlay";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { useSearch } from "@/features/search/hooks/useSearch";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
@@ -42,8 +40,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
   }, [isSearchMode]);
 
-  const handleSearch = (query: string) => {
-    performSearch(query);
+  const handleSearch = (filters: any) => {
+    performSearch(filters);
   };
 
   useEffect(() => {
@@ -78,7 +76,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               onMenuClick={() => setMenuOpen(true)}
               onFavoritesClick={() => setOrdersOpen(true)}
               onSearchClick={() => setSearchOpen(true)}
-              onCartClick={() => setCartOpen(true)}
               hideSearchIcon={isSearchMode || isDetailPage}
               onLogoClick={() => {
                 const next = new URLSearchParams(searchParams.toString());
@@ -89,9 +86,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </motion.div>
         )}
       </AnimatePresence>
-      <CartOverlay open={cartOpen} onClose={() => setCartOpen(false)} />
       <ProtectedMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <CurrentOrdersDrawer open={ordersOpen} onClose={() => setOrdersOpen(false)} />
+      <CurrentBookingsDrawer open={ordersOpen} onClose={() => setOrdersOpen(false)} />
       <SearchOverlay
         open={searchOpen}
         onClose={() => setSearchOpen(false)}

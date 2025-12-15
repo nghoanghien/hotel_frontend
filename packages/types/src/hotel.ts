@@ -67,3 +67,28 @@ export type HotelSearchResult = {
   hotel: Hotel;
   layoutType: number; // 1-10 for different magazine layouts
 };
+
+export type BookingStatus = 'CONFIRMED' | 'CHECKED_IN' | 'CHECKED_OUT' | 'CANCELLED';
+
+export type HotelBooking = {
+  id: string;
+  code: string;
+  hotelId: string;
+  hotelName: string;
+  roomType: string;
+  status: BookingStatus;
+  checkInDate: string; // ISO date string
+  checkOutDate: string; // ISO date string
+  guests: {
+    adults: number;
+    children: number;
+  };
+  roomsBooked: number;
+  hotelLocation: { lng: number; lat: number; address?: string };
+  totalPrice: number;
+  pricePerNight: number;
+  nights: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
