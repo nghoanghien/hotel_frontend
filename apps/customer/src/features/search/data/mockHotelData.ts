@@ -1147,3 +1147,7 @@ export function getHotelById(id: string): Hotel | undefined {
 export function getHotelBySlug(slug: string): Hotel | undefined {
   return mockHotels.find(h => h.slug === slug);
 }
+
+export function getAllHotels(): Hotel[] {
+  return mockHotels;
+}

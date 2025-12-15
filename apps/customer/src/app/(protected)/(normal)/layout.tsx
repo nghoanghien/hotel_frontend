@@ -22,7 +22,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isSearchMode = searchParams.has("q");
   const isRestaurantDetail = pathname?.startsWith("/restaurants/") ?? false;
   const isHotelDetail = pathname?.startsWith("/hotels/") ?? false;
-  const isDetailPage = isRestaurantDetail || isHotelDetail;
+  const isFavoritesPage = pathname === "/favorites";
+  const isDetailPage = isRestaurantDetail || isHotelDetail || isFavoritesPage;
   const isSearchBarCompact = !isHeaderVisible && isSearchMode;
 
   useEffect(() => {

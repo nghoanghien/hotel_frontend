@@ -1,6 +1,6 @@
 "use client";
-import { create } from "zustand";
-import type { RoomType, Hotel } from "@repo/types";
+import { create } from "@repo/store";
+import type { RoomType } from "@repo/types";
 
 export interface BookingRoom {
   hotelId: string;
@@ -27,11 +27,11 @@ interface BookingStore {
 export const useBookingStore = create<BookingStore>((set) => ({
   currentBooking: null,
 
-  setBooking: (booking) => set({ currentBooking: booking }),
+  setBooking: (booking: BookingRoom) => set({ currentBooking: booking }),
 
   clearBooking: () => set({ currentBooking: null }),
 
-  updateGuests: (adults, children) =>
+  updateGuests: (adults: number, children: number) =>
     set((state) => {
       if (!state.currentBooking) return state;
       return {
@@ -42,7 +42,7 @@ export const useBookingStore = create<BookingStore>((set) => ({
       };
     }),
 
-  updateRoomsCount: (count) =>
+  updateRoomsCount: (count: number) =>
     set((state) => {
       if (!state.currentBooking) return state;
       return {
@@ -53,7 +53,7 @@ export const useBookingStore = create<BookingStore>((set) => ({
       };
     }),
 
-  updateDates: (checkIn, checkOut) =>
+  updateDates: (checkIn: Date | null, checkOut: Date | null) =>
     set((state) => {
       if (!state.currentBooking) return state;
       return {

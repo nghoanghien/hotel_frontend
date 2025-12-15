@@ -1,7 +1,7 @@
 "use client";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { History, Home, Heart } from "@repo/ui/icons";
-import { NavItem, NavItemShimmer, ProfileShimmer } from "@repo/ui";
+import { NavItem, NavItemShimmer, ProfileShimmer, useLoading } from "@repo/ui";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -9,6 +9,7 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const params = useSearchParams();
+  const { show } = useLoading();
   useEffect(() => { const t = setTimeout(() => setIsLoading(false), 400); return () => clearTimeout(t); }, []);
 
   const handleHomeClick = () => {
@@ -18,10 +19,21 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
     onClose();
   };
 
+  const handleFavoritesClick = () => {
+    show();
+    router.push('/favorites');
+    onClose();
+  };
+
+  const handleHistoryClick = () => {
+    // TODO: Navigate to history/bookings page when implemented
+    onClose();
+  };
+
   const customerItems = [
     { id: "home", icon: Home, text: "Trang chủ", onClick: handleHomeClick },
-    { id: "history", icon: History, text: "Lịch sử đặt phòng", onClick: onClose },
-    { id: "favorites", icon: Heart, text: "Yêu thích", onClick: onClose },
+    { id: "history", icon: History, text: "Lịch sử đặt phòng", onClick: handleHistoryClick },
+    { id: "favorites", icon: Heart, text: "Yêu thích", onClick: handleFavoritesClick },
   ];
 
   return (
