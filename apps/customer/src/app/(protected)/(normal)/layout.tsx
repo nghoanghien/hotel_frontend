@@ -16,13 +16,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  
+
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
   const { isSearching, performSearch } = useSearch();
   const isSearchMode = searchParams.has("q");
   const isRestaurantDetail = pathname?.startsWith("/restaurants/") ?? false;
+  const isHotelDetail = pathname?.startsWith("/hotels/") ?? false;
+  const isDetailPage = isRestaurantDetail || isHotelDetail;
   const isSearchBarCompact = !isHeaderVisible && isSearchMode;
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-screen w-full overflow-x-hidden">
       <AnimatePresence>
-        {((isSearchMode || isRestaurantDetail) && isHeaderVisible) && (
+        {((isSearchMode || isDetailPage) && isHeaderVisible) && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -65,7 +67,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {(!isSearchMode || isHeaderVisible) && (
           <motion.div
             initial={{ y: 0, opacity: 1 }}
-            animate={{ 
+            animate={{
               y: isSearchMode && !isHeaderVisible ? -100 : 0,
               opacity: isSearchMode && !isHeaderVisible ? 0 : 1,
             }}
@@ -77,7 +79,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               onFavoritesClick={() => setOrdersOpen(true)}
               onSearchClick={() => setSearchOpen(true)}
               onCartClick={() => setCartOpen(true)}
-              hideSearchIcon={isSearchMode || isRestaurantDetail}
+              hideSearchIcon={isSearchMode || isDetailPage}
               onLogoClick={() => {
                 const next = new URLSearchParams(searchParams.toString());
                 next.delete('q');
@@ -90,9 +92,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <CartOverlay open={cartOpen} onClose={() => setCartOpen(false)} />
       <ProtectedMenuOverlay open={menuOpen} onClose={() => setMenuOpen(false)} />
       <CurrentOrdersDrawer open={ordersOpen} onClose={() => setOrdersOpen(false)} />
-      <SearchOverlay 
-        open={searchOpen} 
-        onClose={() => setSearchOpen(false)} 
+      <SearchOverlay
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
         onSearch={handleSearch}
         isSearchMode={isSearchMode}
         isSearchBarCompact={isSearchBarCompact}

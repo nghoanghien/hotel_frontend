@@ -44,8 +44,8 @@ export default function HomeHeader({
               }}
               onClick={onMenuClick}
               className={`w-10 h-10 rounded-xl backdrop-blur-md border flex items-center justify-center transition-colors ${hideSearchIcon
-                  ? 'bg-gray-100 border-gray-200 hover:bg-gray-200'
-                  : 'bg-white/10 border-white/20 hover:bg-white/20'
+                ? 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+                : 'bg-white/10 border-white/20 hover:bg-white/20'
                 }`}
             >
               <Menu className={`w-5 h-5 ${hideSearchIcon ? 'text-gray-900' : 'text-white'}`} />
@@ -86,13 +86,13 @@ export default function HomeHeader({
             whileTap={{ scale: 0.95 }}
             onClick={onFavoritesClick}
             className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md border transition-colors ${hideSearchIcon
-                ? 'bg-gray-100 border-gray-200 hover:bg-gray-200'
-                : 'bg-white/10 border-white/20 hover:bg-white/20'
+              ? 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+              : 'bg-white/10 border-white/20 hover:bg-white/20'
               }`}
           >
             <BookHeart className={`w-5 h-5 ${hideSearchIcon ? 'text-gray-900' : 'text-white'}`} />
             <span className={`text-sm font-medium ${hideSearchIcon ? 'text-gray-900' : 'text-white'}`}>
-              Current Orders
+              Current Bookings
             </span>
           </motion.button>
 
@@ -133,8 +133,8 @@ export default function HomeHeader({
             onClick={onCartClick}
             id="header-cart-button"
             className={`relative rounded-xl backdrop-blur-md border flex items-center justify-center transition-colors ${hideSearchIcon
-                ? 'bg-gray-100 border-gray-200 hover:bg-gray-200'
-                : 'bg-white/10 border-white/20 hover:bg-white/20'
+              ? 'bg-gray-100 border-gray-200 hover:bg-gray-200'
+              : 'bg-white/10 border-white/20 hover:bg-white/20'
               } ${useCartStore((s) => s.items.length) > 0 ? 'px-3 w-auto h-10 gap-2' : 'w-10 h-10'}`}
           >
             <CartButtonContent hideSearchIcon={hideSearchIcon} />
