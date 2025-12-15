@@ -4,7 +4,7 @@ import type { PaymentMethod } from "@repo/types";
 import { Wallet, CreditCard, Banknote, Check } from "@repo/ui/icons";
 
 const METHODS: { key: PaymentMethod; label: string; icon: React.ReactNode }[] = [
-  { key: "EATZYPAY", label: "EatzyPay", icon: <Wallet className="w-5 h-5" /> },
+  { key: "EATZYPAY", label: "HotelzyPay", icon: <Wallet className="w-5 h-5" /> },
   { key: "VNPAY", label: "VnPay", icon: <CreditCard className="w-5 h-5" /> },
   { key: "CASH", label: "Tiền mặt", icon: <Banknote className="w-5 h-5" /> },
 ];
@@ -23,11 +23,10 @@ export default function PaymentMethodSelector({ value, onChange }: { value: Paym
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => onChange(m.key)}
-            className={`relative cursor-pointer p-4 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between ${
-              value === m.key
-                ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--secondary)]/10 to-[var(--primary)]/10 shadow-sm'
-                : 'border-gray-200 bg-white hover:border-[var(--primary)]/40 hover:bg-[var(--primary)]/5'
-            }`}
+            className={`relative cursor-pointer p-4 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between ${value === m.key
+              ? 'border-[var(--primary)] bg-gradient-to-br from-[var(--secondary)]/10 to-[var(--primary)]/10 shadow-sm'
+              : 'border-gray-200 bg-white hover:border-[var(--primary)]/40 hover:bg-[var(--primary)]/5'
+              }`}
           >
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${value === m.key ? 'bg-[var(--primary)] text-white' : 'bg-gray-100 text-gray-700'}`}>
@@ -35,7 +34,7 @@ export default function PaymentMethodSelector({ value, onChange }: { value: Paym
               </div>
               <div>
                 <div className="text-[13px] font-semibold text-[#1A1A1A]">{m.label}</div>
-                <div className="text-[11px] text-[#666]">{m.key === 'EATZYPAY' ? 'Thanh toán Eatzy' : m.key === 'VNPAY' ? 'VnPay QR' : 'Thanh toán khi nhận hàng'}</div>
+                <div className="text-[11px] text-[#666]">{m.key === 'EATZYPAY' ? 'Thanh toán Hotelzy' : m.key === 'VNPAY' ? 'VnPay QR' : 'Thanh toán khi nhận phòng'}</div>
               </div>
               {/* Background icon */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">

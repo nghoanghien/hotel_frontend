@@ -5,6 +5,8 @@ import { useState } from "react";
 import type { RoomType } from "@repo/types";
 import { formatVnd } from "@repo/lib";
 import { Users, Maximize2, X, ChevronLeft, ChevronRight } from "@repo/ui/icons";
+import { useBookingStore } from "@/features/booking/store/bookingStore";
+import { useRouter } from "next/navigation";
 
 export default function RoomDetailDrawer({
   open,
@@ -18,8 +20,32 @@ export default function RoomDetailDrawer({
   hotelName?: string;
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const router = useRouter();
+  const setBooking = useBookingStore((s) => s.setBooking);
 
   if (!room) return null;
+
+  const handleBookNow = () => {
+    if (!hotelName) return;
+
+    // Set booking data
+    setBooking({
+      hotelId: room.hotelId,
+      hotelName,
+      roomType: room,
+      checkInDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Default: 2 days from now
+      checkOutDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // Default: 5 days from now
+      guests: {
+        adults: 2,
+        children: 0,
+      },
+      roomsCount: 1,
+    });
+
+    // Navigate to checkout
+    router.push('/checkout');
+    onClose();
+  };
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % room.images.length);
@@ -115,6 +141,7 @@ export default function RoomDetailDrawer({
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
+                    onClick={handleBookNow}
                     className="w-full h-14 rounded-2xl bg-[var(--primary)] text-white shadow-sm font-semibold text-lg hover:bg-[var(--primary)]/90 transition-colors"
                   >
                     Book Now - {formatVnd(room.price)}
@@ -170,8 +197,8 @@ export default function RoomDetailDrawer({
                           key={idx}
                           onClick={() => setCurrentImageIndex(idx)}
                           className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${currentImageIndex === idx
-                              ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/30"
-                              : "border-gray-200 hover:border-gray-300"
+                            ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/30"
+                            : "border-gray-200 hover:border-gray-300"
                             }`}
                         >
                           <ImageWithFallback
