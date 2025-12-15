@@ -5,14 +5,14 @@ import "./globals.css";
 import Providers from "./providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const bebasNeue = Bebas_Neue({ 
+const bebasNeue = Bebas_Neue({
   weight: "400",
-  subsets: ["latin"], 
-  variable: "--font-bebas" 
+  subsets: ["latin"],
+  variable: "--font-bebas"
 });
-const oswald = Oswald({ 
-  subsets: ["latin"], 
-  variable: "--font-oswald" 
+const oswald = Oswald({
+  subsets: ["latin"],
+  variable: "--font-oswald"
 });
 const pathwayGothic = Pathway_Gothic_One({
   weight: "400",
@@ -26,8 +26,8 @@ const fjallaOne = Fjalla_One({
 });
 
 export const metadata: Metadata = {
-  title: "Eatzy - Discover Amazing Food",
-  description: "Browse and discover amazing restaurants and recipes",
+  title: "Hotelzy - Discover Amazing Hotel",
+  description: "Browse and discover amazing hotels",
 };
 
 export default function RootLayout({

@@ -20,7 +20,7 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
 
   const customerItems = [
     { id: "home", icon: Home, text: "Trang chủ", onClick: handleHomeClick },
-    { id: "history", icon: History, text: "Lịch sử đơn hàng", onClick: onClose },
+    { id: "history", icon: History, text: "Lịch sử đặt phòng", onClick: onClose },
     { id: "favorites", icon: Heart, text: "Yêu thích", onClick: onClose },
   ];
 
@@ -71,7 +71,7 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
                   return (
                     <div key={item.id} onClick={item.onClick} className="cursor-pointer">
                       <NavItem
-                        icon={<Icon size={20} className="text-white" />} 
+                        icon={<Icon size={20} className="text-white" />}
                         text={item.text}
                         expanded={true}
                         active={false}

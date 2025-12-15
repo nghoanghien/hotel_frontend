@@ -1,7 +1,7 @@
 "use client";
 import Image, { ImageProps } from "next/image";
 import { useState } from "react";
-import { Utensils } from "lucide-react";
+import { Building2 } from "lucide-react";
 
 type Props = Omit<ImageProps, "onError"> & {
   containerClassName?: string;
@@ -16,13 +16,13 @@ export default function ImageWithFallback({ containerClassName, className, ...pr
     if (isFill) {
       return (
         <div className={`absolute inset-0 flex items-center justify-center bg-gray-200 ${containerClassName ?? ""}`}>
-          <Utensils className="w-1/3 h-1/3 text-gray-400" />
+          <Building2 className="w-1/3 h-1/3 text-gray-400" />
         </div>
       );
     }
     return (
       <div className={`flex items-center justify-center bg-gray-100 ${containerClassName ?? ""}`}>
-        <Utensils className="w-1/3 h-1/3 text-gray-400" />
+        <Building2 className="w-1/3 h-1/3 text-gray-400" />
       </div>
     );
   }
