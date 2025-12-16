@@ -26,7 +26,8 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
   };
 
   const handleHistoryClick = () => {
-    // TODO: Navigate to history/bookings page when implemented
+    show();
+    router.push('/history');
     onClose();
   };
 

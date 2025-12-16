@@ -23,7 +23,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isRestaurantDetail = pathname?.startsWith("/restaurants/") ?? false;
   const isHotelDetail = pathname?.startsWith("/hotels/") ?? false;
   const isFavoritesPage = pathname === "/favorites";
-  const isDetailPage = isRestaurantDetail || isHotelDetail || isFavoritesPage;
+  const isHistoryPage = pathname === "/history";
+  const isDetailPage = isRestaurantDetail || isHotelDetail || isFavoritesPage || isHistoryPage;
   const isSearchBarCompact = !isHeaderVisible && isSearchMode;
 
   useEffect(() => {
