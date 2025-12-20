@@ -8,6 +8,7 @@ import BackgroundTransition from '@/features/home/components/BackgroundTransitio
 import { useHomePage } from '@/features/home/hooks/useHomePage';
 import { useState, useEffect } from 'react';
 import { List } from '@repo/ui/icons';
+import { useLoading } from '@repo/ui';
 import { useSearch } from '@/features/search/hooks/useSearch';
 import SearchResults from '@/features/search/components/SearchResults';
 declare global {
@@ -17,6 +18,16 @@ declare global {
 }
 
 export default function HomePage() {
+  const { hide } = useLoading();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      hide();
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [hide]);
+
   const {
     categories,
     activeCategoryIndex,
@@ -31,12 +42,14 @@ export default function HomePage() {
   const [showAllCategories, setShowAllCategories] = useState(false);
 
   const {
+    searchFilters,
     searchResults,
     isSearching,
     isSearchMode,
     clearSearch,
-    searchQuery,
   } = useSearch();
+
+  const searchQuery = searchFilters.query;
 
   // Expose clearSearch to window for menu navigation
   useEffect(() => {

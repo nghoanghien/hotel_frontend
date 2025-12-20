@@ -1,7 +1,7 @@
 "use client";
 import { motion, AnimatePresence } from "@repo/ui/motion";
-import { Calendar, ChevronLeft, ChevronRight } from "@repo/ui/icons";
-import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, X } from "@repo/ui/icons";
+import { useState } from "react";
 
 interface DateRange {
   checkIn: Date | null;
@@ -17,169 +17,211 @@ interface DateRangePickerProps {
 
 export default function DateRangePicker({ open, onClose, value, onChange }: DateRangePickerProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selecting, setSelecting] = useState<'checkIn' | 'checkOut'>('checkIn');
 
   const monthNames = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
     "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"];
-  const dayNames = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+  const dayNames = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
   const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    return { firstDay, daysInMonth };
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   };
 
-  const handleDateClick = (day: number) => {
-    const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-
-    if (selecting === 'checkIn') {
-      onChange({ checkIn: selectedDate, checkOut: value.checkOut });
-      setSelecting('checkOut');
-    } else {
-      if (value.checkIn && selectedDate <= value.checkIn) {
-        onChange({ checkIn: selectedDate, checkOut: null });
-        setSelecting('checkOut');
-      } else {
-        onChange({ ...value, checkOut: selectedDate });
-      }
-    }
-  };
-
-  const nextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+  const getFirstDayOfMonth = (date: Date) => {
+    const day = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+    return day === 0 ? 6 : day - 1;
   };
 
   const prevMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
   };
 
-  const { firstDay, daysInMonth } = getDaysInMonth(currentMonth);
-  const blanks = Array(firstDay).fill(null);
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const nextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+  };
 
-  const isInRange = (day: number) => {
+  const handleDateClick = (day: number, monthOffset: number) => {
+    const selectedDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset, day);
+
+    if (!value.checkIn || (value.checkIn && value.checkOut)) {
+      onChange({ checkIn: selectedDate, checkOut: null });
+    } else {
+      if (selectedDate < value.checkIn) {
+        onChange({ checkIn: selectedDate, checkOut: value.checkIn });
+      } else {
+        onChange({ checkIn: value.checkIn, checkOut: selectedDate });
+      }
+    }
+  };
+
+  const isStartDate = (day: number, monthOffset: number) => {
+    if (!value.checkIn) return false;
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset, day);
+    return date.toDateString() === value.checkIn.toDateString();
+  };
+
+  const isEndDate = (day: number, monthOffset: number) => {
+    if (!value.checkOut) return false;
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset, day);
+    return date.toDateString() === value.checkOut.toDateString();
+  };
+
+  const isInRange = (day: number, monthOffset: number) => {
     if (!value.checkIn || !value.checkOut) return false;
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset, day);
     return date > value.checkIn && date < value.checkOut;
   };
 
-  const isSelected = (day: number) => {
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    return (value.checkIn && date.toDateString() === value.checkIn.toDateString()) ||
-      (value.checkOut && date.toDateString() === value.checkOut.toDateString());
+  const formatDateRange = () => {
+    if (!value.checkIn) return '';
+    const checkInStr = `${value.checkIn.getDate()} thg ${value.checkIn.getMonth() + 1}`;
+    if (!value.checkOut) return checkInStr;
+    const checkOutStr = `${value.checkOut.getDate()} thg ${value.checkOut.getMonth() + 1}`;
+    return `${checkInStr} - ${checkOutStr}`;
+  };
+
+  const renderMonth = (monthOffset: number) => {
+    const month = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset);
+    const daysInMonth = getDaysInMonth(month);
+    const firstDay = getFirstDayOfMonth(month);
+    const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+    const blanks = Array.from({ length: firstDay }, (_, i) => i);
+
+    return (
+      <div className="flex-1">
+        <div className="font-semibold text-white text-center mb-4">
+          {monthNames[month.getMonth()]} năm {month.getFullYear()}
+        </div>
+
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {dayNames.map(day => (
+            <div key={day} className="text-center text-xs font-medium text-white/60 py-2">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar grid with row gaps */}
+        <div className="grid grid-cols-7 gap-y-1">
+          {blanks.map((_, i) => (
+            <div key={`blank-${i}`} className="aspect-square" />
+          ))}
+          {days.map(day => {
+            const isStart = isStartDate(day, monthOffset);
+            const isEnd = isEndDate(day, monthOffset);
+            const inRange = isInRange(day, monthOffset);
+            const dayOfWeek = (firstDay + day - 1) % 7;
+            const isRowStart = dayOfWeek === 0;
+            const isRowEnd = dayOfWeek === 6;
+
+            return (
+              <div key={day} className="relative">
+                {/* Background connecting line for in-range dates with rounded corners at row ends */}
+                {inRange && (
+                  <div className={`absolute inset-y-0 left-0 right-0 bg-white/10 ${isRowStart ? 'rounded-l-full' : ''
+                    } ${isRowEnd ? 'rounded-r-full' : ''}`} />
+                )}
+                {/* Background for start date - fills right half */}
+                {isStart && value.checkOut && (
+                  <div className="absolute inset-0 left-[49%] bg-white/10" />
+                )}
+                {/* Background for end date - fills left half */}
+                {isEnd && value.checkIn && (
+                  <div className="absolute inset-0 right-[51%] bg-white/10" />
+                )}
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleDateClick(day, monthOffset)}
+                  style={
+                    isStart && value.checkOut
+                      ? { background: 'linear-gradient(to right, rgba(255, 255, 255, 0.1) 50%, transparent 50%)' }
+                      : isEnd && value.checkIn
+                        ? { background: 'linear-gradient(to right, transparent 50%, rgba(255, 255, 255, 0.1) 50%)' }
+                        : undefined
+                  }
+                  className={`relative aspect-square w-full flex items-center justify-center text-sm font-medium transition-all ${isStart || isEnd
+                    ? 'bg-white/20 border-2 border-white/30 text-white rounded-full z-10'
+                    : inRange
+                      ? 'text-white/90'
+                      : 'hover:bg-white/10 text-white/70 hover:text-white rounded-full'
+                    }`}
+                >
+                  {day}
+                </motion.button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   return (
     <AnimatePresence>
       {open && (
         <>
+          {/* Dark backdrop matching home page */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xl"
             onClick={onClose}
           />
+
+          {/* Date picker with home page styling - centered like SearchOverlay */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="absolute left-0 right-0 top-full mt-2 z-[101] bg-white rounded-3xl shadow-2xl p-6 w-full"
+            layoutId="date-picker"
+            transition={{
+              layout: {
+                type: "spring",
+                damping: 16,
+                stiffness: 100,
+              },
+            }}
+            className="fixed z-[101] inset-x-0 top-[15vh] flex justify-center px-4"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Chọn ngày</h3>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="flex gap-3 mb-6">
-              <button
-                onClick={() => setSelecting('checkIn')}
-                className={`flex-1 px-4 py-3 rounded-xl border-2 transition-all ${selecting === 'checkIn'
-                  ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                  : 'border-gray-200 hover:border-gray-300'
-                  }`}
-              >
-                <div className="text-xs text-gray-500 mb-1">Nhận phòng</div>
-                <div className="font-semibold text-gray-900">
-                  {value.checkIn ? value.checkIn.toLocaleDateString('vi-VN') : 'Chọn ngày'}
-                </div>
-              </button>
-              <button
-                onClick={() => setSelecting('checkOut')}
-                className={`flex-1 px-4 py-3 rounded-xl border-2 transition-all ${selecting === 'checkOut'
-                  ? 'border-[var(--primary)] bg-[var(--primary)]/5'
-                  : 'border-gray-200 hover:border-gray-300'
-                  }`}
-              >
-                <div className="text-xs text-gray-500 mb-1">Trả phòng</div>
-                <div className="font-semibold text-gray-900">
-                  {value.checkOut ? value.checkOut.toLocaleDateString('vi-VN') : 'Chọn ngày'}
-                </div>
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between mb-4">
-              <button
-                onClick={prevMonth}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <div className="font-semibold text-gray-900">
-                {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-              </div>
-              <button
-                onClick={nextMonth}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {dayNames.map(day => (
-                <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-7 gap-1">
-              {blanks.map((_, i) => (
-                <div key={`blank-${i}`} className="aspect-square" />
-              ))}
-              {days.map(day => (
+            <div className="bg-white/0 backdrop-blur-sm border-2 border-white/30 rounded-[30px] shadow-2xl p-10 w-[1000px]">
+              <div className="flex items-center justify-between mb-8">
+                <h3 className="font-anton text-[24px] font-bold text-white uppercase tracking-tight" style={{ fontStretch: "condensed", letterSpacing: "-0.01em" }}>
+                  Chọn ngày {formatDateRange() && `(${formatDateRange()})`}
+                </h3>
                 <motion.button
-                  key={day}
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => handleDateClick(day)}
-                  className={`aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all ${isSelected(day)
-                    ? 'bg-[var(--primary)] text-white shadow-md'
-                    : isInRange(day)
-                      ? 'bg-[var(--primary)]/10 text-[var(--primary)]'
-                      : 'hover:bg-gray-100 text-gray-900'
-                    }`}
+                  onClick={onClose}
+                  className="w-14 h-14 rounded-full bg-white/10 border-2 border-white/30 flex items-center justify-center transition-colors text-white text-xl"
                 >
-                  {day}
+                  <X className="w-4 h-4 text-white" />
                 </motion.button>
-              ))}
-            </div>
+              </div>
 
-            <button
-              onClick={onClose}
-              className="w-full mt-6 py-3 bg-[var(--primary)] text-white rounded-xl font-semibold hover:bg-[var(--primary)]/90 transition-colors"
-            >
-              Xong
-            </button>
+              <div className="flex items-start justify-between mb-6">
+                <motion.button
+                  whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={prevMonth}
+                  className="w-12 h-12 rounded-full bg-white/12 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-colors mt-10"
+                >
+                  <ChevronLeft className="w-6 h-6 text-white" />
+                </motion.button>
+
+                <div className="flex gap-12 flex-1 px-6">
+                  {renderMonth(0)}
+                  {renderMonth(1)}
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={nextMonth}
+                  className="w-12 h-12 rounded-full bg-white/12 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-colors mt-10"
+                >
+                  <ChevronRight className="w-6 h-6 text-white" />
+                </motion.button>
+              </div>
+            </div>
           </motion.div>
         </>
       )}

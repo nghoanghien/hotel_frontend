@@ -107,7 +107,7 @@ export default function HomeHeader({
                 duration: 0.25,
                 layout: {
                   type: "spring",
-                  damping: 16,
+                  damping: 18,
                   stiffness: 100,
                 },
               }}

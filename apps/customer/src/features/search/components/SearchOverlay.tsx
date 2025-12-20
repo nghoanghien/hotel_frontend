@@ -87,68 +87,89 @@ export default function SearchOverlay({
       <AnimatePresence>
         {open && !isSearchMode && (
           <>
+            {/* Dark backdrop matching home page */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-md"
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-xl"
               onClick={onClose}
             />
+
+            {/* Search overlay with home page styling */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3, type: "spring", damping: 25 }}
-              className="fixed z-[70] inset-x-0 top-[12vh] flex justify-center px-4"
+              layoutId="search-bar"
+              transition={{
+                layout: {
+                  type: "spring",
+                  damping: 16,
+                  stiffness: 100,
+                },
+              }}
+              className="fixed z-[70] inset-x-0 top-[8vh] flex justify-center px-4"
             >
-              <div className="relative bg-white rounded-3xl shadow-2xl p-8 w-full max-w-[900px]">
+              <div className="relative rounded-3xl p-8 w-full max-w-[900px]">
+                {/* Loading shimmer */}
                 {isSearching && (
                   <motion.div
                     initial={{ x: "-100%" }}
                     animate={{ x: "100%" }}
                     transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                    className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-[var(--primary)]/10 to-transparent"
+                    className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                   />
                 )}
 
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Tìm kiếm khách sạn</h2>
-                  <button
+                  <h2 className="font-anton text-[clamp(24px,3vw,28px)] font-bold text-white uppercase tracking-tight" style={{ fontStretch: "condensed", letterSpacing: "-0.01em" }}>
+                    TÌM KIẾM KHÁCH SẠN
+                  </h2>
+                  <motion.button
+                    whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={onClose}
-                    className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+                    className="w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-colors"
                   >
-                    <X className="w-6 h-6" />
-                  </button>
+                    <X className="w-6 h-6 text-white" />
+                  </motion.button>
                 </div>
 
                 <div className="space-y-4">
                   {/* Location Input */}
                   <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <MapPin className="absolute left-8 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
                     <input
                       autoFocus
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder="Tìm theo địa chỉ hoặc tên khách sạn..."
-                      className="w-full pl-12 pr-4 py-4 text-lg bg-gray-50 rounded-2xl border-2 border-gray-200 focus:border-[var(--primary)] focus:outline-none transition-colors"
+                      className="w-full pl-16 pr-4 py-6 text-lg bg-white/10 rounded-3xl border-white/30 focus:border-white/50 focus:outline-none transition-all text-white placeholder:text-white/50"
                     />
                   </div>
 
                   {/* Date Range & Guests */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="relative">
-                      <button
+                      <motion.button
+                        layoutId="date-picker"
+                        transition={{
+                          layout: {
+                            type: "spring",
+                            damping: 18,
+                            stiffness: 100,
+                          },
+                        }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setShowDatePicker(true)}
-                        className="w-full flex items-center gap-3 px-4 py-4 bg-gray-50 rounded-2xl border-2 border-gray-200 hover:border-[var(--primary)] transition-colors text-left group"
+                        className="w-full flex items-center gap-3 px-6 py-6 bg-white/12 backdrop-blur-sm rounded-3xl border-2 border-white/30 hover:bg-white/20 transition-colors text-left group"
                       >
-                        <Calendar className="w-5 h-5 text-gray-400 group-hover:text-[var(--primary)]" />
+                        <Calendar className="w-5 h-5 text-white/60 group-hover:text-white/80 transition-colors" />
                         <div className="flex-1">
-                          <div className="text-xs text-gray-500 mb-0.5">Ngày nhận & trả phòng</div>
-                          <div className="font-semibold text-gray-900">{formatDateRange()}</div>
+                          <div className="text-xs text-white/60 mb-0.5 font-medium">Ngày nhận & trả phòng</div>
+                          <div className="font-semibold text-white">{formatDateRange()}</div>
                         </div>
-                      </button>
+                      </motion.button>
 
                       <DateRangePicker
                         open={showDatePicker}
@@ -159,16 +180,25 @@ export default function SearchOverlay({
                     </div>
 
                     <div className="relative">
-                      <button
+                      <motion.button
+                        layoutId="guest-selector"
+                        transition={{
+                          layout: {
+                            type: "spring",
+                            damping: 18,
+                            stiffness: 100,
+                          },
+                        }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => setShowGuestSelector(true)}
-                        className="w-full flex items-center gap-3 px-4 py-4 bg-gray-50 rounded-2xl border-2 border-gray-200 hover:border-[var(--primary)] transition-colors text-left group"
+                        className="w-full flex items-center gap-3 px-6 py-6 bg-white/12 backdrop-blur-sm rounded-3xl border-2 border-white/30 hover:bg-white/20 transition-colors text-left group"
                       >
-                        <Users className="w-5 h-5 text-gray-400 group-hover:text-[var(--primary)]" />
+                        <Users className="w-5 h-5 text-white/60 group-hover:text-white/80 transition-colors" />
                         <div className="flex-1">
-                          <div className="text-xs text-gray-500 mb-0.5">Khách và phòng</div>
-                          <div className="font-semibold text-gray-900">{formatGuestRoom()}</div>
+                          <div className="text-xs text-white/60 mb-0.5 font-medium">Khách và phòng</div>
+                          <div className="font-semibold text-white">{formatGuestRoom()}</div>
                         </div>
-                      </button>
+                      </motion.button>
 
                       <GuestRoomSelector
                         open={showGuestSelector}
@@ -180,14 +210,16 @@ export default function SearchOverlay({
                   </div>
 
                   {/* Search Button */}
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.24)' }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={handleSearch}
                     disabled={!query.trim()}
-                    className="w-full py-4 px-6 bg-[var(--primary)] text-white font-semibold text-lg rounded-2xl hover:bg-[var(--primary)]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full py-6 px-6 bg-white/12 backdrop-blur-sm border-2 border-white/30 text-white font-bold text-[13px] rounded-3xl transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-[0.12em]"
                   >
                     <Search className="w-5 h-5" />
-                    Tìm kiếm
-                  </button>
+                    TÌM KIẾM
+                  </motion.button>
                 </div>
               </div>
             </motion.div>

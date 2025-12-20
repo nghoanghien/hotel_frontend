@@ -23,55 +23,64 @@ export default function GuestRoomSelector({ open, onClose, value, onChange }: Gu
     <AnimatePresence>
       {open && (
         <>
+          {/* Dark backdrop matching home page */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xl"
             onClick={onClose}
           />
+
+          {/* Guest selector with home page styling */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="absolute left-0 right-0 top-full mt-2 z-[101] bg-white rounded-3xl shadow-2xl p-6 w-full"
+            layoutId="guest-selector"
+            transition={{
+              layout: {
+                type: "spring",
+                damping: 16,
+                stiffness: 100,
+              },
+            }}
+            className="absolute left-0 right-0 top-full mt-2 z-[101] bg-white/12 backdrop-blur-sm border-2 border-white/30 rounded-3xl shadow-2xl p-8 w-full"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Khách và phòng</h3>
-              <button
+              <h3 className="font-anton text-[20px] font-bold text-white uppercase tracking-tight" style={{ fontStretch: "condensed", letterSpacing: "-0.01em" }}>Khách và phòng</h3>
+              <motion.button
+                whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
+                whileTap={{ scale: 0.95 }}
                 onClick={onClose}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+                className="w-9 h-9 rounded-full bg-white/12 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-colors text-white text-xl"
               >
                 ×
-              </button>
+              </motion.button>
             </div>
 
             <div className="space-y-5">
               {/* Adults */}
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-gray-900">Người lớn</div>
-                  <div className="text-sm text-gray-500">Từ 13 tuổi trở lên</div>
+                  <div className="font-semibold text-white">Người lớn</div>
+                  <div className="text-sm text-white/60">Từ 13 tuổi trở lên</div>
                 </div>
                 <div className="flex items-center gap-3">
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => updateValue('adults', -1)}
                     disabled={value.adults <= 1}
-                    className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center transition-colors hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="w-10 h-10 rounded-full bg-white/12 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    <Minus className="w-4 h-4" />
+                    <Minus className="w-4 h-4 text-white" />
                   </motion.button>
-                  <div className="w-12 text-center font-semibold text-lg">{value.adults}</div>
+                  <div className="w-12 text-center font-semibold text-lg text-white">{value.adults}</div>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => updateValue('adults', 1)}
-                    className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center transition-colors hover:border-[var(--primary)] hover:bg-[var(--primary)]/5"
+                    className="w-10 h-10 rounded-full bg-white/12 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-all"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-4 h-4 text-white" />
                   </motion.button>
                 </div>
               </div>
@@ -79,27 +88,27 @@ export default function GuestRoomSelector({ open, onClose, value, onChange }: Gu
               {/* Children */}
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-gray-900">Trẻ em</div>
-                  <div className="text-sm text-gray-500">Từ 0-12 tuổi</div>
+                  <div className="font-semibold text-white">Trẻ em</div>
+                  <div className="text-sm text-white/60">Từ 0-12 tuổi</div>
                 </div>
                 <div className="flex items-center gap-3">
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => updateValue('children', -1)}
                     disabled={value.children <= 0}
-                    className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center transition-colors hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="w-10 h-10 rounded-full bg-white/12 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    <Minus className="w-4 h-4" />
+                    <Minus className="w-4 h-4 text-white" />
                   </motion.button>
-                  <div className="w-12 text-center font-semibold text-lg">{value.children}</div>
+                  <div className="w-12 text-center font-semibold text-lg text-white">{value.children}</div>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => updateValue('children', 1)}
-                    className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center transition-colors hover:border-[var(--primary)] hover:bg-[var(--primary)]/5"
+                    className="w-10 h-10 rounded-full bg-white/12 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-all"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-4 h-4 text-white" />
                   </motion.button>
                 </div>
               </div>
@@ -107,38 +116,40 @@ export default function GuestRoomSelector({ open, onClose, value, onChange }: Gu
               {/* Rooms */}
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold text-gray-900">Phòng</div>
-                  <div className="text-sm text-gray-500">Số lượng phòng</div>
+                  <div className="font-semibold text-white">Phòng</div>
+                  <div className="text-sm text-white/60">Số lượng phòng</div>
                 </div>
                 <div className="flex items-center gap-3">
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => updateValue('rooms', -1)}
                     disabled={value.rooms <= 1}
-                    className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center transition-colors hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="w-10 h-10 rounded-full bg-white/12 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    <Minus className="w-4 h-4" />
+                    <Minus className="w-4 h-4 text-white" />
                   </motion.button>
-                  <div className="w-12 text-center font-semibold text-lg">{value.rooms}</div>
+                  <div className="w-12 text-center font-semibold text-lg text-white">{value.rooms}</div>
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.15, backgroundColor: 'rgba(255, 255, 255, 0.28)' }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => updateValue('rooms', 1)}
-                    className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center transition-colors hover:border-[var(--primary)] hover:bg-[var(--primary)]/5"
+                    className="w-10 h-10 rounded-full bg-white/12 backdrop-blur-sm border-2 border-white/30 flex items-center justify-center transition-all"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-4 h-4 text-white" />
                   </motion.button>
                 </div>
               </div>
             </div>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.24)' }}
+              whileTap={{ scale: 0.98 }}
               onClick={onClose}
-              className="w-full mt-6 py-3 bg-[var(--primary)] text-white rounded-xl font-semibold hover:bg-[var(--primary)]/90 transition-colors"
+              className="w-full mt-6 py-4 bg-white/12 backdrop-blur-sm border-2 border-white/30 text-white rounded-3xl font-bold uppercase tracking-[0.12em] text-[13px] transition-all"
             >
               Xong
-            </button>
+            </motion.button>
           </motion.div>
         </>
       )}

@@ -68,8 +68,8 @@ export default function LoginForm({ onForgotPassword, onSuccess, onRegister, for
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">
-        <FloatingLabelInput label="Email" type="email" value={emailValue} error={errors.email?.message} autoComplete="email" {...register("email")} />
-        <FloatingLabelInput label="Mật khẩu" type="password" value={passwordValue} error={errors.password?.message} autoComplete="current-password" {...register("password")} />
+        <FloatingLabelInput label="Email" type="email" value={emailValue} error={errors.email?.message} autoComplete="email" className="text-gray-900" {...register("email")} />
+        <FloatingLabelInput label="Mật khẩu" type="password" value={passwordValue} error={errors.password?.message} autoComplete="current-password" className="text-gray-900" {...register("password")} />
 
         <div className="flex items-center justify-between text-sm">
           <label className="flex items-center gap-2 cursor-pointer group">
