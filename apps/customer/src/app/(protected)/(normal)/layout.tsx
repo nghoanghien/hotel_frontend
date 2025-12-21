@@ -27,7 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const isFavoritesPage = pathname === "/favorites";
   const isHistoryPage = pathname === "/history";
   const isDetailPage = isRestaurantDetail || isHotelDetail || isFavoritesPage || isHistoryPage;
-  const isSearchBarCompact = !isHeaderVisible && isSearchMode;
+  const isSearchBarCompact = !isHeaderVisible && isSearchMode && !isHotelDetail;
 
   useEffect(() => {
     const handleHeaderVisibility = (e: Event) => {
@@ -97,7 +97,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
         onSearch={handleSearch}
-        isSearchMode={isSearchMode}
+        isSearchMode={isSearchMode && !isHotelDetail}
         isSearchBarCompact={isSearchBarCompact}
         isSearching={isSearching}
       />

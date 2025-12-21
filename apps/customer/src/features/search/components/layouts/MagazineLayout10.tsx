@@ -4,7 +4,7 @@ import { Star, MapPin, Users } from '@repo/ui/icons';
 import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
 import { ImageWithFallback } from '@repo/ui';
 import { useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Props {
   hotel: Hotel;
@@ -15,12 +15,13 @@ export default function MagazineLayout10({ hotel }: Props) {
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
   const { show } = useLoading();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
   return (
     <motion.article initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="mb-12 px-4">
       <div className="max-w-[900px] mx-auto">
-        <div ref={setRefs} onMouseLeave={clearHover} onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết khách sạn'); router.push(`/hotels/${hotel.slug}`); }, 300); }} className="relative bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer">
+        <div ref={setRefs} onMouseLeave={clearHover} onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết khách sạn'); router.push(`/hotels/${hotel.slug}?${searchParams.toString()}`); }, 300); }} className="relative bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer">
           <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
           <TapRippleOverlay ripple={ripple} />
           <div className="grid grid-cols-12 gap-0">

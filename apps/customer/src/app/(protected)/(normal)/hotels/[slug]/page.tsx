@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { ImageWithFallback } from "@repo/ui";
 import { Star, MapPin, ArrowLeft, Users, Maximize2 } from "@repo/ui/icons";
 import { motion, AnimatePresence } from "@repo/ui/motion";
@@ -36,6 +36,23 @@ export default function HotelDetailPage() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<RoomType | null>(null);
+
+  // Read search parameters from URL
+  const searchParams = useSearchParams();
+  const checkInParam = searchParams.get('checkIn');
+  const checkOutParam = searchParams.get('checkOut');
+  const adultsParam = searchParams.get('adults');
+  const childrenParam = searchParams.get('children');
+  const roomsParam = searchParams.get('rooms');
+
+  // Parse dates and guest info
+  const bookingInfo = useMemo(() => ({
+    checkIn: checkInParam ? new Date(checkInParam) : null,
+    checkOut: checkOutParam ? new Date(checkOutParam) : null,
+    adults: adultsParam ? parseInt(adultsParam) : 2,
+    children: childrenParam ? parseInt(childrenParam) : 0,
+    rooms: roomsParam ? parseInt(roomsParam) : 1,
+  }), [checkInParam, checkOutParam, adultsParam, childrenParam, roomsParam]);
 
   const { containerRef: tabContainerRef, rect: tabRect, style: tabStyle, moveHighlight: tabMove, clearHover: tabClear } = useHoverHighlight<HTMLDivElement>();
 
@@ -347,6 +364,10 @@ export default function HotelDetailPage() {
         onClose={() => setDrawerOpen(false)}
         room={selectedRoom}
         hotelName={hotel.name}
+        checkIn={bookingInfo.checkIn}
+        checkOut={bookingInfo.checkOut}
+        guests={{ adults: bookingInfo.adults, children: bookingInfo.children }}
+        rooms={bookingInfo.rooms}
       />
     </div>
   );

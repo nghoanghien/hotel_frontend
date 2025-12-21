@@ -1,10 +1,10 @@
 "use client";
 import { motion, AnimatePresence } from "@repo/ui/motion";
-import { ImageWithFallback } from "@repo/ui";
+import { ImageWithFallback, useLoading } from "@repo/ui";
 import { useState } from "react";
 import type { RoomType } from "@repo/types";
 import { formatVnd } from "@repo/lib";
-import { Users, Maximize2, X, ChevronLeft, ChevronRight } from "@repo/ui/icons";
+import { Users, Maximize2, X, ChevronLeft, ChevronRight, Wifi, Wind, Coffee, Tv, Bath, Sparkles, Calendar } from "@repo/ui/icons";
 import { useBookingStore } from "@/features/booking/store/bookingStore";
 import { useRouter } from "next/navigation";
 
@@ -13,33 +13,59 @@ export default function RoomDetailDrawer({
   onClose,
   room,
   hotelName,
+  checkIn,
+  checkOut,
+  guests,
+  rooms,
 }: {
   open: boolean;
   onClose: () => void;
   room: RoomType | null;
   hotelName?: string;
+  checkIn?: Date | null;
+  checkOut?: Date | null;
+  guests?: { adults: number; children: number };
+  rooms?: number;
 }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
+
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? "100%" : "-100%",
+      opacity: 0
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? "100%" : "-100%",
+      opacity: 0
+    })
+  };
   const router = useRouter();
   const setBooking = useBookingStore((s) => s.setBooking);
+  const { show } = useLoading();
 
   if (!room) return null;
 
   const handleBookNow = () => {
     if (!hotelName) return;
 
+    show("Đang chuyển đến trang thanh toán...");
+
     // Set booking data
     setBooking({
       hotelId: room.hotelId,
       hotelName,
       roomType: room,
-      checkInDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // Default: 2 days from now
-      checkOutDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // Default: 5 days from now
-      guests: {
-        adults: 2,
-        children: 0,
-      },
-      roomsCount: 1,
+      checkInDate: checkIn || new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+      checkOutDate: checkOut || new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
+      guests: guests || { adults: 2, children: 0 },
+      roomsCount: rooms || 1,
     });
 
     // Navigate to checkout
@@ -48,10 +74,12 @@ export default function RoomDetailDrawer({
   };
 
   const nextImage = () => {
+    setDirection(1);
     setCurrentImageIndex((prev) => (prev + 1) % room.images.length);
   };
 
   const prevImage = () => {
+    setDirection(-1);
     setCurrentImageIndex((prev) => (prev - 1 + room.images.length) % room.images.length);
   };
 
@@ -72,11 +100,11 @@ export default function RoomDetailDrawer({
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 480, opacity: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 26 }}
-            className="fixed z-[70] left-0 right-0 bottom-0 max-h-[88vh] rounded-t-[48px] bg-[#F7F7F7] border-t border-gray-200 overflow-hidden"
+            className="fixed z-[70] left-0 right-0 bottom-0 h-[90vh] rounded-t-[48px] bg-[#F7F7F7] border-t border-gray-200 overflow-hidden"
           >
             <div className="grid grid-cols-[45%_55%] gap-0 h-full">
               {/* Left Column - Room Info */}
-              <div className="relative overflow-y-auto no-scrollbar p-8 pb-24">
+              <div className="relative overflow-y-auto room-drawer-scroll p-8 pb-8">
                 <button
                   onClick={onClose}
                   className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-lg border border-gray-200 hover:bg-white transition-all flex items-center justify-center"
@@ -108,33 +136,53 @@ export default function RoomDetailDrawer({
                   {/* Price */}
                   <div className="bg-gradient-to-r from-[var(--primary)]/10 to-[var(--secondary)]/10 rounded-2xl p-6 mb-6">
                     <div className="text-sm text-gray-600 mb-1">Price per night</div>
-                    <div className="text-4xl font-bold text-[var(--primary)]">
+                    <div className="text-4xl font-bold text-[var(--primary)] mb-2">
                       {formatVnd(room.price)}
                     </div>
+                    {checkIn && checkOut && (() => {
+                      const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+                      return (
+                        <div className="mt-3 pt-3 border-t border-[var(--primary)]/20 flex flex-col gap-1">
+                          <div className="flex items-baseline gap-2 text-[#1A1A1A]">
+                            <span className="font-anton text-3xl tracking-tight">× {nights}</span>
+                            <span className="font-anton text-xl text-gray-400 uppercase tracking-wide">ĐÊM</span>
+                          </div>
+                          <div className="text-sm font-medium text-gray-600 flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]"></div>
+                            <span>
+                              {checkIn.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })} - {checkOut.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Room Amenities */}
-                  <div className="mb-6">
+                  {/* Room Amenities Magazine Style */}
+                  <div className="mb-8">
                     <div className="text-xl font-bold text-[#1A1A1A] mb-4">Room Amenities</div>
-                    <div className="grid grid-cols-2 gap-3">
-                      {room.amenities.map((amenity) => (
-                        <div
-                          key={amenity.id}
-                          className="flex items-center gap-2 bg-white rounded-xl p-3 border border-gray-100"
-                        >
-                          <div className="w-8 h-8 rounded-lg bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center flex-shrink-0">
-                            <span className="text-sm">✓</span>
-                          </div>
-                          <span className="text-sm font-medium text-gray-900">{amenity.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
 
-                  {/* Available Rooms */}
-                  <div className="bg-gray-100 rounded-xl p-4 mb-6">
-                    <div className="text-sm text-gray-600">Available Rooms</div>
-                    <div className="text-2xl font-bold text-gray-900">{room.availableRooms}</div>
+                    <div className="grid grid-cols-2 gap-4">
+                      {room.amenities.map((amenity) => {
+                        const n = amenity.name.toLowerCase();
+                        let Icon = Sparkles;
+                        if (n.includes('wifi')) Icon = Wifi;
+                        else if (n.includes('ac') || n.includes('air') || n.includes('lạnh')) Icon = Wind;
+                        else if (n.includes('tv') || n.includes('tivi')) Icon = Tv;
+                        else if (n.includes('coffee') || n.includes('cafe')) Icon = Coffee;
+                        else if (n.includes('bath') || n.includes('tắm')) Icon = Bath;
+
+                        return (
+                          <div key={amenity.id} className="group flex items-center gap-4 p-4 rounded-2xl bg-white border border-gray-100 hover:border-[var(--primary)]/20 transition-all">
+                            <div className="w-10 h-10 rounded-full bg-[var(--primary)] text-white flex items-center justify-center shadow-[var(--primary)]/30 group-hover:scale-110 transition-transform flex-shrink-0">
+                              <Icon size={18} strokeWidth={1.5} />
+                            </div>
+                            <span className="font-medium text-gray-800 tracking-wide text-[15px] group-hover:text-black transition-colors">{amenity.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Book Button */}
@@ -144,25 +192,45 @@ export default function RoomDetailDrawer({
                     onClick={handleBookNow}
                     className="w-full h-14 rounded-2xl bg-[var(--primary)] text-white shadow-sm font-semibold text-lg hover:bg-[var(--primary)]/90 transition-colors"
                   >
-                    Book Now - {formatVnd(room.price)}
+                    {checkIn && checkOut ? (() => {
+                      const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+                      const totalPrice = room.price * nights;
+                      return `Book Now - ${formatVnd(totalPrice)}`;
+                    })() : `Book Now - ${formatVnd(room.price)}`}
                   </motion.button>
                 </div>
               </div>
 
               {/* Right Column - Image Slider */}
-              <div className="relative overflow-y-auto px-12 p-8 pb-24 bg-white border-l border-gray-100">
+              <div className="relative overflow-y-auto room-drawer-scroll px-12 p-8 pb-8 bg-white border-l border-gray-100">
                 <div className="sticky top-0">
                   <div className="text-2xl font-bold text-[#1A1A1A] mb-6">Room Gallery</div>
 
                   {/* Main Image */}
                   <div className="relative rounded-3xl overflow-hidden mb-4 group">
-                    <div className="relative aspect-[4/3]">
-                      <ImageWithFallback
-                        src={room.images[currentImageIndex]}
-                        alt={`${room.name} - ${currentImageIndex + 1}`}
-                        fill
-                        className="object-cover"
-                      />
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                      <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                        <motion.div
+                          key={currentImageIndex}
+                          custom={direction}
+                          variants={variants}
+                          initial="enter"
+                          animate="center"
+                          exit="exit"
+                          transition={{
+                            x: { type: "spring", stiffness: 300, damping: 30 },
+                            opacity: { duration: 0.2 }
+                          }}
+                          className="absolute inset-0"
+                        >
+                          <ImageWithFallback
+                            src={room.images[currentImageIndex]}
+                            alt={`${room.name} - ${currentImageIndex + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                        </motion.div>
+                      </AnimatePresence>
                     </div>
 
                     {/* Navigation Buttons */}
@@ -170,13 +238,13 @@ export default function RoomDetailDrawer({
                       <>
                         <button
                           onClick={prevImage}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-lg border border-gray-200 hover:bg-white transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+                          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-lg border border-gray-200 hover:bg-white transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
                         >
                           <ChevronLeft className="w-5 h-5 text-gray-700" />
                         </button>
                         <button
                           onClick={nextImage}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-lg border border-gray-200 hover:bg-white transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
+                          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm shadow-lg border border-gray-200 hover:bg-white transition-all flex items-center justify-center opacity-0 group-hover:opacity-100"
                         >
                           <ChevronRight className="w-5 h-5 text-gray-700" />
                         </button>
@@ -195,7 +263,7 @@ export default function RoomDetailDrawer({
                       {room.images.map((img, idx) => (
                         <button
                           key={idx}
-                          onClick={() => setCurrentImageIndex(idx)}
+                          onClick={() => { setDirection(idx > currentImageIndex ? 1 : -1); setCurrentImageIndex(idx); }}
                           className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${currentImageIndex === idx
                             ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/30"
                             : "border-gray-200 hover:border-gray-300"
@@ -225,6 +293,31 @@ export default function RoomDetailDrawer({
               </div>
             </div>
           </motion.div>
+          <style jsx>{`
+            /* Firefox */
+            .room-drawer-scroll {
+              scrollbar-width: thin;
+              scrollbar-color: transparent transparent;
+            }
+            .room-drawer-scroll:hover {
+              scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+            }
+            /* Webkit */
+            .room-drawer-scroll::-webkit-scrollbar {
+              width: 6px;
+              height: 6px;
+            }
+            .room-drawer-scroll::-webkit-scrollbar-track {
+              background: transparent;
+            }
+            .room-drawer-scroll::-webkit-scrollbar-thumb {
+              background-color: transparent;
+              border-radius: 20px;
+            }
+            .room-drawer-scroll:hover::-webkit-scrollbar-thumb {
+              background-color: rgba(0, 0, 0, 0.2);
+            }
+          `}</style>
         </>
       )}
     </AnimatePresence>

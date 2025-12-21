@@ -3,7 +3,7 @@ import type { Hotel } from '@repo/types';
 import { Star, MapPin, Wifi, Users } from '@repo/ui/icons';
 import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
 import { ImageWithFallback } from '@repo/ui';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 
 interface Props {
@@ -18,6 +18,7 @@ export default function MagazineLayout1({ hotel }: Props) {
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
   const { show } = useLoading();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
   return (
@@ -62,7 +63,7 @@ export default function MagazineLayout1({ hotel }: Props) {
         <div
           ref={setRefs}
           onMouseLeave={clearHover}
-          onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết khách sạn'); router.push(`/hotels/${hotel.slug}`); }, 300); }}
+          onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết khách sạn'); router.push(`/hotels/${hotel.slug}?${searchParams.toString()}`); }, 300); }}
           className="relative grid grid-cols-12 gap-8 cursor-pointer"
         >
           <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
