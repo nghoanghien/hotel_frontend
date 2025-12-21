@@ -53,16 +53,12 @@ export default function BookingCheckoutSummary({
         onClick={onConfirm}
         disabled={!canConfirm}
         className={`mt-6 w-full py-4 rounded-xl font-semibold text-lg transition-all ${canConfirm
-            ? "bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90 shadow-lg"
-            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+          ? "bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90 shadow-lg"
+          : "bg-gray-200 text-gray-400 cursor-not-allowed"
           }`}
       >
         {canConfirm ? "Confirm Booking" : "Please fill required fields"}
       </motion.button>
-
-      <div className="mt-4 text-xs text-center text-gray-500">
-        By confirming, you agree to our Terms & Conditions
-      </div>
     </div>
   );
 }

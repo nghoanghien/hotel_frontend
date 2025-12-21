@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "@repo/ui/icons";
 import { useLoading, useHoverHighlight, HoverHighlightOverlay } from "@repo/ui";
 import { useBookingCheckout } from "@/features/booking/hooks/useBookingCheckout";
 import GuestInfoForm from "@/features/booking/components/GuestInfoForm";
@@ -122,6 +123,14 @@ export default function BookingCheckoutPage() {
 
   return (
     <div className="h-screen flex flex-col bg-[#F7F7F7]">
+      {/* Back button */}
+      <button
+        onClick={() => router.back()}
+        className="fixed top-24 left-6 z-50 w-11 h-11 rounded-full bg-white/90 backdrop-blur-sm shadow-lg border border-gray-200 hover:bg-white hover:scale-110 transition-all flex items-center justify-center group"
+      >
+        <ArrowLeft className="w-5 h-5 text-gray-700 group-hover:text-gray-900" />
+      </button>
+
       <div className="flex-1 overflow-hidden">
         <div className="max-w-[1400px] mx-auto pr-16 px-8 pt-12 h-full">
           <div className="grid grid-cols-[65%_35%] gap-8 h-full">
@@ -238,6 +247,9 @@ export default function BookingCheckoutPage() {
                       canConfirm={canConfirm}
                     />
                   )}
+                  <p className="text-xs text-gray-500 mt-4 text-center px-4 leading-relaxed">
+                    By proceeding with payment, you agree to Hotelzy's <span className="text-[var(--primary)] cursor-pointer hover:underline">Terms & Conditions</span>, <span className="text-[var(--primary)] cursor-pointer hover:underline">Privacy Policy</span>, and <span className="text-[var(--primary)] cursor-pointer hover:underline">Refund Policy</span>.
+                  </p>
                 </section>
               </div>
             </div>
@@ -272,13 +284,42 @@ export default function BookingCheckoutPage() {
                 </div>
 
                 {/* Policies Card */}
+                {/* Policies Card */}
                 <div className="bg-white rounded-2xl border-2 border-gray-300 p-6">
-                  <div className="text-sm font-semibold text-gray-900 mb-3">Cancellation Policy</div>
-                  <ul className="text-xs text-gray-600 space-y-2">
-                    <li>• Free cancellation up to 24 hours before check-in</li>
-                    <li>• No refund for late cancellations</li>
-                    <li>• Early check-in subject to availability</li>
-                  </ul>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">Accommodation Policies</h3>
+
+                  <div className="space-y-4">
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900 mb-2">Check-in / Check-out</div>
+                      <div className="text-xs text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <div className="flex justify-between mb-1">
+                          <span>Check-in:</span>
+                          <span className="font-medium text-gray-900">From 14:00</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Check-out:</span>
+                          <span className="font-medium text-gray-900">Before 12:00</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900 mb-2">Cancellation Policy</div>
+                      <ul className="text-xs text-gray-600 space-y-2 list-disc list-inside bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <li>Free cancellation up to 24 hours before check-in</li>
+                        <li>Non-refundable if cancelled within 24 hours</li>
+                      </ul>
+                    </div>
+
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900 mb-2">Other Regulations</div>
+                      <ul className="text-xs text-gray-600 space-y-2 list-disc list-inside bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <li>Smoking is not allowed in rooms</li>
+                        <li>Pets are welcome (additional charges may apply)</li>
+                        <li>Quiet hours: 22:00 - 07:00</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
