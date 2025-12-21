@@ -7,6 +7,7 @@ import dynamic from "next/dynamic";
 const CurrentBookingsDrawer = dynamic(() => import("@/features/orders/components/CurrentBookingsDrawer"), { ssr: false });
 import SearchOverlay from "@/features/search/components/SearchOverlay";
 import { motion, AnimatePresence } from "@repo/ui/motion";
+import { useLoading } from "@repo/ui";
 import { useSearch } from "@/features/search/hooks/useSearch";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -19,6 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { isSearching, performSearch } = useSearch();
+  const { show } = useLoading();
   const isSearchMode = searchParams.has("q");
   const isRestaurantDetail = pathname?.startsWith("/restaurants/") ?? false;
   const isHotelDetail = pathname?.startsWith("/hotels/") ?? false;
@@ -80,6 +82,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               onSearchClick={() => setSearchOpen(true)}
               hideSearchIcon={isSearchMode || isDetailPage}
               onLogoClick={() => {
+                show("Đang chuyển hướng đến trang chủ");
                 const next = new URLSearchParams(searchParams.toString());
                 next.delete('q');
                 router.replace(`/home`, { scroll: false });

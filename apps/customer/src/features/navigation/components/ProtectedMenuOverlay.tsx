@@ -13,6 +13,7 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
   useEffect(() => { const t = setTimeout(() => setIsLoading(false), 400); return () => clearTimeout(t); }, []);
 
   const handleHomeClick = () => {
+    show("Đang chuyển hướng đến trang chủ");
     const next = new URLSearchParams(params.toString());
     next.delete('q');
     router.replace(`/home`, { scroll: false });
