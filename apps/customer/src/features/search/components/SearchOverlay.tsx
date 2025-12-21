@@ -1,9 +1,10 @@
 "use client";
 import { AnimatePresence, motion } from "@repo/ui/motion";
-import { Search, X, MapPin, Calendar, Users } from "@repo/ui/icons";
+import { Search, X, MapPin, Calendar, Users, SlidersHorizontal } from "@repo/ui/icons";
 import { useState, useEffect, KeyboardEvent } from "react";
 import DateRangePicker from "./DateRangePicker";
 import GuestRoomSelector from "./GuestRoomSelector";
+import FilterModal from "./FilterModal";
 
 interface SearchOverlayProps {
   open: boolean;
@@ -43,6 +44,7 @@ export default function SearchOverlay({
   });
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGuestSelector, setShowGuestSelector] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const handleSearch = () => {
     if (query.trim() && onSearch) {
@@ -238,7 +240,7 @@ export default function SearchOverlay({
             animate={{ y: isSearchBarCompact ? -100 : 0 }}
             exit={{ y: -100 }}
             transition={{ duration: 0.3, type: "spring", damping: 25 }}
-            className="fixed z-[50] inset-x-64 top-4 flex justify-center px-4"
+            className="fixed z-[50] inset-x-0 top-4 flex justify-center items-stretch gap-4 px-4"
           >
             <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-200 w-full max-w-[900px] overflow-hidden">
               {isSearching && (
@@ -290,10 +292,37 @@ export default function SearchOverlay({
                 </button>
               </div>
             </div>
+
+
+            <AnimatePresence>
+              {!filterOpen && (
+                <motion.button
+                  layoutId="filter-modal"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  onClick={() => setFilterOpen(true)}
+                  className="relative h-auto self-stretch flex items-center gap-2 px-6 bg-white rounded-3xl shadow-2xl border border-gray-200 text-gray-900 font-bold hover:bg-gray-50 transition-colors whitespace-nowrap"
+                >
+                  <SlidersHorizontal className="w-5 h-5" />
+                  Filter
+                </motion.button>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>
 
+
+      <AnimatePresence>
+        {filterOpen && (
+          <FilterModal
+            open={filterOpen}
+            onClose={() => setFilterOpen(false)}
+            layoutId="filter-modal"
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }
