@@ -52,6 +52,10 @@ export default function SearchOverlay({
         checkOut: dateRange.checkOut,
         ...guestRoom
       });
+      // Close overlay after 1.5s loading
+      setTimeout(() => {
+        onClose();
+      }, 1500);
     }
   };
 
@@ -110,16 +114,6 @@ export default function SearchOverlay({
               className="fixed z-[70] inset-x-0 top-[8vh] flex justify-center px-4"
             >
               <div className="relative rounded-3xl p-8 w-full max-w-[900px]">
-                {/* Loading shimmer */}
-                {isSearching && (
-                  <motion.div
-                    initial={{ x: "-100%" }}
-                    animate={{ x: "100%" }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                    className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                  />
-                )}
-
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="font-anton text-[clamp(24px,3vw,28px)] font-bold text-white uppercase tracking-tight" style={{ fontStretch: "condensed", letterSpacing: "-0.01em" }}>
                     TÌM KIẾM KHÁCH SẠN
@@ -136,7 +130,16 @@ export default function SearchOverlay({
 
                 <div className="space-y-4">
                   {/* Location Input */}
-                  <div className="relative">
+                  <div className="relative overflow-hidden rounded-3xl">
+                    {/* Loading shimmer */}
+                    {isSearching && (
+                      <motion.div
+                        initial={{ x: "-100%" }}
+                        animate={{ x: "100%" }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                        className="absolute inset-y-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      />
+                    )}
                     <MapPin className="absolute left-8 top-1/2 -translate-y-1/2 w-5 h-5 text-white/60" />
                     <input
                       autoFocus
@@ -235,9 +238,9 @@ export default function SearchOverlay({
             animate={{ y: isSearchBarCompact ? -100 : 0 }}
             exit={{ y: -100 }}
             transition={{ duration: 0.3, type: "spring", damping: 25 }}
-            className="fixed z-[50] inset-x-0 top-4 flex justify-center px-4"
+            className="fixed z-[50] inset-x-64 top-4 flex justify-center px-4"
           >
-            <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-200 w-full max-w-[900px]">
+            <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-200 w-full max-w-[900px] overflow-hidden">
               {isSearching && (
                 <motion.div
                   initial={{ x: "-100%" }}
