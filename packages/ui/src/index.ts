@@ -42,3 +42,23 @@ export * from "./effects/HoverHighlight";
 export * from "./effects/TapRipple";
 export * from "./effects/FlyToCart";
 export { default as ImageWithFallback } from "./media/ImageWithFallback";
+export {
+  RechartsAreaChart,
+  RechartsLineChart,
+  RechartsBarChart,
+  RechartsPieChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  RadialBarChart,
+  RadialBar,
+  Legend,
+  PolarAngleAxis,
+  Line,
+  Bar,
+  Pie,
+  Cell
+} from "./charts";
