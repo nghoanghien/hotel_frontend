@@ -112,8 +112,8 @@ export default function FilterModal({ open, onClose, layoutId }: FilterModalProp
           className="bg-white w-full max-w-2xl rounded-[32px] overflow-hidden shadow-2xl pointer-events-auto flex flex-col max-h-[90vh]"
           transition={{
             type: "spring",
-            damping: 24,
-            stiffness: 200,
+            damping: 17,
+            stiffness: 100,
           }}
         >
           {/* Header */}

@@ -5,6 +5,8 @@ import { useState, useEffect, KeyboardEvent } from "react";
 import DateRangePicker from "./DateRangePicker";
 import GuestRoomSelector from "./GuestRoomSelector";
 import FilterModal from "./FilterModal";
+import CompactDateSelector from "./CompactDateSelector";
+import CompactGuestSelector from "./CompactGuestSelector";
 
 interface SearchOverlayProps {
   open: boolean;
@@ -44,6 +46,7 @@ export default function SearchOverlay({
   });
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showGuestSelector, setShowGuestSelector] = useState(false);
+  const [activeSelector, setActiveSelector] = useState<'date' | 'guest' | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
 
   const handleSearch = () => {
@@ -240,9 +243,9 @@ export default function SearchOverlay({
             animate={{ y: isSearchBarCompact ? -100 : 0 }}
             exit={{ y: -100 }}
             transition={{ duration: 0.3, type: "spring", damping: 25 }}
-            className="fixed z-[50] inset-x-0 top-4 flex justify-center items-stretch gap-4 px-4"
+            className="fixed z-[50] inset-x-56 top-4 flex justify-center items-stretch gap-4 px-4"
           >
-            <div className="relative bg-white rounded-3xl shadow-2xl border border-gray-200 w-full max-w-[900px] overflow-hidden">
+            <div className={`relative bg-white rounded-3xl border border-gray-200 w-full max-w-[800px] overflow-hidden ${activeSelector ? '' : 'shadow-2xl'}`}>
               {isSearching && (
                 <motion.div
                   initial={{ x: "-100%" }}
@@ -267,8 +270,11 @@ export default function SearchOverlay({
                 <div className="h-8 w-px bg-gray-200" />
 
                 <button
-                  onClick={() => setShowDatePicker(true)}
-                  className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 rounded-2xl transition-colors"
+                  onClick={() => {
+                    setActiveSelector('date');
+                    setFilterOpen(false);
+                  }}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-2xl transition-colors ${activeSelector === 'date' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
                 >
                   <Calendar className="w-5 h-5 text-gray-400" />
                   <span className="text-sm font-medium text-gray-700 whitespace-nowrap">{formatDateRange()}</span>
@@ -277,8 +283,11 @@ export default function SearchOverlay({
                 <div className="h-8 w-px bg-gray-200" />
 
                 <button
-                  onClick={() => setShowGuestSelector(true)}
-                  className="flex items-center gap-2 px-4 py-3 hover:bg-gray-50 rounded-2xl transition-colors"
+                  onClick={() => {
+                    setActiveSelector('guest');
+                    setFilterOpen(false);
+                  }}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-2xl transition-colors ${activeSelector === 'guest' ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
                 >
                   <Users className="w-5 h-5 text-gray-400" />
                   <span className="text-sm font-medium text-gray-700 whitespace-nowrap">{formatGuestRoom()}</span>
@@ -301,10 +310,15 @@ export default function SearchOverlay({
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{
+                    type: "spring",
+                    damping: 18,
+                    stiffness: 100,
+                  }}
                   onClick={() => setFilterOpen(true)}
-                  className="relative h-auto self-stretch flex items-center gap-2 px-6 bg-white rounded-3xl shadow-2xl border border-gray-200 text-gray-900 font-bold hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  className="relative h-auto self-stretch flex items-center gap-2 px-6 bg-white rounded-3xl shadow-2xl border border-gray-100 text-[var(--primary)] font-bold hover:bg-gray-50 transition-colors whitespace-nowrap"
                 >
-                  <SlidersHorizontal className="w-5 h-5" />
+                  <SlidersHorizontal className="w-5 h-5 text-[var(--primary)]" />
                   Filter
                 </motion.button>
               )}
@@ -314,12 +328,53 @@ export default function SearchOverlay({
       </AnimatePresence>
 
 
+
       <AnimatePresence>
         {filterOpen && (
           <FilterModal
             open={filterOpen}
             onClose={() => setFilterOpen(false)}
             layoutId="filter-modal"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Shared Backdrop for Compact Selectors */}
+      <AnimatePresence>
+        {activeSelector && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[40] bg-black/40 backdrop-blur-sm"
+            onClick={() => {
+              setActiveSelector(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Compact Selectors - Same layoutId for morphing between them */}
+      <AnimatePresence>
+        {activeSelector === 'date' && (
+          <CompactDateSelector
+            key="date"
+            open={true}
+            onClose={() => setActiveSelector(null)}
+            value={dateRange}
+            onChange={setDateRange}
+            layoutId="compact-selector-shared"
+          />
+        )}
+        {activeSelector === 'guest' && (
+          <CompactGuestSelector
+            key="guest"
+            open={true}
+            onClose={() => setActiveSelector(null)}
+            value={guestRoom}
+            onChange={setGuestRoom}
+            layoutId="compact-selector-shared"
           />
         )}
       </AnimatePresence>
