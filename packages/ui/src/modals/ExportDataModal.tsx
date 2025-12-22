@@ -17,13 +17,24 @@ export type ExportDataModalProps = {
 };
 
 const ExportDataModal = ({ isOpen, onClose, data = [], onExport, initialSelectedColumns = null, title = "Xuất dữ liệu", columnLabels = null, formatData = (v) => v, defaultFormat = "pdf", customColumnCategories = null, enableGrouping = true }: ExportDataModalProps) => {
+  // State management
   const [selectedColumns, setSelectedColumns] = useState<Record<string, boolean>>({});
   const [exportFormat, setExportFormat] = useState<'pdf' | 'excel'>(defaultFormat);
   const [previewData, setPreviewData] = useState<Record<string, any>[]>([]);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({ personal: true, contact: true, address: true, other: true });
-  const [ghostColumns, setGhostColumns] = useState<Record<string, { value: boolean; position: { left: number; width: number } }>>({});
+
+  // Animation states
+  const [columnAnimations, setColumnAnimations] = useState<Record<string, 'adding' | 'removing' | null>>({});
   const [lastAddedColumn, setLastAddedColumn] = useState<string | null>(null);
+  const [lastRemovedColumn, setLastRemovedColumn] = useState<string | null>(null);
+  const [ghostColumns, setGhostColumns] = useState<Record<string, { value: boolean; position: { left: number; width: number } }>>({});
+
+  // Refs
   const tableRef = useRef<HTMLDivElement | null>(null);
+  const tableContainerRef = useRef<HTMLDivElement | null>(null);
+  const lastToggledColumn = useRef<string | null>(null);
+  const previousSelectedColumns = useRef<Record<string, boolean>>({});
+  const isFirstRender = useRef(true);
 
   const defaultColumnCategories: Record<string, string[]> = { personal: ['fullName', 'birthDate', 'age', 'idNumber', 'code'], contact: ['email', 'phone'], address: ['permanentAddress', 'contactAddress'], other: ['registrationDate', 'status'] };
   const columnCategories = customColumnCategories || defaultColumnCategories;
@@ -41,9 +52,72 @@ const ExportDataModal = ({ isOpen, onClose, data = [], onExport, initialSelected
 
   useEffect(() => { if (data && data.length > 0) { const preview = data.slice(0, 3).map(item => { const row: Record<string, any> = {}; Object.keys(selectedColumns).forEach(column => { if (selectedColumns[column]) { const value = getNestedValue(item, column); row[column] = formatValue(value, column); } }); return row; }); setPreviewData(preview); } }, [selectedColumns, data]);
 
-  const findColumnPosition = (column: string) => { if (!tableRef.current) return { left: 0, width: 0 }; const columnElement = (tableRef.current as any).querySelector(`[data-column="${column}"]`); if (!columnElement) return { left: 0, width: 0 }; const rect = columnElement.getBoundingClientRect(); const tableRect = (tableRef.current as any).getBoundingClientRect(); return { left: rect.left - tableRect.left + (tableRef.current as any).scrollLeft, width: rect.width }; };
-  const toggleColumn = (column: string) => { if (selectedColumns[column]) { const position = findColumnPosition(column); setTimeout(() => { setGhostColumns(prev => ({ ...prev, [column]: { value: true, position } })); }, 10); setTimeout(() => { setGhostColumns(prev => { const newGhosts = { ...prev }; delete newGhosts[column]; return newGhosts; }); }, 500); } else { setLastAddedColumn(column); } setSelectedColumns(prev => ({ ...prev, [column]: !prev[column] })); setTimeout(() => { setLastAddedColumn(null); }, 500); };
-  const toggleSectionColumns = (section: string, value: boolean) => { const newSelectedColumns = { ...selectedColumns }; const newGhostColumns = { ...ghostColumns }; (columnCategories[section] || []).forEach(column => { if (column in newSelectedColumns) { if (newSelectedColumns[column] && !value) { newGhostColumns[column] = { value: true, position: findColumnPosition(column) }; } if (!newSelectedColumns[column] && value) { setLastAddedColumn(column); } newSelectedColumns[column] = value; } }); setSelectedColumns(newSelectedColumns); setGhostColumns(newGhostColumns); setTimeout(() => { setGhostColumns({}); setLastAddedColumn(null); }, 500); };
+  const findColumnPosition = (column: string) => {
+    if (!tableRef.current) return { left: 0, width: 0 };
+    const columnElement = tableRef.current.querySelector(`[data-column="${column}"]`);
+    if (!columnElement) return { left: 0, width: 0 };
+    const rect = columnElement.getBoundingClientRect();
+    const tableRect = tableRef.current.getBoundingClientRect();
+    return { left: rect.left - tableRect.left + tableRef.current.scrollLeft, width: rect.width };
+  };
+
+  const toggleColumn = (column: string) => {
+    lastToggledColumn.current = column;
+    previousSelectedColumns.current = { ...selectedColumns };
+
+    if (selectedColumns[column]) {
+      setLastRemovedColumn(column);
+      const position = findColumnPosition(column);
+      setTimeout(() => { setGhostColumns(prev => ({ ...prev, [column]: { value: true, position } })); }, 10);
+      setTimeout(() => { setGhostColumns(prev => { const newGhosts = { ...prev }; delete newGhosts[column]; return newGhosts; }); }, 500);
+    } else {
+      setLastAddedColumn(column);
+    }
+
+    setSelectedColumns(prev => ({ ...prev, [column]: !prev[column] }));
+    setColumnAnimations(prev => ({ ...prev, [column]: !selectedColumns[column] ? 'adding' : 'removing' }));
+
+    setTimeout(() => {
+      setColumnAnimations(prev => ({ ...prev, [column]: null }));
+      if (selectedColumns[column]) { setLastRemovedColumn(null); } else { setLastAddedColumn(null); }
+    }, 500);
+  };
+
+  const toggleSectionColumns = (section: string, value: boolean) => {
+    const newSelectedColumns = { ...selectedColumns };
+    const columnsToAnimate: Record<string, 'adding' | 'removing'> = {};
+    const newGhostColumns = { ...ghostColumns };
+
+    previousSelectedColumns.current = { ...selectedColumns };
+
+    (columnCategories[section] || []).forEach(column => {
+      if (column in newSelectedColumns) {
+        if (newSelectedColumns[column] !== value) {
+          columnsToAnimate[column] = value ? 'adding' : 'removing';
+          if (newSelectedColumns[column] && !value) {
+            newGhostColumns[column] = { value: true, position: findColumnPosition(column) };
+            setLastRemovedColumn(column);
+          }
+          if (!newSelectedColumns[column] && value) { setLastAddedColumn(column); }
+        }
+        newSelectedColumns[column] = value;
+      }
+    });
+
+    setSelectedColumns(newSelectedColumns);
+    setGhostColumns(newGhostColumns);
+    setColumnAnimations(prev => ({ ...prev, ...columnsToAnimate }));
+
+    setTimeout(() => {
+      const resetAnimations: Record<string, null> = {};
+      Object.keys(columnsToAnimate).forEach(column => { resetAnimations[column] = null; });
+      setColumnAnimations(prev => ({ ...prev, ...resetAnimations }));
+      setGhostColumns({});
+      setLastAddedColumn(null);
+      setLastRemovedColumn(null);
+    }, 500);
+  };
+
   const areSectionColumnsSelected = (section: string) => { if (!columnCategories || !columnCategories[section] || !Array.isArray(columnCategories[section])) return false; if (columnCategories[section].length === 0) return false; if (!selectedColumns) return false; return columnCategories[section].every(column => selectedColumns[column] === true); };
 
   const categorizedColumns = (() => { const categorized: Record<string, { key: string; label: string }[]> = {}; const labels = getColumnLabels(); if (!enableGrouping) { categorized.all = Object.keys(selectedColumns).map(column => ({ key: column, label: labels[column] || column })); return categorized; } Object.keys(columnCategories).forEach(category => { categorized[category] = []; }); if (!categorized.other) categorized.other = []; Object.entries(columnCategories).forEach(([category, columns]) => { if (Array.isArray(columns)) { columns.forEach(column => { const list = categorized[category] || (categorized[category] = []); const alreadyIncluded = list.some(item => item.key === column); const isInSelectedColumns = column in selectedColumns; let isComplexObject = false; if (data && data.length > 0 && !isInSelectedColumns) { const firstItem = data[0]!; if (firstItem && typeof firstItem === 'object') { isComplexObject = column in firstItem && firstItem[column] !== null && typeof firstItem[column] === 'object' && !Array.isArray(firstItem[column]); } } if (!alreadyIncluded && (isInSelectedColumns || isComplexObject)) { list.push({ key: column, label: labels[column] || column }); } }); } }); Object.keys(selectedColumns || {}).forEach(column => { let found = false; for (const category in categorized) { if ((categorized[category] || []).some(item => item.key === column)) { found = true; break; } } if (!found) { (categorized.other || (categorized.other = [])).push({ key: column, label: labels[column] || column }); } }); return categorized; })();
@@ -123,26 +197,51 @@ const ExportDataModal = ({ isOpen, onClose, data = [], onExport, initialSelected
                   <h3 className="font-medium text-gray-800 mb-5 flex items-center"><div className="mr-2 p-2 bg-gradient-to-br from-green-500 to-lime-500 rounded-lg text-white shadow-md"><Eye size={18} /></div><span className="bg-gradient-to-r from-green-600 to-lime-500 bg-clip-text text-transparent font-semibold text-lg">Xem trước dữ liệu</span></h3>
                   {Object.values(selectedColumns).some(Boolean) ? (
                     <div className="border border-green-200/50 rounded-xl overflow-hidden shadow-[0_5px_30px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(34,197,94,0.1)] transition-all duration-500 relative bg-white/80 backdrop-blur-sm">
-                      <div className="overflow-x-auto relative" ref={tableRef as any}>
-                        <motion.div className="min-w-full relative">
+                      <div className="overflow-x-auto relative" ref={tableContainerRef}>
+                        <motion.div className="min-w-full relative" ref={tableRef} layout="position" layoutRoot transition={{ type: "spring", stiffness: 200, damping: 30, duration: 0.4 }}>
                           <table className="min-w-full divide-y divide-green-100">
                             <thead className="bg-gradient-to-r from-green-50 to-lime-50">
                               <tr className="relative">
-                                {Object.keys(selectedColumns).map(column => selectedColumns[column] && (
-                                  <th key={column} data-column={column} className={`px-4 py-3.5 text-left text-xs font-medium uppercase tracking-wider border-r border-green-100/30 last:border-r-0 relative ${column === lastAddedColumn ? 'text-green-700' : 'text-gray-600'}`}>
+                                {Object.entries(ghostColumns).map(([column, ghost]) => (
+                                  <motion.th key={`ghost-${column}`} className="absolute px-4 py-3.5 text-left text-xs font-medium text-gray-600/40 uppercase tracking-wider border-r border-green-100/30 pointer-events-none" style={{ left: ghost.position.left, width: ghost.position.width, zIndex: 5 }} initial={{ opacity: 0.9 }} animate={{ opacity: 0, y: -10, scale: 0.9 }} transition={{ duration: 0.4 }}>
                                     <div className="flex items-center space-x-1.5"><span>{getColumnLabels()[column] || column}</span></div>
-                                    {column === lastAddedColumn && (<motion.div className="absolute inset-0 bg-green-200/30 z-0" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 1.5 }} />)}
-                                  </th>
+                                  </motion.th>
                                 ))}
+                                <AnimatePresence initial={false} mode="sync">
+                                  {Object.keys(selectedColumns).map(column => (
+                                    selectedColumns[column] && (
+                                      <motion.th key={column} data-column={column} className={`px-4 py-3.5 text-left text-xs font-medium uppercase tracking-wider border-r border-green-100/30 last:border-r-0 relative ${column === lastAddedColumn ? 'text-green-700' : 'text-gray-600'}`} initial={{ opacity: 0, width: 0, scale: 0.8 }} animate={{ opacity: 1, width: 'auto', scale: 1 }} exit={{ opacity: 0, width: 0, scale: 0.8 }} transition={{ type: "spring", stiffness: 300, damping: 25, duration: 0.4 }} layout="position">
+                                        <div className="flex items-center space-x-1.5"><span>{getColumnLabels()[column] || column}</span></div>
+                                        {column === lastAddedColumn && (<motion.div className="absolute inset-0 bg-green-200/30 z-0" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 1.5 }} />)}
+                                        {columnAnimations[column] === 'adding' && (<motion.div className="absolute inset-0 bg-green-100/30 z-10" initial={{ opacity: 0.8, scale: 1.1 }} animate={{ opacity: 0, scale: 1 }} transition={{ duration: 0.5 }} />)}
+                                      </motion.th>
+                                    )
+                                  ))}
+                                </AnimatePresence>
                               </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-green-50">
                               {previewData.map((row, index) => (
-                                <tr key={index} className="hover:bg-green-50/50 transition-colors duration-200 relative">
-                                  {Object.keys(selectedColumns).map(column => selectedColumns[column] && (
-                                    <td key={column} data-column={column} className={`px-4 py-3.5 whitespace-nowrap text-sm border-r border-green-50 last:border-r-0 relative ${column === lastAddedColumn ? 'text-green-700 font-medium' : 'text-gray-700'}`}>{row[column]}</td>
+                                <motion.tr key={index} className="hover:bg-green-50/50 transition-colors duration-200 relative" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: index * 0.1 }} layout="position">
+                                  {Object.entries(ghostColumns).map(([column, ghost]) => (
+                                    <motion.td key={`ghost-${column}-${index}`} className="absolute px-4 py-3.5 whitespace-nowrap text-sm text-gray-700/40 border-r border-green-50 pointer-events-none" style={{ left: ghost.position.left, width: ghost.position.width, zIndex: 5 }} initial={{ opacity: 0.9 }} animate={{ opacity: 0, y: 10, scale: 0.9 }} transition={{ duration: 0.4, delay: index * 0.05 }}>
+                                      {row[column]}
+                                    </motion.td>
                                   ))}
-                                </tr>
+                                  <AnimatePresence initial={false} mode="sync">
+                                    {Object.keys(selectedColumns).map(column => (
+                                      selectedColumns[column] && (
+                                        <motion.td key={column} data-column={column} className={`px-4 py-3.5 whitespace-nowrap text-sm border-r border-green-50 last:border-r-0 relative ${column === lastAddedColumn ? 'text-green-700 font-medium' : 'text-gray-700'}`} initial={{ opacity: 0, width: 0, x: columnAnimations[column] === 'adding' ? -20 : 0, scale: columnAnimations[column] === 'adding' ? 0.8 : 1 }} animate={{ opacity: 1, width: 'auto', x: 0, scale: 1 }} exit={{ opacity: 0, width: 0, x: columnAnimations[column] === 'removing' ? 20 : 0, scale: columnAnimations[column] === 'removing' ? 0.8 : 1 }} transition={{ type: "spring", stiffness: 300, damping: 25, duration: 0.4, delay: index * 0.05 }} layout="position">
+                                          {column === lastAddedColumn && (<motion.div className="absolute inset-0 bg-green-100/30 z-0" initial={{ opacity: 1 }} animate={{ opacity: 0 }} transition={{ duration: 1.5 }} />)}
+                                          {columnAnimations[column] === 'adding' && (<motion.div className="absolute inset-0 bg-green-100/30 z-10" initial={{ opacity: 0.8, scale: 1.1 }} animate={{ opacity: 0, scale: 1 }} transition={{ duration: 0.5 }} />)}
+                                          {columnAnimations[column] === 'removing' && (<motion.div className="absolute inset-0 bg-red-100/20 z-10" initial={{ opacity: 0 }} animate={{ opacity: 0.8 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }} />)}
+                                          {columnAnimations[column] === 'adding' && (<motion.div className="absolute inset-0 flex items-center px-4 text-green-700 font-medium" initial={{ opacity: 0.8, scale: 1.1, x: -10 }} animate={{ opacity: 0, scale: 1, x: 0 }} transition={{ duration: 0.4 }}>{row[column]}</motion.div>)}
+                                          {row[column]}
+                                        </motion.td>
+                                      )
+                                    ))}
+                                  </AnimatePresence>
+                                </motion.tr>
                               ))}
                             </tbody>
                           </table>
