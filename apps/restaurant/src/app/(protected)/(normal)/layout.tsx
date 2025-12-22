@@ -5,13 +5,10 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { motion } from '@repo/ui/motion';
 import {
-  ShoppingCart,
-  UtensilsCrossed,
-  Percent,
-  Star,
-  Store,
-  TrendingUp,
-  Wallet,
+  LayoutDashboard,
+  Building2,
+  Users,
+  Settings,
   User,
   LogOut,
   Power
@@ -20,21 +17,18 @@ import RestaurantNavItem from '../../../components/RestaurantNavItem';
 import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation } from '@repo/ui';
 
 const restaurantMenuItems = [
-  { id: 'orders', icon: ShoppingCart, text: 'Đơn hàng' },
-  { id: 'menu', icon: UtensilsCrossed, text: 'Thực đơn' },
-  { id: 'promotions', icon: Percent, text: 'Khuyến mãi' },
-  { id: 'reviews', icon: Star, text: 'Đánh giá' },
-  { id: 'store', icon: Store, text: 'Cửa hàng' },
-  { id: 'finances', icon: TrendingUp, text: 'Tài chính' },
-  { id: 'wallet', icon: Wallet, text: 'Ví cửa hàng' }
+  { id: 'overview', icon: LayoutDashboard, text: 'Tổng quan' },
+  { id: 'hotels', icon: Building2, text: 'Quản lý khách sạn' },
+  { id: 'customers', icon: Users, text: 'Quản lý khách hàng' },
+  { id: 'settings', icon: Settings, text: 'Thông số hệ thống' }
 ];
 
 export default function NormalLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { confirm } = useSwipeConfirmation();
-  const [activeSection, setActiveSection] = useState('orders');
-  const [profileData] = useState({ fullName: 'Nhà hàng ABC', email: 'restaurant@eatzy.com' });
+  const [activeSection, setActiveSection] = useState('overview');
+  const [profileData] = useState({ fullName: 'Super Admin', email: 'admin@hotel.com' });
   const [navHovered, setNavHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isAppActive, setIsAppActive] = useState(true);
@@ -70,10 +64,10 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
   const handleToggleApp = () => {
     const newStatus = !isAppActive;
     confirm({
-      title: newStatus ? 'Bật ứng dụng' : 'Tắt ứng dụng',
+      title: newStatus ? 'Bật hệ thống' : 'Tắt hệ thống',
       description: newStatus
-        ? 'Bật ứng dụng để nhận đơn hàng mới từ khách hàng.'
-        : 'Tắt ứng dụng sẽ ngừng nhận đơn hàng mới. Bạn có chắc chắn?',
+        ? 'Bật hệ thống để khách sạn có thể nhận đặt phòng mới.'
+        : 'Tắt hệ thống sẽ ngừng nhận đặt phòng mới. Bạn có chắc chắn?',
       confirmText: newStatus ? 'Bật' : 'Tắt',
       onConfirm: () => {
         setIsAppActive(newStatus);
@@ -183,7 +177,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
         <div className="relative flex-1 py-6 px-3 flex flex-col overflow-hidden">
           <div className={`mb-4 ${navHovered ? "px-4" : "text-center"}`}>
             <p className="text-xs text-gray-600 uppercase font-medium mb-3 drop-shadow-sm whitespace-nowrap overflow-hidden tracking-wider">
-              {navHovered ? "Quản lý nhà hàng" : "QL"}
+              {navHovered ? "Quản trị hệ thống" : "QT"}
             </p>
           </div>
 
@@ -252,7 +246,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
         <div className="border-b border-gray-200 px-8 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-anton font-bold text-[#1A1A1A]">
-              NHÀ HÀNG ABC
+              HOTEL ADMIN DASHBOARD
             </h1>
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -264,7 +258,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
                 }`}
             >
               <Power className="w-5 h-5" />
-              <span>{isAppActive ? 'Đang mở' : 'Đã đóng'}</span>
+              <span>{isAppActive ? 'Hệ thống hoạt động' : 'Hệ thống ngừng'}</span>
             </motion.button>
           </div>
         </div>
