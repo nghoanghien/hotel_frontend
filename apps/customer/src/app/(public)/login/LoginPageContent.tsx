@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useZodForm, loginSchema, type LoginFormData } from "@repo/lib";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { useLoading } from "@repo/ui";
+import { useEffect } from "react";
 
 /**
  * Login Page Content - Pattern from RoleCard.jsx
@@ -20,13 +21,25 @@ import { useLoading } from "@repo/ui";
  */
 export default function LoginPageContent() {
   const router = useRouter();
-  const { show } = useLoading();
+  const { show, hide } = useLoading();
 
   const form = useZodForm<LoginFormData>({
     schema: loginSchema,
     mode: "onChange",
     defaultValues: { email: "", password: "", rememberMe: false },
   });
+
+  // Show loading on page load, then hide after 2 seconds
+  useEffect(() => {
+    show("Đang tải trang đăng nhập...");
+
+    const timer = setTimeout(() => {
+      hide();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [show, hide]); // Safe to include now that LoadingProvider uses useCallback
+
 
   const handleRegisterClick = () => {
     router.push("/register");

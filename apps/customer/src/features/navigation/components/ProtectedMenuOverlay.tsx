@@ -1,16 +1,26 @@
 "use client";
 import { motion, AnimatePresence } from "@repo/ui/motion";
-import { History, Home, Heart } from "@repo/ui/icons";
-import { NavItem, NavItemShimmer, ProfileShimmer, useLoading } from "@repo/ui";
+import { History, Home, Heart, LogOut, LucideIcon } from "@repo/ui/icons";
+import { NavItem, NavItemShimmer, ProfileShimmer, useLoading, useSwipeConfirmation } from "@repo/ui";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+
+interface MenuItem {
+  id: string;
+  icon: LucideIcon;
+  text: string;
+  onClick: () => void;
+  isLogout?: boolean;
+}
 
 export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const params = useSearchParams();
   const { show } = useLoading();
+  const { confirm } = useSwipeConfirmation();
   useEffect(() => { const t = setTimeout(() => setIsLoading(false), 400); return () => clearTimeout(t); }, []);
+
 
   const handleHomeClick = () => {
     show("Đang chuyển hướng đến trang chủ");
@@ -32,10 +42,35 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
     onClose();
   };
 
-  const customerItems = [
+  const handleLogoutClick = () => {
+    onClose();
+    confirm({
+      title: "Xác nhận đăng xuất",
+      description: "Bạn có chắc chắn muốn đăng xuất khỏi tài khoản?",
+      confirmText: "Vuốt để đăng xuất",
+      type: "danger",
+      onConfirm: async () => {
+        // Simulate 2 second loading
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Show loading overlay
+        show("Đang đăng xuất...");
+
+        // Clear any auth data (if needed)
+        // localStorage.removeItem('authToken');
+        // sessionStorage.clear();
+
+        // Redirect to login page
+        router.replace('/login');
+      }
+    });
+  };
+
+  const customerItems: MenuItem[] = [
     { id: "home", icon: Home, text: "Trang chủ", onClick: handleHomeClick },
     { id: "history", icon: History, text: "Lịch sử đặt phòng", onClick: handleHistoryClick },
     { id: "favorites", icon: Heart, text: "Yêu thích", onClick: handleFavoritesClick },
+    { id: "logout", icon: LogOut, text: "Đăng xuất", onClick: handleLogoutClick, isLogout: true },
   ];
 
   return (
@@ -85,7 +120,7 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
                   return (
                     <div key={item.id} onClick={item.onClick} className="cursor-pointer">
                       <NavItem
-                        icon={<Icon size={20} className="text-white" />}
+                        icon={<Icon size={20} className={item.isLogout ? "text-red-400" : "text-white"} />}
                         text={item.text}
                         expanded={true}
                         active={false}

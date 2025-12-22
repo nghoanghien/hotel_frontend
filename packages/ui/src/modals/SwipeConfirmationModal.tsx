@@ -206,7 +206,7 @@ export function SwipeConfirmationModal({
                     <LoadingSpinner size={56} color={getBackgroundIconColor()} />
                   </motion.div>
                   <motion.p className="text-gray-700 text-center font-medium tracking-wide drop-shadow-sm" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.4 }}>
-                    Eatzy đang xử lý, sẽ xong ngay thôi...
+                    Hotelzy đang xử lý, sẽ xong ngay thôi...
                   </motion.p>
                 </motion.div>
               ) : (
