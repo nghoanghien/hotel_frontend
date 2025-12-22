@@ -1,0 +1,246 @@
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { X, Search, Star, Sparkles, CheckCircle2, Key, MessageSquare, Map, Tag } from "@repo/ui/icons";
+import { ImageWithFallback } from "@repo/ui";
+import { motion, AnimatePresence } from "@repo/ui/motion";
+import type { Hotel } from "@repo/types";
+
+interface ReviewsModalProps {
+  hotel: Hotel;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("relevant");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const categories = [
+    { label: "Mức độ sạch sẽ", score: 4.9, icon: Sparkles },
+    { label: "Độ chính xác", score: 4.9, icon: CheckCircle2 },
+    { label: "Nhận phòng", score: 5.0, icon: Key },
+    { label: "Giao tiếp", score: 5.0, icon: MessageSquare },
+    { label: "Vị trí", score: 4.8, icon: Map },
+    { label: "Giá trị", score: 5.0, icon: Tag },
+  ];
+
+  const ratingDistribution = [
+    { stars: 5, count: hotel.reviewCount, percentage: 100 },
+    { stars: 4, count: 0, percentage: 0 },
+    { stars: 3, count: 0, percentage: 0 },
+    { stars: 2, count: 0, percentage: 0 },
+    { stars: 1, count: 0, percentage: 0 },
+  ];
+
+  const filteredReviews = hotel.reviews?.filter(review =>
+    review.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    review.authorName.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Full Screen Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100]"
+          />
+
+          {/* Modal Container - Centered with max-width */}
+          <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 md:p-6 lg:p-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full max-w-[1050px] h-[90vh] bg-white rounded-[36px] shadow-2xl flex flex-col overflow-hidden"
+            >
+              {/* Fixed Header with Close Button */}
+              <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
+                <button
+                  onClick={onClose}
+                  className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-900" />
+                </button>
+                <div className="flex-1" />
+              </div>
+
+              {/* Two Column Layout with Independent Scrolling */}
+              <div className="flex-1 flex overflow-hidden">
+
+                {/* Left Column - Scrollable Stats */}
+                <div className="w-[400px] flex-shrink-0 overflow-y-auto border-r border-gray-100 pr-8 px-16 py-8">
+                  <div className="space-y-8">
+                    {/* Hero Rating */}
+                    <div className="text-center space-y-3">
+                      <div className="flex items-center justify-center gap-4 mb-3">
+                        <span className="text-4xl">🏆</span>
+                        <div className="text-[80px] leading-none font-bold text-[#1A1A1A]">
+                          {hotel.rating.toFixed(2).replace('.', ',')}
+                        </div>
+                        <span className="text-4xl">🏆</span>
+                      </div>
+
+                      <h3 className="text-[18px] font-bold text-[#1A1A1A]">Được khách yêu thích</h3>
+                      <p className="text-gray-600 text-[13px] leading-relaxed">
+                        Trong số các chỗ ở cho thuê đủ điều kiện dựa trên điểm xếp hạng, lượt đánh giá và độ tin cậy, nhà này nằm trong <span className="font-bold text-gray-900">nhóm 10% chỗ ở hàng đầu</span>
+                      </p>
+                    </div>
+
+                    {/* Rating Distribution */}
+                    <div className="space-y-2.5">
+                      <h4 className="font-semibold text-gray-900 text-sm mb-3">Xếp hạng tổng thể</h4>
+                      {ratingDistribution.map((item) => (
+                        <div key={item.stars} className="flex items-center gap-2.5">
+                          <span className="text-xs text-gray-600 w-2">{item.stars}</span>
+                          <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${item.percentage}%` }}
+                              transition={{ duration: 0.8, delay: 0.2 }}
+                              className="h-full bg-gray-900 rounded-full"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Categories */}
+                    <div className="space-y-3 pt-4 border-t border-gray-100">
+                      {categories.map((cat) => {
+                        const Icon = cat.icon;
+                        return (
+                          <div key={cat.label} className="flex items-center justify-between py-1">
+                            <div className="flex items-center gap-2.5">
+                              <Icon className="w-4 h-4 text-gray-700" strokeWidth={1.5} />
+                              <span className="text-sm text-gray-900">{cat.label}</span>
+                            </div>
+                            <span className="font-semibold text-gray-900 text-sm">{cat.score.toFixed(1).replace('.', ',')}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column - Scrollable Reviews */}
+                <div className="flex-1 overflow-y-auto pr-12 px-8 py-6">
+                  <div className="space-y-6">
+                    {/* Header */}
+                    <div className="flex items-center justify-between pb-4">
+                      <h2 className="text-xl font-bold text-gray-900">
+                        {hotel.reviewCount} lượt đánh giá
+                      </h2>
+
+                      <div className="relative">
+                        <select
+                          value={sortBy}
+                          onChange={(e) => setSortBy(e.target.value)}
+                          className="appearance-none pl-3 pr-8 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none cursor-pointer"
+                        >
+                          <option value="relevant">Phù hợp nhất</option>
+                          <option value="recent">Gần đây nhất</option>
+                          <option value="highest">Đánh giá cao nhất</option>
+                          <option value="lowest">Đánh giá thấp nhất</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="relative">
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder="Tìm kiếm tất cả đánh giá"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-gray-400 focus:outline-none transition-colors text-sm"
+                      />
+                    </div>
+
+                    {/* Reviews List */}
+                    <div className="space-y-6 pt-2">
+                      {filteredReviews.length === 0 ? (
+                        <div className="text-center py-12 text-gray-500 text-sm">
+                          Không tìm thấy đánh giá nào
+                        </div>
+                      ) : (
+                        filteredReviews.map((review) => (
+                          <motion.div
+                            key={review.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="space-y-3 pb-6 border-b border-gray-100 last:border-0"
+                          >
+                            {/* Author Info */}
+                            <div className="flex items-start gap-3">
+                              <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+                                <ImageWithFallback
+                                  src={review.authorAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.authorName}`}
+                                  alt={review.authorName}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-bold text-gray-900 text-sm">{review.authorName}</div>
+                                {review.tenure && (
+                                  <div className="text-xs text-gray-500">{review.tenure} trên Hotelzy</div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Rating & Date */}
+                            <div className="flex items-center gap-2 text-xs">
+                              <div className="flex gap-0.5">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`w-2.5 h-2.5 ${i < review.rating ? 'fill-gray-900 text-gray-900' : 'text-gray-300'}`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="text-gray-400">·</span>
+                              <span className="text-gray-600">{review.date}</span>
+                            </div>
+
+                            {/* Review Content */}
+                            <p className="text-gray-700 leading-relaxed text-[14px]">
+                              {review.content}
+                            </p>
+
+                            {review.location && (
+                              <div className="text-xs text-gray-500 flex items-center gap-1">
+                                <Map className="w-3 h-3" />
+                                {review.location}
+                              </div>
+                            )}
+                          </motion.div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+};

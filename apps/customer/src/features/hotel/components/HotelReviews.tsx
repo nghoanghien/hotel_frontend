@@ -1,12 +1,16 @@
+import { useState } from "react";
 import { Star, Sparkles, CheckCircle2, Key, MessageSquare, Map, Tag } from "@repo/ui/icons";
 import { ImageWithFallback } from "@repo/ui";
 import type { Hotel } from "@repo/types";
+import { ReviewsModal } from "./ReviewsModal";
 
 interface HotelReviewsProps {
   hotel: Hotel;
 }
 
 export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const categories = [
     { label: "Mức độ sạch sẽ", score: 4.9, icon: Sparkles },
     { label: "Độ chính xác", score: 4.9, icon: CheckCircle2 },
@@ -123,7 +127,7 @@ export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
               {review.content}
             </p>
 
-            <button className="font-semibold text-gray-900 underline decoration-gray-900 underline-offset-2 text-[15px] hover:decoration-2 transition-all">
+            <button onClick={() => setIsModalOpen(true)} className="font-semibold text-gray-900 underline decoration-gray-900 underline-offset-2 text-[15px] hover:decoration-2 transition-all">
               Hiển thị thêm
             </button>
           </div>
@@ -132,7 +136,7 @@ export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
 
       {/* Footer Actions */}
       <div className="flex items-center gap-4 pt-4">
-        <button className="px-8 py-3 border border-gray-900 rounded-[8px] text-[16px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
+        <button onClick={() => setIsModalOpen(true)} className="px-8 py-3 border border-gray-900 rounded-[8px] text-[16px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors">
           Hiển thị tất cả {hotel.reviewCount} đánh giá
         </button>
         <div className="text-gray-300"> </div>
@@ -140,6 +144,9 @@ export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
           Quy trình đánh giá
         </button>
       </div>
+
+      {/* Reviews Modal */}
+      <ReviewsModal hotel={hotel} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 };

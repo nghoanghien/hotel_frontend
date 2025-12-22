@@ -7,7 +7,7 @@ import Providers from "./providers";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Eatzy Restaurant",
+  title: "Hotelzy Admin",
   description: "Restaurant management portal",
 };
 
