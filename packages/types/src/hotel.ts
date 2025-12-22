@@ -39,6 +39,17 @@ export type RoomType = {
   availableRooms?: number;
 };
 
+export type Review = {
+  id: string;
+  authorName: string;
+  authorAvatar?: string;
+  rating: number;
+  date: string;
+  content: string;
+  tenure?: string;
+  location?: string;
+};
+
 export type Hotel = {
   id: string;
   name: string;
@@ -52,6 +63,7 @@ export type Hotel = {
   amenities: Amenity[];
   roomTypes: RoomType[];
   description?: string;
+  reviews?: Review[];
 };
 
 export type HotelSearchFilters = {

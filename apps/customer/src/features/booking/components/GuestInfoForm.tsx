@@ -28,7 +28,7 @@ export default function GuestInfoForm({
             value={guestName}
             onChange={(e) => onNameChange(e.target.value)}
             placeholder="Enter your full name"
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
+            className="w-full px-4 py-3 bg-transparent border-b-2 border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
           />
         </div>
         <div>
@@ -38,7 +38,7 @@ export default function GuestInfoForm({
             value={guestEmail}
             onChange={(e) => onEmailChange(e.target.value)}
             placeholder="your.email@example.com"
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
+            className="w-full px-4 py-3 bg-transparent border-b-2 border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
           />
         </div>
         <div>
@@ -48,7 +48,7 @@ export default function GuestInfoForm({
             value={guestPhone}
             onChange={(e) => onPhoneChange(e.target.value)}
             placeholder="+84 123 456 789"
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
+            className="w-full px-4 py-3 bg-transparent border-b-2 border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
           />
         </div>
       </div>

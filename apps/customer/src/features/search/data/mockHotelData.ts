@@ -18,6 +18,63 @@ const commonAmenities: Record<string, Amenity> = {
   concierge: { id: 'concierge', name: 'Lễ tân 24/7' }
 };
 
+const commonReviews = [
+  {
+    id: 'r1',
+    authorName: 'Fr',
+    authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100',
+    rating: 5,
+    date: '1 ngày trước',
+    content: 'Chúng tôi đã có một kỳ nghỉ tuyệt vời như vậy! Chủ nhà phản hồi cực nhanh và đã có gắng hết sức để giúp chúng tôi mang hành lý, mặc dù chúng tôi đến sau 2 giờ sáng. Họ đã chờ chúng tôi...',
+    tenure: '5 năm hoạt động',
+  },
+  {
+    id: 'r2',
+    authorName: 'Rani',
+    authorAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100',
+    rating: 4,
+    date: '3 tuần trước',
+    content: 'Tôi đã có một thời gian thoải mái ở đây. Mọi thứ như được quảng cáo và chủ nhà phản hồi cực kỳ nhanh và hữu ích. Lý do duy nhất tại sao tôi không cho nó 5 sao là vì tiếng ồn. Chắc...',
+    tenure: '10 năm hoạt động',
+  },
+  {
+    id: 'r3',
+    authorName: 'Francis',
+    authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100',
+    rating: 5,
+    date: '1 tuần trước',
+    content: 'Chỗ ở tuyệt vời ở một vị trí tuyệt vời. Nhận phòng không khó khăn và chủ nhà cũng rất hữu ích. Rất đáng tiền ở đây. Tôi hoàn toàn khuyên bạn ở tại chỗ này.',
+    location: 'Santa Monica, California'
+  },
+  {
+    id: 'r4',
+    authorName: 'Mai',
+    authorAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100',
+    rating: 5,
+    date: '1 tuần trước',
+    content: 'Đây là lần thứ hai chúng tôi ở đây. Vị trí tuyệt vời, tất cả mọi thứ đều cách đó một quãng đi bộ. Người bán đồ ăn đường phố các loại. Ngay trung tâm thành phố nhưng cũng có cảm giác...',
+    location: 'Bancroft, Ca-na-đa'
+  },
+  {
+    id: 'r5',
+    authorName: 'Rosemarie Joy',
+    authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100',
+    rating: 5,
+    date: 'tháng 11 năm 2025',
+    content: 'Vị trí 💎 rất gần ATM - TP bank và các ngân hàng khác. Cách Cafe apartment và nhà hát opera 5 phút đi bộ. Chỗ ở được giữ sạch sẽ và họ rất hào phóng về nước uống và đồ vệ sinh cá...',
+    tenure: '8 năm hoạt động',
+  },
+  {
+    id: 'r6',
+    authorName: 'Daniel',
+    authorAvatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100',
+    rating: 5,
+    date: '6 ngày trước',
+    content: 'Studio rất đẹp và sạch sẽ, có mọi thứ bạn cần và ở một vị trí tuyệt vời. Các chủ nhà cực kỳ phản hồi nhanh và hữu ích, chắc chắn khuyên dùng. 5 🌟',
+    tenure: '9 năm hoạt động',
+  }
+];
+
 export const mockHotels: Hotel[] = [
   {
     id: 'hotel-1',
@@ -147,7 +204,66 @@ export const mockHotels: Hotel[] = [
         availableRooms: 2
       }
     ],
-    description: 'Resort sang trọng với view biển tuyệt đẹp, đầy đủ tiện nghi hiện đại'
+    description: 'Resort sang trọng với view biển tuyệt đẹp, đầy đủ tiện nghi hiện đại',
+    reviews: [
+      {
+        id: 'r1',
+        authorName: 'Fr',
+        authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100',
+        rating: 5,
+        date: '1 tuần trước',
+        content: 'Chỗ ở tuyệt vời ở một vị trí tuyệt vời. Nhận phòng không khó khăn và chủ nhà cũng rất hữu ích. Rất đáng tiền ở đây. Tôi hoàn toàn khuyên bạn ở tại chỗ này.',
+        tenure: '5 năm hoạt động',
+        location: 'Santa Monica, California'
+      },
+      {
+        id: 'r2',
+        authorName: 'Rani',
+        authorAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100',
+        rating: 5,
+        date: '3 tuần trước',
+        content: 'Tôi đã có một thời gian thoải mái ở đây. Mọi thứ như được quảng cáo và chủ nhà phản hồi cực kỳ nhanh và hữu ích. Lý do duy nhất tại sao tôi không cho nó 5 sao là vì tiếng ồn. Chắc chắn vẫn sẽ quay lại.',
+        tenure: '10 năm hoạt động',
+      },
+      {
+        id: 'r3',
+        authorName: 'Francis',
+        authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100',
+        rating: 5,
+        date: '1 tuần trước',
+        content: 'Chỗ ở tuyệt vời ở một vị trí tuyệt vời. Nhận phòng không khó khăn và chủ nhà cũng rất hữu ích. Rất đáng tiền ở đây. Tôi hoàn toàn khuyên bạn ở tại chỗ này.',
+        tenure: '1 tuần trước',
+        location: 'Santa Monica, California'
+      },
+      {
+        id: 'r4',
+        authorName: 'Mai',
+        authorAvatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100',
+        rating: 5,
+        date: '1 tuần trước',
+        content: 'Đây là lần thứ hai chúng tôi ở đây. Vị trí tuyệt vời, tất cả mọi thứ đều cách đó một quãng đi bộ. Người bán đồ ăn đường phố các loại. Ngay trung tâm thành phố nhưng cũng có cảm giác yên bình.',
+        tenure: '1 tuần trước',
+        location: 'Bancroft, Ca-na-đa'
+      },
+      {
+        id: 'r5',
+        authorName: 'Rosemarie Joy',
+        authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100',
+        rating: 4,
+        date: 'tháng 11 năm 2025',
+        content: 'Vị trí 💎 rất gần ATM - TP bank và các ngân hàng khác. Cách Cafe apartment và nhà hát opera 5 phút đi bộ. Chỗ ở được giữ sạch sẽ và họ rất hào phóng về nước uống và đồ vệ sinh cá nhân.',
+        tenure: '8 năm hoạt động',
+      },
+      {
+        id: 'r6',
+        authorName: 'Daniel',
+        authorAvatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100',
+        rating: 5,
+        date: '6 ngày trước',
+        content: 'Studio rất đẹp và sạch sẽ, có mọi thứ bạn cần và ở một vị trí tuyệt vời. Các chủ nhà cực kỳ phản hồi nhanh và hữu ích, chắc chắn khuyên dùng. 5 🌟',
+        tenure: '9 năm hoạt động',
+      }
+    ]
   },
   {
     id: 'hotel-2',
@@ -264,7 +380,8 @@ export const mockHotels: Hotel[] = [
         availableRooms: 5
       }
     ],
-    description: 'Khách sạn 4 sao tiện nghi, gần biển Mỹ Khê'
+    description: 'Khách sạn 4 sao tiện nghi, gần biển Mỹ Khê',
+    reviews: commonReviews
   },
   {
     id: 'hotel-3',
@@ -374,7 +491,8 @@ export const mockHotels: Hotel[] = [
         availableRooms: 2
       }
     ],
-    description: 'Lodge ấm cúng giữa núi rừng Đà Lạt, view tuyệt đẹp'
+    description: 'Lodge ấm cúng giữa núi rừng Đà Lạt, view tuyệt đẹp',
+    reviews: commonReviews
   },
   {
     id: 'hotel-4',
@@ -486,7 +604,8 @@ export const mockHotels: Hotel[] = [
         availableRooms: 1
       }
     ],
-    description: 'Khách sạn trung tâm thành phố, thuận tiện di chuyển'
+    description: 'Khách sạn trung tâm thành phố, thuận tiện di chuyển',
+    reviews: commonReviews
   },
   {
     id: 'hotel-5',
@@ -592,7 +711,8 @@ export const mockHotels: Hotel[] = [
         availableRooms: 1
       }
     ],
-    description: 'Khách sạn boutique phong cách độc đáo, gần sông Hương'
+    description: 'Khách sạn boutique phong cách độc đáo, gần sông Hương',
+    reviews: commonReviews
   },
   {
     id: 'hotel-6',
@@ -694,7 +814,8 @@ export const mockHotels: Hotel[] = [
         availableRooms: 10
       }
     ],
-    description: 'Resort nghỉ dưỡng cao nguyên, không khí trong lành'
+    description: 'Resort nghỉ dưỡng cao nguyên, không khí trong lành',
+    reviews: commonReviews
   },
   {
     id: 'hotel-7',
@@ -804,7 +925,8 @@ export const mockHotels: Hotel[] = [
         availableRooms: 2
       }
     ],
-    description: 'Resort đẳng cấp trên đảo ngọc Phú Quốc'
+    description: 'Resort đẳng cấp trên đảo ngọc Phú Quốc',
+    reviews: commonReviews
   },
   {
     id: 'hotel-8',
@@ -907,7 +1029,8 @@ export const mockHotels: Hotel[] = [
         availableRooms: 2
       }
     ],
-    description: 'Khách sạn phong cách hiện đại, gần chợ Bến Thành'
+    description: 'Khách sạn phong cách hiện đại, gần chợ Bến Thành',
+    reviews: commonReviews
   },
   {
     id: 'hotel-9',
@@ -1010,7 +1133,8 @@ export const mockHotels: Hotel[] = [
         availableRooms: 2
       }
     ],
-    description: 'Nhà nghỉ phong cách cổ điển, gần phố cổ Hội An'
+    description: 'Nhà nghỉ phong cách cổ điển, gần phố cổ Hội An',
+    reviews: commonReviews
   },
   {
     id: 'hotel-10',
@@ -1120,7 +1244,8 @@ export const mockHotels: Hotel[] = [
         availableRooms: 8
       }
     ],
-    description: 'Khách sạn sang trọng bên bờ sông Hương thơ mộng'
+    description: 'Khách sạn sang trọng bên bờ sông Hương thơ mộng',
+    reviews: commonReviews
   }
 ];
 

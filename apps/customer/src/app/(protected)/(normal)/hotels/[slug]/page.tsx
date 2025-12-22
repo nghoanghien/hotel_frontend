@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { ImageWithFallback } from "@repo/ui";
-import { Star, MapPin, ArrowLeft, Users, Maximize2 } from "@repo/ui/icons";
+import { Star, MapPin, ArrowLeft, Users, Maximize2, Plus, Wifi, Car, Utensils, Monitor, Snowflake, Waves, Dumbbell, Coffee, Wind, PawPrint, Refrigerator, WashingMachine, CalendarX, Key, Shield, Award, Briefcase, MessageCircle, ShieldCheck } from "@repo/ui/icons";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { useLoading, useHoverHighlight, HoverHighlightOverlay } from "@repo/ui";
 import type { Hotel, RoomType } from "@repo/types";
 import { getHotelBySlug } from "@/features/search/data/mockHotelData";
 import RoomDetailDrawer from "@/features/cart/components/RoomDetailDrawer";
+import { HotelReviews } from "@/features/hotel/components/HotelReviews";
 
 type TabType = 'overview' | 'rooms' | 'location' | 'policies' | 'amenities' | 'reviews';
 
@@ -73,58 +74,163 @@ export default function HotelDetailPage() {
     switch (activeTab) {
       case 'overview':
         return (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-2xl font-bold mb-4">About {hotel.name}</h3>
-              <p className="text-gray-600 leading-relaxed">{hotel.description}</p>
-            </div>
-            {hotel.imageUrls.length > 1 && (
-              <div className="grid grid-cols-2 gap-4">
-                {hotel.imageUrls.slice(1, 5).map((img, idx) => (
-                  <div key={idx} className="relative aspect-video rounded-2xl overflow-hidden">
-                    <ImageWithFallback src={img} alt={`${hotel.name} - ${idx + 2}`} fill className="object-cover" />
+          <div className="space-y-12">
+            <h3 className="text-2xl font-bold text-[#1A1A1A] mb-8">Gặp gỡ khách sạn của bạn</h3>
+
+            <div className="grid grid-cols-[380px_1fr] gap-16">
+              {/* Left Column - Card */}
+              <div className="space-y-6">
+                <div className="bg-white rounded-[32px] p-8 shadow-[0_6px_20px_rgba(0,0,0,0.08)] border border-gray-100 flex flex-col items-center text-center relative overflow-hidden">
+                  {/* Main Avatar */}
+                  <div className="relative w-32 h-32 mb-4">
+                    <div className="w-full h-full rounded-full overflow-hidden relative z-10">
+                      {hotel.imageUrls[0] && (
+                        <ImageWithFallback src={hotel.imageUrls[0]} alt={hotel.name} fill className="object-cover" />
+                      )}
+                    </div>
+                    <div className="absolute bottom-1 right-0 z-20 bg-[var(--primary)] text-white p-2 rounded-full shadow-md">
+                      <Award className="w-5 h-5" />
+                    </div>
                   </div>
-                ))}
+
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{hotel.name}</h2>
+                  <div className="flex items-center gap-2 mb-6 text-sm font-medium text-gray-500">
+                    <Award className="w-4 h-4" />
+                    <span>Đối tác cao cấp</span>
+                  </div>
+
+                  {/* Stats Grid */}
+                  <div className="w-full border-t border-gray-200 pt-6">
+                    <div className="grid grid-cols-2 gap-4 text-left">
+                      <div className="space-y-1">
+                        <div className="text-2xl font-bold text-gray-900">{hotel.reviewCount}</div>
+                        <div className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">Đánh giá</div>
+                      </div>
+                      <div className="space-y-1 pl-4 border-l border-gray-200">
+                        <div className="flex items-center gap-1 text-2xl font-bold text-gray-900">
+                          {hotel.rating} <Star className="w-4 h-4 fill-gray-900 text-gray-900" />
+                        </div>
+                        <div className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">Xếp hạng</div>
+                      </div>
+                      <div className="col-span-2 mt-4 pt-4 border-t border-gray-200 space-y-1">
+                        <div className="text-2xl font-bold text-gray-900">5</div>
+                        <div className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">Năm kinh nghiệm đón tiếp khách</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Extra Info */}
+                <div className="space-y-4 px-2">
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <Briefcase className="w-6 h-6 stroke-1" />
+                    <span>Hoạt động từ năm 2019</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <MessageCircle className="w-6 h-6 stroke-1" />
+                    <span>Phản hồi nhanh chóng</span>
+                  </div>
+                </div>
               </div>
-            )}
+
+              {/* Right Column - Details */}
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{hotel.name} là một Đối tác cao cấp</h3>
+                  <p className="text-gray-600 leading-relaxed mb-6">
+                    {hotel.description}
+                  </p>
+                  <p className="text-gray-600 leading-relaxed">
+                    Đối tác cao cấp là những khách sạn có kinh nghiệm, được đánh giá cao và cam kết mang lại kỳ nghỉ tuyệt vời cho khách.
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="font-bold text-gray-900 mb-3">Thông tin khách sạn</h4>
+                  <ul className="space-y-2 text-gray-600">
+                    <li>Tỉ lệ phản hồi: 100%</li>
+                    <li>Phản hồi trong vòng 1 giờ</li>
+                  </ul>
+                </div>
+
+                <button className="bg-gray-900 text-white px-6 py-3.5 rounded-[10px] font-semibold text-[15px] hover:bg-black transition-colors">
+                  Nhắn tin cho khách sạn
+                </button>
+
+                <div className="border-t border-gray-200 pt-8 mt-8 flex items-start gap-4">
+                  <ShieldCheck className="w-6 h-6 text-[var(--primary)] flex-shrink-0 mt-0.5" />
+                  <p className="text-[12px] text-gray-500 leading-tight">
+                    Để bảo vệ khoản thanh toán của bạn, hãy luôn sử dụng app để chuyển tiền và liên lạc với khách sạn.
+                  </p>
+                </div>
+
+                {/* Original Images Grid moved here */}
+                {hotel.imageUrls.length > 1 && (
+                  <div className="pt-8">
+                    <h4 className="font-bold text-gray-900 mb-4 text-lg">Hình ảnh nổi bật</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {hotel.imageUrls.slice(1, 5).map((img, idx) => (
+                        <div key={idx} className="relative aspect-video rounded-2xl overflow-hidden">
+                          <ImageWithFallback src={img} alt={`${hotel.name} - ${idx + 2}`} fill className="object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         );
 
       case 'rooms':
+        const nights = bookingInfo.checkOut && bookingInfo.checkIn
+          ? Math.max(1, Math.ceil((bookingInfo.checkOut.getTime() - bookingInfo.checkIn.getTime()) / (1000 * 60 * 60 * 24)))
+          : 1;
+
         return (
           <div className="space-y-4">
             <h3 className="text-2xl font-bold mb-6">Available Rooms</h3>
-            <div className="grid grid-cols-3 gap-5">
+            <div className="grid grid-cols-3 gap-x-5 gap-y-8">
               {hotel.roomTypes.map((room) => (
                 <motion.div
                   key={room.id}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ y: -4 }}
                   onClick={() => handleRoomClick(room)}
-                  className="group relative bg-white rounded-[20px] overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 cursor-pointer"
+                  className="group cursor-pointer"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden">
+                  <div className="relative aspect-square rounded-[20px] overflow-hidden mb-3 bg-gray-100">
                     <ImageWithFallback
                       src={room.images[0]}
                       alt={room.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                  </div>
-                  <div className="p-4">
-                    <div className="font-semibold text-lg text-gray-900 mb-2">{room.name}</div>
-                    <div className="flex items-center gap-3 text-sm text-gray-600 mb-3">
-                      <div className="flex items-center gap-1">
-                        <Maximize2 className="w-4 h-4" />
-                        <span>{room.area}m²</span>
-                      </div>
-                      <span>·</span>
-                      <div className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        <span>{room.maxGuests} guests</span>
-                      </div>
+
+                    {/* Badge */}
+                    <div className="absolute top-4 left-4 bg-white/70 backdrop-blur-md border border-white/60 px-4 py-2 rounded-2xl shadow-sm z-10">
+                      <span className="text-sm font-semibold text-gray-800 block leading-none pb-0.5">Loại phòng này đang <br />hết nhanh</span>
                     </div>
-                    <div className="text-xl font-bold text-[var(--primary)]">
-                      {(room.price / 1000).toFixed(0)}K<span className="text-sm text-gray-500 font-normal">/night</span>
+
+                    {/* Action Button */}
+                    <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border-2 border-white flex items-center justify-center transition-colors z-10 border border-white/20">
+                      <Plus className="w-6 h-6 text-white" />
+                    </button>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="font-semibold text-xl text-gray-900 leading-tight">
+                      {room.name}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-base text-gray-500">
+                      <span className="font-bold text-xl text-[var(--primary)]">
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.price)}
+                      </span>
+                      <span className="font-normal text-sm">/đêm</span>
+                      <span className="w-1 h-1 rounded-full bg-gray-400 mx-0.5" />
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 fill-black text-black" />
+                        <span className="font-medium text-gray-900">{hotel.rating}</span>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -154,62 +260,87 @@ export default function HotelDetailPage() {
 
       case 'policies':
         return (
-          <div className="space-y-4">
-            <h3 className="text-2xl font-bold mb-4">Hotel Policies</h3>
-            <div className="bg-gray-50 rounded-2xl p-6 space-y-4">
-              <div>
-                <div className="font-semibold text-gray-900 mb-2">Check-in / Check-out</div>
-                <div className="text-gray-600">Check-in: 14:00 | Check-out: 12:00</div>
+          <div className="space-y-8">
+            <h3 className="text-2xl font-bold text-[#1A1A1A]">Những điều cần biết</h3>
+            <div className="grid grid-cols-3 gap-8">
+              {/* Column 1: Cancellation */}
+              <div className="space-y-3">
+                <CalendarX className="w-6 h-6 text-gray-900 mb-1" />
+                <h4 className="font-semibold text-gray-900 text-lg">Chính sách hủy</h4>
+                <p className="text-gray-600 text-[15px] leading-relaxed">
+                  Bạn được hủy miễn phí trước 24 giờ khi nhận phòng. Sau thời gian đó, bạn sẽ không được hoàn tiền.
+                </p>
+                <button className="font-medium text-gray-900 underline underline-offset-2 text-[15px]">Tìm hiểu thêm</button>
               </div>
-              <div>
-                <div className="font-semibold text-gray-900 mb-2">Cancellation Policy</div>
-                <div className="text-gray-600">Free cancellation up to 24 hours before check-in</div>
+
+              {/* Column 2: Rules */}
+              <div className="space-y-3">
+                <Key className="w-6 h-6 text-gray-900 mb-1" />
+                <h4 className="font-semibold text-gray-900 text-lg">Nội quy nhà</h4>
+                <div className="text-gray-600 text-[15px] space-y-1">
+                  <p>Nhận phòng sau 14:00</p>
+                  <p>Trả phòng trước 12:00</p>
+                  <p>Khách thú cưng được chào đón</p>
+                </div>
+                <button className="font-medium text-gray-900 underline underline-offset-2 text-[15px]">Tìm hiểu thêm</button>
               </div>
-              <div>
-                <div className="font-semibold text-gray-900 mb-2">Additional Policies</div>
-                <ul className="list-disc list-inside text-gray-600 space-y-1">
-                  <li>No smoking in rooms</li>
-                  <li>Pets allowed (additional fee may apply)</li>
-                  <li>Children welcome</li>
-                </ul>
+
+              {/* Column 3: Safety */}
+              <div className="space-y-3">
+                <Shield className="w-6 h-6 text-gray-900 mb-1" />
+                <h4 className="font-semibold text-gray-900 text-lg">An toàn và chỗ ở</h4>
+                <div className="text-gray-600 text-[15px] space-y-1">
+                  <p>Có máy báo khói</p>
+                  <p>Có bình chữa cháy</p>
+                  <p>Khóa cửa thông minh</p>
+                </div>
+                <button className="font-medium text-gray-900 underline underline-offset-2 text-[15px]">Tìm hiểu thêm</button>
               </div>
             </div>
           </div>
         );
 
       case 'amenities':
+        const getAmenityIcon = (name: string) => {
+          const lowerName = name.toLowerCase();
+          if (lowerName.includes('wifi') || lowerName.includes('internet')) return Wifi;
+          if (lowerName.includes('pool') || lowerName.includes('swim') || lowerName.includes('hồ bơi')) return Waves;
+          if (lowerName.includes('ac') || lowerName.includes('cool') || lowerName.includes('điều hòa') || lowerName.includes('lạnh')) return Snowflake;
+          if (lowerName.includes('parking') || lowerName.includes('car') || lowerName.includes('đỗ xe')) return Car;
+          if (lowerName.includes('restaurant') || lowerName.includes('food') || lowerName.includes('dining') || lowerName.includes('ăn')) return Utensils;
+          if (lowerName.includes('tv') || lowerName.includes('monitor')) return Monitor;
+          if (lowerName.includes('gym') || lowerName.includes('fitness') || lowerName.includes('thể dục')) return Dumbbell;
+          if (lowerName.includes('coffee') || lowerName.includes('cafe')) return Coffee;
+          if (lowerName.includes('pet') || lowerName.includes('thú cưng')) return PawPrint;
+          if (lowerName.includes('fridge') || lowerName.includes('tủ lạnh')) return Refrigerator;
+          if (lowerName.includes('washer') || lowerName.includes('laundry') || lowerName.includes('giặt')) return WashingMachine;
+          if (lowerName.includes('hair') || lowerName.includes('dryer') || lowerName.includes('sấy')) return Wind;
+          return Star;
+        };
+
         return (
-          <div className="space-y-4">
-            <h3 className="text-2xl font-bold mb-4">Hotel Amenities</h3>
-            <div className="grid grid-cols-3 gap-4">
-              {hotel.amenities.map((amenity) => (
-                <div key={amenity.id} className="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
-                  <div className="w-10 h-10 rounded-lg bg-[var(--primary)]/10 text-[var(--primary)] flex items-center justify-center">
-                    <span className="text-lg">✓</span>
+          <div className="space-y-8">
+            <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Nơi này có những gì cho bạn</h3>
+            <div className="grid grid-cols-2 gap-y-7 gap-x-12">
+              {hotel.amenities.map((amenity) => {
+                const Icon = getAmenityIcon(amenity.name);
+                return (
+                  <div key={amenity.id} className="flex items-center gap-4 group">
+                    <div className="w-8 h-8 flex items-center justify-center">
+                      <Icon className="w-7 h-7 text-gray-700 stroke-[1.5] group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+                    <span className="text-[17px] text-gray-700 font-normal group-hover:text-gray-900 transition-colors">
+                      {amenity.name}
+                    </span>
                   </div>
-                  <span className="font-medium text-gray-900">{amenity.name}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         );
 
       case 'reviews':
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold">Guest Reviews</h3>
-              <div className="flex items-center gap-2">
-                <Star className="w-6 h-6 fill-amber-500 text-amber-500" />
-                <span className="text-2xl font-bold">{hotel.rating}</span>
-                <span className="text-gray-500">({hotel.reviewCount} reviews)</span>
-              </div>
-            </div>
-            <div className="bg-gray-100 rounded-2xl p-8 text-center text-gray-500">
-              Reviews feature coming soon...
-            </div>
-          </div>
-        );
+        return <HotelReviews hotel={hotel} />;
 
       default:
         return null;

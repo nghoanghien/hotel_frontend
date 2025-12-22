@@ -184,7 +184,7 @@ export default function BookingCheckoutPage() {
               {/* Sections */}
               <div className="rounded-[28px] mx-2 border-2 border-gray-300">
                 <section
-                  className="p-4 border-b-2 border-gray-300"
+                  className="p-8 border-b-2 border-gray-300"
                   ref={(el) => {
                     sectionRefs.current["guest"] = el;
                   }}
@@ -201,7 +201,7 @@ export default function BookingCheckoutPage() {
                 </section>
 
                 <section
-                  className="p-4 border-b-2 border-gray-300"
+                  className="p-8 border-b-2 border-gray-300"
                   ref={(el) => {
                     sectionRefs.current["summary"] = el;
                   }}
@@ -211,7 +211,7 @@ export default function BookingCheckoutPage() {
                 </section>
 
                 <section
-                  className="p-4 border-b-2 border-gray-300"
+                  className="p-8 border-b-2 border-gray-300"
                   ref={(el) => {
                     sectionRefs.current["requests"] = el;
                   }}
@@ -235,7 +235,7 @@ export default function BookingCheckoutPage() {
                     sectionRefs.current["checkout"] = el;
                   }}
                   data-id="checkout"
-                  className="p-4"
+                  className="p-8"
                 >
                   {mounted && (
                     <BookingCheckoutSummary

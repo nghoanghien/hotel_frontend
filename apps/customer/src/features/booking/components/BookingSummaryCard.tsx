@@ -13,7 +13,7 @@ export default function BookingSummaryCard({ booking, nights }: BookingSummaryCa
   return (
     <div>
       <div className="text-[14px] font-semibold text-[#1A1A1A] mb-3">Booking Summary</div>
-      <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden">
+      <div className="overflow-hidden">
         {/* Hotel & Room Info */}
         <div className="p-4 border-b border-gray-200">
           <div className="flex gap-3">
