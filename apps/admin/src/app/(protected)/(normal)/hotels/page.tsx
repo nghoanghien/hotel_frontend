@@ -11,13 +11,17 @@ import {
   MapPin,
   Star,
   Users,
-  Bed
+  Bed,
+  Lock,
+  LockOpen
 } from 'lucide-react';
 import SearchFilterBar from '@repo/ui/search/SearchFilterBar';
 import DataTable from '@repo/ui/tables/DataTable';
 import type { ColumnDef } from '@repo/ui/tables/DataTable';
 import ExportDataModal from '@repo/ui/modals/ExportDataModal';
 import ExportNotification from '@repo/ui/feedback/ExportNotification';
+import { useSwipeConfirmation } from '@repo/ui/providers/SwipeConfirmationProvider';
+import { useNotification } from '@repo/ui/providers/NotificationProvider';
 
 // Hotel type definition
 interface Hotel {
@@ -155,6 +159,10 @@ const formatDate = (dateString: string): string => {
 };
 
 export default function HotelsManagement() {
+  // Hooks
+  const { confirm } = useSwipeConfirmation();
+  const { showNotification } = useNotification();
+
   // Loading states
   const [isLoadingSearch, setIsLoadingSearch] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -294,6 +302,37 @@ export default function HotelsManagement() {
     }
   ];
 
+  // Handle toggle status
+  const handleToggleStatus = async (hotel: Hotel) => {
+    const isInactive = hotel.status === 'inactive';
+    const actionText = isInactive ? 'kích hoạt' : 'vô hiệu hóa';
+    const newStatus = isInactive ? 'active' : 'inactive';
+
+    confirm({
+      title: `Xác nhận ${actionText} khách sạn`,
+      description: `Bạn có chắc chắn muốn ${actionText} khách sạn "${hotel.name}"?`,
+      confirmText: `Vuốt để ${actionText}`,
+      type: isInactive ? "success" : "danger",
+      onConfirm: async () => {
+        // Simulate loading 1.5s
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Update status
+        setHotels(prev => prev.map(h =>
+          h.id === hotel.id ? { ...h, status: newStatus } : h
+        ));
+
+        // Show notification
+        showNotification({
+          title: 'Thành công!',
+          message: `Đã ${actionText} khách sạn "${hotel.name}" thành công.`,
+          type: 'success',
+          duration: 3000
+        });
+      }
+    });
+  };
+
   // Render action for each row
   const renderActions = (hotel: Hotel) => (
     <div className="flex justify-end space-x-2">
@@ -303,8 +342,26 @@ export default function HotelsManagement() {
           alert('Xem chi tiết khách sạn: ' + hotel.name);
         }}
         className="text-green-600 hover:text-green-900 p-1 rounded-full hover:bg-green-50"
+        title="Xem chi tiết"
       >
         <FileText size={16} />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleToggleStatus(hotel);
+        }}
+        className={`p-1 rounded-full transition-colors ${hotel.status === 'inactive'
+            ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
+            : 'text-amber-600 hover:text-amber-900 hover:bg-amber-50'
+          }`}
+        title={hotel.status === 'inactive' ? 'Kích hoạt khách sạn' : 'Vô hiệu hóa khách sạn'}
+      >
+        {hotel.status === 'inactive' ? (
+          <LockOpen size={16} />
+        ) : (
+          <Lock size={16} />
+        )}
       </button>
     </div>
   );

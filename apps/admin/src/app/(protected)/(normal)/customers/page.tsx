@@ -8,13 +8,17 @@ import {
   FileText,
   Phone,
   Mail,
-  MapPin
+  MapPin,
+  Lock,
+  LockOpen
 } from 'lucide-react';
 import SearchFilterBar from '@repo/ui/search/SearchFilterBar';
 import DataTable from '@repo/ui/tables/DataTable';
 import type { ColumnDef } from '@repo/ui/tables/DataTable';
 import ExportDataModal from '@repo/ui/modals/ExportDataModal';
 import ExportNotification from '@repo/ui/feedback/ExportNotification';
+import { useSwipeConfirmation } from '@repo/ui/providers/SwipeConfirmationProvider';
+import { useNotification } from '@repo/ui/providers/NotificationProvider';
 
 // Customer type definition
 interface Customer {
@@ -88,6 +92,10 @@ const formatDate = (dateString: string): string => {
 };
 
 export default function CustomersManagement() {
+  // Hooks
+  const { confirm } = useSwipeConfirmation();
+  const { showNotification } = useNotification();
+
   // Loading states
   const [isLoadingSearch, setIsLoadingSearch] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -214,6 +222,37 @@ export default function CustomersManagement() {
     }
   ];
 
+  // Handle toggle status
+  const handleToggleStatus = async (customer: Customer) => {
+    const isBlocked = customer.status === 'blocked';
+    const actionText = isBlocked ? 'kích hoạt' : 'vô hiệu hóa';
+    const newStatus = isBlocked ? 'active' : 'blocked';
+
+    confirm({
+      title: `Xác nhận ${actionText} tài khoản`,
+      description: `Bạn có chắc chắn muốn ${actionText} tài khoản của khách hàng "${customer.fullName}"?`,
+      confirmText: `Vuốt để ${actionText}`,
+      type: isBlocked ? "success" : "danger",
+      onConfirm: async () => {
+        // Simulate loading 1.5s
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Update status
+        setCustomers(prev => prev.map(c =>
+          c.id === customer.id ? { ...c, status: newStatus } : c
+        ));
+
+        // Show notification
+        showNotification({
+          title: 'Thành công!',
+          message: `Đã ${actionText} tài khoản khách hàng "${customer.fullName}" thành công.`,
+          type: 'success',
+          duration: 3000
+        });
+      }
+    });
+  };
+
   // Render action for each row
   const renderActions = (customer: Customer) => (
     <div className="flex justify-end space-x-2">
@@ -223,8 +262,26 @@ export default function CustomersManagement() {
           alert('Xem chi tiết khách hàng: ' + customer.fullName);
         }}
         className="text-green-600 hover:text-green-900 p-1 rounded-full hover:bg-green-50"
+        title="Xem chi tiết"
       >
         <FileText size={16} />
+      </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleToggleStatus(customer);
+        }}
+        className={`p-1 rounded-full transition-colors ${customer.status === 'blocked'
+            ? 'text-red-600 hover:text-red-900 hover:bg-red-50'
+            : 'text-amber-600 hover:text-amber-900 hover:bg-amber-50'
+          }`}
+        title={customer.status === 'blocked' ? 'Kích hoạt tài khoản' : 'Vô hiệu hóa tài khoản'}
+      >
+        {customer.status === 'blocked' ? (
+          <LockOpen size={16} />
+        ) : (
+          <Lock size={16} />
+        )}
       </button>
     </div>
   );
