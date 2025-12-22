@@ -4,10 +4,22 @@ import { LoginForm, LoginIllustration, useLoading } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useZodForm, loginSchema, type LoginFormData } from "@repo/lib";
 import { motion, AnimatePresence } from "@repo/ui/motion";
+import { useEffect } from "react";
 
 export default function LoginPageContent() {
   const router = useRouter();
-  const { show } = useLoading();
+  const { show, hide } = useLoading();
+
+  // Show loading on page load, then hide after 2 seconds
+  useEffect(() => {
+    show("Đang tải trang đăng nhập...");
+
+    const timer = setTimeout(() => {
+      hide();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [show, hide]);
 
   const form = useZodForm<LoginFormData>({
     schema: loginSchema,

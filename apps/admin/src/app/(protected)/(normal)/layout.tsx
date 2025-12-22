@@ -13,7 +13,7 @@ import {
   LogOut
 } from '@repo/ui/icons';
 import RestaurantNavItem from '../../../components/RestaurantNavItem';
-import { ProfileShimmer, NavItemShimmer } from '@repo/ui';
+import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation, useLoading } from '@repo/ui';
 
 const adminMenuItems = [
   { id: 'overview', icon: LayoutDashboard, text: 'Tổng quan', title: 'OVERVIEW' },
@@ -29,6 +29,8 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
   const [profileData] = useState({ fullName: 'Super Admin', email: 'admin@hotel.com' });
   const [navHovered, setNavHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { confirm } = useSwipeConfirmation();
+  const { show } = useLoading();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -45,9 +47,32 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
     }
   }, [pathname]);
 
+  const handleLogout = () => {
+    confirm({
+      title: "Xác nhận đăng xuất",
+      description: "Bạn có chắc chắn muốn đăng xuất khỏi trang quản trị?",
+      confirmText: "Vuốt để đăng xuất",
+      type: "danger",
+      onConfirm: async () => {
+        // Simulate 2 second loading
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Show loading overlay
+        show("Đang đăng xuất...");
+
+        // Clear any auth data (if needed)
+        // localStorage.removeItem('authToken');
+        // sessionStorage.clear();
+
+        // Redirect to login page
+        router.replace('/login');
+      }
+    });
+  };
+
   const handleSectionChange = (sectionId: string) => {
     if (sectionId === 'logout') {
-      router.push('/login');
+      handleLogout();
     } else {
       setActiveSection(sectionId);
       router.push(`/${sectionId}`);
