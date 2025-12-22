@@ -10,28 +10,25 @@ import {
   Users,
   Settings,
   User,
-  LogOut,
-  Power
+  LogOut
 } from '@repo/ui/icons';
 import RestaurantNavItem from '../../../components/RestaurantNavItem';
-import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation } from '@repo/ui';
+import { ProfileShimmer, NavItemShimmer } from '@repo/ui';
 
-const restaurantMenuItems = [
-  { id: 'overview', icon: LayoutDashboard, text: 'Tổng quan' },
-  { id: 'hotels', icon: Building2, text: 'Quản lý khách sạn' },
-  { id: 'customers', icon: Users, text: 'Quản lý khách hàng' },
-  { id: 'settings', icon: Settings, text: 'Thông số hệ thống' }
+const adminMenuItems = [
+  { id: 'overview', icon: LayoutDashboard, text: 'Tổng quan', title: 'OVERVIEW' },
+  { id: 'hotels', icon: Building2, text: 'Quản lý khách sạn', title: 'HOTEL MANAGEMENT' },
+  { id: 'customers', icon: Users, text: 'Quản lý khách hàng', title: 'CUSTOMER MANAGEMENT' },
+  { id: 'settings', icon: Settings, text: 'Thông số hệ thống', title: 'SYSTEM SETTINGS' }
 ];
 
 export default function NormalLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { confirm } = useSwipeConfirmation();
   const [activeSection, setActiveSection] = useState('overview');
   const [profileData] = useState({ fullName: 'Super Admin', email: 'admin@hotel.com' });
   const [navHovered, setNavHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAppActive, setIsAppActive] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -43,7 +40,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
   // Update active section based on pathname
   useEffect(() => {
     const currentPath = pathname.split('/').pop();
-    if (currentPath && restaurantMenuItems.some(item => item.id === currentPath)) {
+    if (currentPath && adminMenuItems.some(item => item.id === currentPath)) {
       setActiveSection(currentPath);
     }
   }, [pathname]);
@@ -61,19 +58,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
     router.push('/profile');
   };
 
-  const handleToggleApp = () => {
-    const newStatus = !isAppActive;
-    confirm({
-      title: newStatus ? 'Bật hệ thống' : 'Tắt hệ thống',
-      description: newStatus
-        ? 'Bật hệ thống để khách sạn có thể nhận đặt phòng mới.'
-        : 'Tắt hệ thống sẽ ngừng nhận đặt phòng mới. Bạn có chắc chắn?',
-      confirmText: newStatus ? 'Bật' : 'Tắt',
-      onConfirm: () => {
-        setIsAppActive(newStatus);
-      }
-    });
-  };
+  const activeItem = adminMenuItems.find(item => item.id === activeSection) || adminMenuItems[0];
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -182,7 +167,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
           </div>
 
           {isLoading ? (
-            Array.from({ length: restaurantMenuItems.length }, (_, index) => (
+            Array.from({ length: adminMenuItems.length }, (_, index) => (
               <NavItemShimmer
                 key={`shimmer-${index}`}
                 expanded={navHovered}
@@ -190,7 +175,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
               />
             ))
           ) : (
-            restaurantMenuItems.map((item) => {
+            adminMenuItems.map((item) => {
               const IconComponent = item.icon;
               return (
                 <RestaurantNavItem
@@ -224,7 +209,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
           {isLoading ? (
             <NavItemShimmer
               expanded={navHovered}
-              index={restaurantMenuItems.length}
+              index={adminMenuItems.length}
             />
           ) : (
             <RestaurantNavItem
@@ -246,20 +231,8 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
         <div className="border-b border-gray-200 px-8 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-anton font-bold text-[#1A1A1A]">
-              HOTEL ADMIN DASHBOARD
+              {activeItem.title}
             </h1>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleToggleApp}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${isAppActive
-                ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                : 'bg-gray-200 text-gray-600'
-                }`}
-            >
-              <Power className="w-5 h-5" />
-              <span>{isAppActive ? 'Hệ thống hoạt động' : 'Hệ thống ngừng'}</span>
-            </motion.button>
           </div>
         </div>
 

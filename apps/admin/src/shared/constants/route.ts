@@ -2,7 +2,7 @@ export const PATH = {
   root: '/',
   login: '/login',
   dashboard: '/dashboard',
-  users: '/users',
-  restaurants: '/restaurants',
+  menu: '/menu',
   orders: '/orders',
+  profile: '/profile',
 } as const;

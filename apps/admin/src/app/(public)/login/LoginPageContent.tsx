@@ -17,7 +17,7 @@ export default function LoginPageContent() {
 
   const handleSuccess = () => {
     show("Đang đăng nhập...");
-    document.cookie = "restaurant_auth=1; path=/";
+    document.cookie = "admin_auth=1; path=/";
     router.push("/overview");
     // Note: Loading will be hidden in overview page after 1.5s
   };
