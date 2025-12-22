@@ -340,7 +340,7 @@ export default function OverviewPage() {
   };
 
   return (
-    <div className="h-[calc(100vh-88px)] overflow-y-auto custom-scrollbar bg-[#F7F7F7]">
+    <div className="h-[calc(100vh-88px)] overflow-y-auto custom-scrollbar">
       <div className="p-8 space-y-8">
         {/* Period Selector */}
         <div className="flex items-center justify-between">
@@ -354,8 +354,8 @@ export default function OverviewPage() {
                 key={period}
                 onClick={() => setSelectedPeriod(period)}
                 className={`px-5 py-2 rounded-xl font-semibold text-sm transition-all ${selectedPeriod === period
-                    ? 'bg-[var(--primary)] text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-[var(--primary)] text-white shadow-md'
+                  : 'text-gray-600 hover:text-gray-900'
                   }`}
               >
                 {period === 'today' ? 'Hôm nay' : period === 'week' ? 'Tuần' : period === 'month' ? 'Tháng' : 'Năm'}
@@ -703,9 +703,9 @@ export default function OverviewPage() {
                   className="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 hover:border-[var(--primary)]/30 hover:bg-gray-50/50 transition-all cursor-pointer group"
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${index === 0 ? 'bg-[var(--warning)]' :
-                      index === 1 ? 'bg-gray-400' :
-                        index === 2 ? 'bg-[var(--secondary)]' :
-                          'bg-gray-300'
+                    index === 1 ? 'bg-gray-400' :
+                      index === 2 ? 'bg-[var(--secondary)]' :
+                        'bg-gray-300'
                     }`}>
                     {index + 1}
                   </div>
