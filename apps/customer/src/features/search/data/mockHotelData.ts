@@ -1,22 +1,23 @@
 import type { HotelDetailDto, AmenityDto, HotelSearchResultDto, RoomType, HotelImageDto, RoomAvailabilityDto } from '@repo/types';
 
 // Common Amenities
+// type: 1 = General (Mock)
 const commonAmenities: Record<string, AmenityDto> = {
-  wifi: { id: 'wifi', name: 'WiFi miễn phí', icon: 'wifi' },
-  pool: { id: 'pool', name: 'Hồ bơi', icon: 'pool' },
-  restaurant: { id: 'restaurant', name: 'Nhà hàng', icon: 'utensils' },
-  bar: { id: 'bar', name: 'Quầy bar', icon: 'glass-martini' },
-  spa: { id: 'spa', name: 'Spa & Massage', icon: 'spa' },
-  gym: { id: 'gym', name: 'Phòng gym', icon: 'dumbbell' },
-  parking: { id: 'parking', name: 'Bãi đỗ xe', icon: 'parking' },
-  airport: { id: 'airport', name: 'Đưa đón sân bay', icon: 'plane' },
-  breakfast: { id: 'breakfast', name: 'Ăn sáng', icon: 'coffee' },
-  beachVolley: { id: 'beachVolley', name: 'Bóng chuyền bãi biển', icon: 'volleyball-ball' },
-  bikeRent: { id: 'bikeRent', name: 'Cho thuê xe đạp', icon: 'bicycle' },
-  motoRent: { id: 'motoRent', name: 'Cho thuê xe máy', icon: 'motorcycle' },
-  rooftop: { id: 'rooftop', name: 'Sân thượng', icon: 'building' },
-  laundry: { id: 'laundry', name: 'Giặt ủi', icon: 'tshirt' },
-  concierge: { id: 'concierge', name: 'Lễ tân 24/7', icon: 'bell' }
+  wifi: { id: 'wifi', createdAt: '', updatedAt: '', name: 'WiFi miễn phí', icon: 'wifi', type: 1, isActive: true },
+  pool: { id: 'pool', createdAt: '', updatedAt: '', name: 'Hồ bơi', icon: 'pool', type: 1, isActive: true },
+  restaurant: { id: 'restaurant', createdAt: '', updatedAt: '', name: 'Nhà hàng', icon: 'utensils', type: 1, isActive: true },
+  bar: { id: 'bar', createdAt: '', updatedAt: '', name: 'Quầy bar', icon: 'glass-martini', type: 1, isActive: true },
+  spa: { id: 'spa', createdAt: '', updatedAt: '', name: 'Spa & Massage', icon: 'spa', type: 1, isActive: true },
+  gym: { id: 'gym', createdAt: '', updatedAt: '', name: 'Phòng gym', icon: 'dumbbell', type: 1, isActive: true },
+  parking: { id: 'parking', createdAt: '', updatedAt: '', name: 'Bãi đỗ xe', icon: 'parking', type: 1, isActive: true },
+  airport: { id: 'airport', createdAt: '', updatedAt: '', name: 'Đưa đón sân bay', icon: 'plane', type: 1, isActive: true },
+  breakfast: { id: 'breakfast', createdAt: '', updatedAt: '', name: 'Ăn sáng', icon: 'coffee', type: 1, isActive: true },
+  beachVolley: { id: 'beachVolley', createdAt: '', updatedAt: '', name: 'Bóng chuyền bãi biển', icon: 'volleyball-ball', type: 1, isActive: true },
+  bikeRent: { id: 'bikeRent', createdAt: '', updatedAt: '', name: 'Cho thuê xe đạp', icon: 'bicycle', type: 1, isActive: true },
+  motoRent: { id: 'motoRent', createdAt: '', updatedAt: '', name: 'Cho thuê xe máy', icon: 'motorcycle', type: 1, isActive: true },
+  rooftop: { id: 'rooftop', createdAt: '', updatedAt: '', name: 'Sân thượng', icon: 'building', type: 1, isActive: true },
+  laundry: { id: 'laundry', createdAt: '', updatedAt: '', name: 'Giặt ủi', icon: 'tshirt', type: 1, isActive: true },
+  concierge: { id: 'concierge', createdAt: '', updatedAt: '', name: 'Lễ tân 24/7', icon: 'bell', type: 1, isActive: true }
 };
 
 const createImages = (urls: string[]): HotelImageDto[] => {

@@ -1,11 +1,11 @@
 import { BaseDto } from './common';
 
-export interface AmenityDto {
-  id: string;
+export interface AmenityDto extends BaseDto {
   name: string;
   description?: string;
   icon?: string;
-  category?: string;
+  type: number;
+  isActive: boolean;
 }
 
 export interface ReviewDto {

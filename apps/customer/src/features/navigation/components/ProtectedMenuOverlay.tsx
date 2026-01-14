@@ -31,13 +31,13 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
   };
 
   const handleFavoritesClick = () => {
-    show();
+    show("Đang tải trang Yêu thích...");
     router.push('/favorites');
     onClose();
   };
 
   const handleHistoryClick = () => {
-    show();
+    show("Đang tải trang lịch sử đặt phòng...");
     router.push('/history');
     onClose();
   };
@@ -55,10 +55,6 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
 
         // Show loading overlay
         show("Đang đăng xuất...");
-
-        // Clear any auth data (if needed)
-        // localStorage.removeItem('authToken');
-        // sessionStorage.clear();
 
         // Redirect to login page
         router.replace('/login');
