@@ -1,7 +1,7 @@
 import { BaseDto } from './common';
 import { RoomType } from './room';
 
-export type BookingStatus = 'Pending' | 'Confirmed' | 'CheckedIn' | 'CheckedOut' | 'Cancelled' | 'NoShow' | 'PaymentFailed'; // Inferred
+export type BookingStatus = 'Pending' | 'Confirmed' | 'CheckedIn' | 'CheckedOut' | 'Cancelled' | 'NoShow' | 'Refunded';
 
 export interface BookingRoomDto {
   roomId: string;
