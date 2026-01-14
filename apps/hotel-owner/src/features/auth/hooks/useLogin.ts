@@ -1,46 +1,42 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { authApi } from "@repo/api";
-import { setAccessToken } from "@repo/api/http";
 import { useAuthStore } from "@repo/store";
 import { LoginFormData } from "@repo/lib";
 
 export const useLogin = () => {
-  const queryClient = useQueryClient();
-  const { setUser, setToken } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { setLogin } = useAuthStore();
 
-  const mutation = useMutation({
-    mutationFn: async (data: LoginFormData) => {
-      // API call
-      const res = await authApi.login({
-        username: data.email,
-        password: data.password,
-      });
-      return res;
-    },
-    onSuccess: (data) => {
-      // data is the response from backend (IBackendRes<IResLoginDTO>)
-      const payload = data.data; // This is IResLoginDTO
+  const handleLogin = async (data: LoginFormData): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+    localStorage.removeItem("access_token");
 
-      if (payload?.access_token && payload?.user) {
-        // 1. Set Access Token in Memory (Http Client)
-        setAccessToken(payload.access_token);
+    // Mock success response
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // 2. Update Store (User info only)
-        setUser(payload.user);
-        setToken(null);
+    // Create mock user matching UserRole type
+    const mockUser: any = {
+      id: "mock-owner-id-123",
+      email: data.email,
+      firstName: "Hotel",
+      lastName: "Owner",
+      role: "HotelOwner", // Updated to match UserRole type
+      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
+    };
+    const mockToken = "mock_access_token_" + Date.now();
 
-        // 3. Invalidate auth query to ensure fresh state
-        queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
-      }
-    },
-    onError: (error) => {
-      console.error("Login failed:", error);
-    }
-  });
+    setLogin(mockToken, mockUser);
+    localStorage.setItem("access_token", mockToken);
+
+    setIsLoading(false);
+    return true;
+  };
 
   return {
-    handleLogin: (data: LoginFormData) => mutation.mutateAsync(data).then(() => true).catch(() => false),
-    isLoading: mutation.isPending,
-    error: mutation.error ? (mutation.error as any).message || "Đăng nhập thất bại" : null,
+    handleLogin,
+    isLoading,
+    error,
   };
 };
