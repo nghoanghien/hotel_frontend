@@ -1,106 +1,105 @@
-// Hotel-specific types
-export type HotelStatus = 'ACTIVE' | 'INACTIVE' | 'CLOSED';
+import { BaseDto } from './common';
 
-export type HotelCategory = {
+export interface AmenityDto {
   id: string;
   name: string;
-  slug?: string;
-};
-
-export type Address = {
-  streetNumber: string;
-  streetName: string;
-  ward: string;
-  district: string;
-  city: string;
-  fullAddress?: string;
-};
-
-export type Amenity = {
-  id: string;
-  name: string;
-  icon?: string;
-};
-
-export type RoomAmenity = {
-  id: string;
-  name: string;
-};
-
-export type RoomType = {
-  id: string;
-  name: string;
-  hotelId: string;
-  images: string[];
-  area: number; // in square meters
-  amenities: RoomAmenity[];
-  maxGuests: number;
-  price: number;
-  availableRooms?: number;
-};
-
-export type Review = {
-  id: string;
-  authorName: string;
-  authorAvatar?: string;
-  rating: number;
-  date: string;
-  content: string;
-  tenure?: string;
-  location?: string;
-};
-
-export type Hotel = {
-  id: string;
-  name: string;
-  slug?: string;
-  categories: HotelCategory[];
-  status: HotelStatus;
-  rating: number; // Star rating (1-5)
-  reviewCount: number;
-  address: Address;
-  imageUrls: string[]; // Multiple images for the hotel
-  amenities: Amenity[];
-  roomTypes: RoomType[];
   description?: string;
-  reviews?: Review[];
-};
+  icon?: string;
+  category?: string;
+}
 
-export type HotelSearchFilters = {
-  query?: string; // Location or hotel name
-  checkIn?: string; // ISO date string
-  checkOut?: string; // ISO date string
-  adults: number;
-  children: number;
-  rooms: number;
-};
-
-export type HotelSearchResult = {
-  hotel: Hotel;
-  layoutType: number; // 1-10 for different magazine layouts
-};
-
-export type BookingStatus = 'CONFIRMED' | 'CHECKED_IN' | 'CHECKED_OUT' | 'CANCELLED';
-
-export type HotelBooking = {
+export interface ReviewDto {
   id: string;
-  code: string;
-  hotelId: string;
-  hotelName: string;
-  roomType: string;
-  status: BookingStatus;
-  checkInDate: string; // ISO date string
-  checkOutDate: string; // ISO date string
-  guests: {
-    adults: number;
-    children: number;
-  };
-  roomsBooked: number;
-  hotelLocation: { lng: number; lat: number; address?: string };
-  totalPrice: number;
-  pricePerNight: number;
-  nights: number;
-  createdAt?: string;
-  updatedAt?: string;
-};
+  userId: string;
+  userName: string;
+  rating: number;
+  comment?: string;
+  createdAt: string;
+}
 
+export interface HotelSettingsDto {
+  checkInTime: string;
+  checkOutTime: string;
+  maxAdultsPerRoom: number;
+  maxChildrenPerRoom: number;
+  maxGuestsPerRoom: number;
+  allowExtraBed: boolean;
+  extraBedPrice?: number;
+  minNights: number;
+  maxNights: number;
+  minAdvanceBookingHours: number;
+  maxAdvanceBookingDays: number;
+  enableStripePayment: boolean;
+  enablePayAtHotel: boolean;
+  stripeAccountId?: string;
+  taxRate: number;
+  serviceFeeRate: number;
+  cancellationPolicy?: string;
+  childPolicy?: string;
+  petPolicy?: string;
+  smokingPolicy?: string;
+}
+
+export interface HotelPublicSettingsDto {
+  checkInTime: string;
+  checkOutTime: string;
+  maxGuestsPerRoom: number;
+  allowExtraBed: boolean;
+  extraBedPrice?: number;
+  cancellationPolicy?: string;
+  childPolicy?: string;
+  petPolicy?: string;
+  smokingPolicy?: string;
+  enableStripePayment: boolean;
+  enablePayAtHotel: boolean;
+}
+
+export interface HotelImageDto {
+  imageUrl: string;
+  caption?: string;
+  altText?: string;
+  displayOrder: number;
+  isPrimary: boolean;
+  category?: string;
+}
+
+export interface HotelDto extends BaseDto {
+  brandId: string;
+  brandName: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  city?: string;
+  country?: string;
+  starRating: number;
+  isActive: boolean;
+  isVerified: boolean;
+  averageRating?: number;
+  reviewCount: number;
+  minPrice?: number;
+}
+
+export interface HotelDetailDto extends HotelDto {
+  address?: string;
+  state?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  phoneNumber?: string;
+  email?: string;
+  website?: string;
+  totalRooms?: number;
+  numberOfFloors?: number;
+  taxId?: string;
+  smokingPolicy?: string;
+  settings: HotelSettingsDto;
+  publicSettings: HotelPublicSettingsDto;
+  images: HotelImageDto[];
+  amenities: AmenityDto[];
+  recentReviews: ReviewDto[];
+}
+
+export interface HotelSearchResultDto extends HotelDto {
+  availableRooms: number;
+  lowestAvailablePrice?: number;
+}

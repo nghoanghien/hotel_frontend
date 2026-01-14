@@ -1,7 +1,7 @@
 "use client";
 
 import BackgroundTransition from "@/features/home/components/BackgroundTransition";
-import { getCategoryBackgroundImage } from "@/features/home/data/mockRestaurants";
+import { getCategoryBackgroundImage } from "@/features/home/hooks/useHomePage";
 
 export default function Loading() {
   const img = getCategoryBackgroundImage("fish-seafood");
@@ -18,7 +18,7 @@ export default function Loading() {
               <div className="absolute inset-[2px] rounded-md bg-white"></div>
             </div>
           </div>
-          <div className="text-base tracking-wide">Eatzy Magazine</div>
+          <div className="text-base tracking-wide">Hotel Magazine</div>
           <div className="text-sm text-white/80">Đang tải…</div>
         </div>
       </div>

@@ -1,31 +1,32 @@
 "use client";
 import { motion } from "@repo/ui/motion";
 import { Calendar, Users, BedDouble, MapPin, Clock, CheckCircle2, XCircle } from "@repo/ui/icons";
-import type { HotelBooking } from "@repo/types";
+import type { BookingDto } from "@repo/types";
 import { formatVnd } from "@repo/lib";
 
 interface BookingHistoryCardProps {
-  booking: HotelBooking;
+  booking: BookingDto;
 }
 
 export default function BookingHistoryCard({ booking }: BookingHistoryCardProps) {
-  const getStatusConfig = (status: HotelBooking["status"]) => {
+  const getStatusConfig = (status: string) => {
     switch (status) {
-      case "CONFIRMED":
+      case "Confirmed":
+      case "Pending":
         return {
           bg: "bg-blue-50 border-blue-200",
           text: "text-blue-700",
           icon: Clock,
-          label: "Upcoming",
+          label: status,
         };
-      case "CHECKED_OUT":
+      case "CheckedOut":
         return {
           bg: "bg-green-50 border-green-200",
           text: "text-green-700",
           icon: CheckCircle2,
           label: "Completed",
         };
-      case "CANCELLED":
+      case "Cancelled":
         return {
           bg: "bg-red-50 border-red-200",
           text: "text-red-700",
@@ -37,7 +38,7 @@ export default function BookingHistoryCard({ booking }: BookingHistoryCardProps)
           bg: "bg-gray-50 border-gray-200",
           text: "text-gray-700",
           icon: Clock,
-          label: "Unknown",
+          label: status,
         };
     }
   };
@@ -66,7 +67,6 @@ export default function BookingHistoryCard({ booking }: BookingHistoryCardProps)
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h3 className="text-xl font-bold text-gray-900 mb-1">{booking.hotelName}</h3>
-            <p className="text-sm text-gray-600">{booking.roomType}</p>
           </div>
 
           <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${statusConfig.bg} ${statusConfig.text}`}>
@@ -107,8 +107,7 @@ export default function BookingHistoryCard({ booking }: BookingHistoryCardProps)
             <div>
               <div className="text-xs text-gray-500 mb-0.5">Guests</div>
               <div className="text-sm font-semibold text-gray-900">
-                {booking.guests.adults} Adults
-                {booking.guests.children > 0 && `, ${booking.guests.children} Children`}
+                {booking.numberOfGuests} Guests
               </div>
             </div>
           </div>
@@ -120,27 +119,21 @@ export default function BookingHistoryCard({ booking }: BookingHistoryCardProps)
             </div>
             <div>
               <div className="text-xs text-gray-500 mb-0.5">Rooms</div>
-              <div className="text-sm font-semibold text-gray-900">{booking.roomsBooked}</div>
+              <div className="text-sm font-semibold text-gray-900">{booking.numberOfRooms}</div>
             </div>
           </div>
-        </div>
-
-        {/* Location */}
-        <div className="flex items-center gap-2 text-sm text-gray-600 mb-4 pb-4 border-b border-gray-100">
-          <MapPin className="w-4 h-4" />
-          <span className="line-clamp-1">{booking.hotelLocation.address}</span>
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-xs text-gray-500 mb-1">Booking Code</div>
-            <div className="text-sm font-mono font-semibold text-gray-900">{booking.code}</div>
+            <div className="text-xs text-gray-500 mb-1">Confirmation #</div>
+            <div className="text-sm font-mono font-semibold text-gray-900">{booking.confirmationNumber}</div>
           </div>
 
           <div className="text-right">
             <div className="text-xs text-gray-500 mb-1">Total Amount</div>
-            <div className="text-2xl font-bold text-[var(--primary)]">{formatVnd(booking.totalPrice)}</div>
+            <div className="text-2xl font-bold text-[var(--primary)]">{formatVnd(booking.totalAmount)}</div>
           </div>
         </div>
       </div>

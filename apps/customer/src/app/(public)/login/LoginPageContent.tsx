@@ -79,7 +79,7 @@ export default function LoginPageContent() {
                   form={form}
                   onForgotPassword={() => router.push("/forgot-password")}
                   onSuccess={() => {
-                    show();
+                    show("Đang tải trang home...");
                     router.push("/home");
                   }}
                   onRegister={handleRegisterClick}

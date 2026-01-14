@@ -1,9 +1,9 @@
 "use client";
+import type { HotelDetailDto as Hotel } from "@repo/types";
 import { motion } from "@repo/ui/motion";
 import { ImageWithFallback, useLoading } from "@repo/ui";
-import { Star, MapPin, Heart, Trash2, ExternalLink } from "@repo/ui/icons";
+import { Star, MapPin, Heart, ExternalLink } from "@repo/ui/icons";
 import { useRouter } from "next/navigation";
-import type { Hotel } from "@repo/types";
 import { formatVnd } from "@repo/lib";
 import { useFavoritesStore } from "@/features/favorites/store/favoritesStore";
 
@@ -23,12 +23,10 @@ export default function FavoriteHotelCard({ hotel }: FavoriteHotelCardProps) {
 
   const handleViewDetails = () => {
     show();
-    router.push(`/hotels/${hotel.slug}`);
+    router.push(`/hotels/${hotel.id}`);
   };
 
-  const minPrice = hotel.roomTypes.length > 0
-    ? Math.min(...hotel.roomTypes.map((r) => r.price))
-    : 0;
+  const minPrice = hotel.minPrice || 0;
 
   return (
     <motion.div
@@ -39,19 +37,16 @@ export default function FavoriteHotelCard({ hotel }: FavoriteHotelCardProps) {
       transition={{ duration: 0.3 }}
       className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
     >
-      {/* Image */}
       <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
         <ImageWithFallback
-          src={hotel.imageUrls[0]}
+          src={hotel.imageUrl || ''}
           alt={hotel.name}
           fill
           className="object-cover group-hover:scale-110 transition-transform duration-500"
         />
 
-        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-        {/* Favorite Badge */}
         <div className="absolute top-4 right-4 flex gap-2">
           <motion.button
             whileHover={{ scale: 1.1 }}
@@ -63,53 +58,44 @@ export default function FavoriteHotelCard({ hotel }: FavoriteHotelCardProps) {
           </motion.button>
         </div>
 
-        {/* Rating Badge */}
         <div className="absolute top-4 left-4">
           <div className="flex items-center gap-1 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-lg">
             <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
-            <span className="font-bold text-sm text-gray-900">{hotel.rating}</span>
+            <span className="font-bold text-sm text-gray-900">{hotel.starRating}</span>
             <span className="text-xs text-gray-600">({hotel.reviewCount})</span>
           </div>
         </div>
 
-        {/* Hotel Name Overlay */}
         <div className="absolute bottom-4 left-4 right-4">
           <h3 className="text-xl font-bold text-white mb-1 line-clamp-1">{hotel.name}</h3>
           <div className="flex items-center gap-1 text-white/90 text-sm">
             <MapPin className="w-4 h-4" />
-            <span className="line-clamp-1">{hotel.address.fullAddress}</span>
+            <span className="line-clamp-1">{hotel.address}</span>
           </div>
         </div>
       </div>
 
-      {/* Content */}
       <div className="p-5">
-        {/* Categories */}
         <div className="flex flex-wrap gap-2 mb-3">
-          {hotel.categories.slice(0, 3).map((cat) => (
-            <span
-              key={cat.id}
-              className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium"
-            >
-              {cat.name}
-            </span>
-          ))}
+          <span
+            className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium"
+          >
+            {hotel.brandName}
+          </span>
         </div>
 
-        {/* Amenities */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {hotel.amenities.slice(0, 4).map((amenity) => (
+          {hotel.amenities?.slice(0, 4).map((amenity) => (
             <div key={amenity.id} className="flex items-center gap-1 text-xs text-gray-600">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--primary)]" />
               <span>{amenity.name}</span>
             </div>
           ))}
-          {hotel.amenities.length > 4 && (
+          {hotel.amenities && hotel.amenities.length > 4 && (
             <span className="text-xs text-gray-500">+{hotel.amenities.length - 4} more</span>
           )}
         </div>
 
-        {/* Price & Action */}
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <div>
             <div className="text-xs text-gray-500 mb-1">Starting from</div>

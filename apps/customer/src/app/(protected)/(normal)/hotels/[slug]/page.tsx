@@ -6,10 +6,11 @@ import { ImageWithFallback } from "@repo/ui";
 import { Star, MapPin, ArrowLeft, Users, Maximize2, Plus, Wifi, Car, Utensils, Monitor, Snowflake, Waves, Dumbbell, Coffee, Wind, PawPrint, Refrigerator, WashingMachine, CalendarX, Key, Shield, Award, Briefcase, MessageCircle, ShieldCheck } from "@repo/ui/icons";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { useLoading, useHoverHighlight, HoverHighlightOverlay } from "@repo/ui";
-import type { Hotel, RoomType } from "@repo/types";
-import { getHotelBySlug } from "@/features/search/data/mockHotelData";
+import type { HotelDetailDto as Hotel, RoomAvailabilityDto } from "@repo/types";
+import { getHotelBySlug, getRoomsByHotelId } from "@/features/search/data/mockHotelData";
 import RoomDetailDrawer from "@/features/cart/components/RoomDetailDrawer";
 import { HotelReviews } from "@/features/hotel/components/HotelReviews";
+
 
 type TabType = 'overview' | 'rooms' | 'location' | 'policies' | 'amenities' | 'reviews';
 
@@ -32,11 +33,16 @@ export default function HotelDetailPage() {
     return () => clearTimeout(t);
   }, [hide]);
 
-  const hotel: Hotel | undefined = useMemo(() => getHotelBySlug(params.slug), [params.slug]);
+  const hotel = useMemo(() => getHotelBySlug(params.slug), [params.slug]);
+  const rooms = useMemo(() => hotel ? getRoomsByHotelId(hotel.id) : [], [hotel]);
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState<RoomType | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<RoomAvailabilityDto | null>(null);
+
+  // ... (rest of component logic)
+
+
 
   // Read search parameters from URL
   const searchParams = useSearchParams();
@@ -65,10 +71,14 @@ export default function HotelDetailPage() {
     );
   }
 
-  const handleRoomClick = (room: RoomType) => {
+  const handleRoomClick = (room: RoomAvailabilityDto) => {
     setSelectedRoom(room);
     setDrawerOpen(true);
   };
+
+  const getHotelImage = (index: number = 0) => {
+    return hotel?.images?.find(img => img.displayOrder === index)?.imageUrl || hotel?.imageUrl || '';
+  }
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -84,9 +94,7 @@ export default function HotelDetailPage() {
                   {/* Main Avatar */}
                   <div className="relative w-32 h-32 mb-4">
                     <div className="w-full h-full rounded-full overflow-hidden relative z-10">
-                      {hotel.imageUrls[0] && (
-                        <ImageWithFallback src={hotel.imageUrls[0]} alt={hotel.name} fill className="object-cover" />
-                      )}
+                      <ImageWithFallback src={getHotelImage(0)} alt={hotel.name} fill className="object-cover" />
                     </div>
                     <div className="absolute bottom-1 right-0 z-20 bg-[var(--primary)] text-white p-2 rounded-full shadow-md">
                       <Award className="w-5 h-5" />
@@ -108,7 +116,7 @@ export default function HotelDetailPage() {
                       </div>
                       <div className="space-y-1 pl-4 border-l border-gray-200">
                         <div className="flex items-center gap-1 text-2xl font-bold text-gray-900">
-                          {hotel.rating} <Star className="w-4 h-4 fill-gray-900 text-gray-900" />
+                          {hotel.starRating} <Star className="w-4 h-4 fill-gray-900 text-gray-900" />
                         </div>
                         <div className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">Xếp hạng</div>
                       </div>
@@ -165,13 +173,13 @@ export default function HotelDetailPage() {
                 </div>
 
                 {/* Original Images Grid moved here */}
-                {hotel.imageUrls.length > 1 && (
+                {hotel.images && hotel.images.length > 1 && (
                   <div className="pt-8">
                     <h4 className="font-bold text-gray-900 mb-4 text-lg">Hình ảnh nổi bật</h4>
                     <div className="grid grid-cols-2 gap-4">
-                      {hotel.imageUrls.slice(1, 5).map((img, idx) => (
+                      {hotel.images.slice(1, 5).map((img, idx) => (
                         <div key={idx} className="relative aspect-video rounded-2xl overflow-hidden">
-                          <ImageWithFallback src={img} alt={`${hotel.name} - ${idx + 2}`} fill className="object-cover" />
+                          <ImageWithFallback src={img.imageUrl} alt={`${hotel.name} - ${idx + 2}`} fill className="object-cover" />
                         </div>
                       ))}
                     </div>
@@ -183,59 +191,63 @@ export default function HotelDetailPage() {
         );
 
       case 'rooms':
-        const nights = bookingInfo.checkOut && bookingInfo.checkIn
-          ? Math.max(1, Math.ceil((bookingInfo.checkOut.getTime() - bookingInfo.checkIn.getTime()) / (1000 * 60 * 60 * 24)))
-          : 1;
-
         return (
           <div className="space-y-4">
             <h3 className="text-2xl font-bold mb-6">Available Rooms</h3>
-            <div className="grid grid-cols-3 gap-x-5 gap-y-8">
-              {hotel.roomTypes.map((room) => (
-                <motion.div
-                  key={room.id}
-                  whileHover={{ y: -4 }}
-                  onClick={() => handleRoomClick(room)}
-                  className="group cursor-pointer"
-                >
-                  <div className="relative aspect-square rounded-[20px] overflow-hidden mb-3 bg-gray-100">
-                    <ImageWithFallback
-                      src={room.images[0]}
-                      alt={room.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+            {rooms.length === 0 ? (
+              <div className="p-8 bg-gray-50 rounded-2xl border border-dashed border-gray-300 text-center">
+                <p className="text-gray-500">Currently no rooms available for this hotel.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3 gap-x-5 gap-y-8">
+                {rooms.map((room) => (
+                  <motion.div
+                    key={room.roomId}
+                    whileHover={{ y: -4 }}
+                    onClick={() => handleRoomClick(room)}
+                    className="group cursor-pointer"
+                  >
+                    <div className="relative aspect-square rounded-[20px] overflow-hidden mb-3 bg-gray-100">
+                      <ImageWithFallback
+                        src={room.imageUrl || getHotelImage(0)}
+                        alt={room.type}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
 
-                    {/* Badge */}
-                    <div className="absolute top-4 left-4 bg-white/70 backdrop-blur-md border border-white/60 px-4 py-2 rounded-2xl shadow-sm z-10">
-                      <span className="text-sm font-semibold text-gray-800 block leading-none pb-0.5">Loại phòng này đang <br />hết nhanh</span>
+                      {/* Badge */}
+                      {room.maxOccupancy > 2 && (
+                        <div className="absolute top-4 left-4 bg-white/70 backdrop-blur-md border border-white/60 px-4 py-2 rounded-2xl shadow-sm z-10">
+                          <span className="text-sm font-semibold text-gray-800 block leading-none pb-0.5">Phù hợp gia đình</span>
+                        </div>
+                      )}
+
+                      {/* Action Button */}
+                      <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border-2 border-white flex items-center justify-center transition-colors z-10 border border-white/20">
+                        <Plus className="w-6 h-6 text-white" />
+                      </button>
                     </div>
 
-                    {/* Action Button */}
-                    <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border-2 border-white flex items-center justify-center transition-colors z-10 border border-white/20">
-                      <Plus className="w-6 h-6 text-white" />
-                    </button>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className="font-semibold text-xl text-gray-900 leading-tight">
-                      {room.name}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-base text-gray-500">
-                      <span className="font-bold text-xl text-[var(--primary)]">
-                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.price)}
-                      </span>
-                      <span className="font-normal text-sm">/đêm</span>
-                      <span className="w-1 h-1 rounded-full bg-gray-400 mx-0.5" />
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-black text-black" />
-                        <span className="font-medium text-gray-900">{hotel.rating}</span>
+                    <div className="space-y-1">
+                      <div className="font-semibold text-xl text-gray-900 leading-tight">
+                        {room.type}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-base text-gray-500">
+                        <span className="font-bold text-xl text-[var(--primary)]">
+                          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(room.basePrice)}
+                        </span>
+                        <span className="font-normal text-sm">/đêm</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-400 mx-0.5" />
+                        <div className="flex items-center gap-1">
+                          <Users className="w-4 h-4 text-gray-500" />
+                          <span className="font-medium text-gray-900">{room.maxOccupancy}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         );
 
@@ -248,7 +260,7 @@ export default function HotelDetailPage() {
                 <MapPin className="w-5 h-5 text-[var(--primary)] mt-1" />
                 <div>
                   <div className="font-semibold text-gray-900 mb-1">Address</div>
-                  <div className="text-gray-600">{hotel.address.fullAddress}</div>
+                  <div className="text-gray-600">{hotel.address}</div>
                 </div>
               </div>
               <div className="aspect-video bg-gray-200 rounded-xl flex items-center justify-center text-gray-500">
@@ -268,7 +280,7 @@ export default function HotelDetailPage() {
                 <CalendarX className="w-6 h-6 text-gray-900 mb-1" />
                 <h4 className="font-semibold text-gray-900 text-lg">Chính sách hủy</h4>
                 <p className="text-gray-600 text-[15px] leading-relaxed">
-                  Bạn được hủy miễn phí trước 24 giờ khi nhận phòng. Sau thời gian đó, bạn sẽ không được hoàn tiền.
+                  Bạn được hủy miễn phí trước {hotel.settings?.minAdvanceBookingHours || 24} giờ khi nhận phòng.
                 </p>
                 <button className="font-medium text-gray-900 underline underline-offset-2 text-[15px]">Tìm hiểu thêm</button>
               </div>
@@ -278,9 +290,9 @@ export default function HotelDetailPage() {
                 <Key className="w-6 h-6 text-gray-900 mb-1" />
                 <h4 className="font-semibold text-gray-900 text-lg">Nội quy nhà</h4>
                 <div className="text-gray-600 text-[15px] space-y-1">
-                  <p>Nhận phòng sau 14:00</p>
-                  <p>Trả phòng trước 12:00</p>
-                  <p>Khách thú cưng được chào đón</p>
+                  <p>Nhận phòng sau {hotel.publicSettings?.checkInTime || '14:00'}</p>
+                  <p>Trả phòng trước {hotel.publicSettings?.checkOutTime || '12:00'}</p>
+                  <p>{hotel.publicSettings?.allowExtraBed ? 'Hỗ trợ giường phụ' : 'Không hỗ trợ giường phụ'}</p>
                 </div>
                 <button className="font-medium text-gray-900 underline underline-offset-2 text-[15px]">Tìm hiểu thêm</button>
               </div>
@@ -322,7 +334,7 @@ export default function HotelDetailPage() {
           <div className="space-y-8">
             <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Nơi này có những gì cho bạn</h3>
             <div className="grid grid-cols-2 gap-y-7 gap-x-12">
-              {hotel.amenities.map((amenity) => {
+              {hotel.amenities?.map((amenity) => {
                 const Icon = getAmenityIcon(amenity.name);
                 return (
                   <div key={amenity.id} className="flex items-center gap-4 group">
@@ -346,6 +358,8 @@ export default function HotelDetailPage() {
         return null;
     }
   };
+
+  const mainImage = getHotelImage(0);
 
   return (
     <div className="h-screen flex flex-col bg-[#F7F7F7]">
@@ -375,29 +389,26 @@ export default function HotelDetailPage() {
                 </h1>
                 <p className="text-[14px] text-[#555555] leading-relaxed mb-4">{hotel.description}</p>
 
-                {hotel.categories && hotel.categories.length > 0 && (
+                {hotel.brandName && (
                   <div className="flex flex-wrap gap-2 mb-3">
-                    {hotel.categories.map((cat) => (
-                      <span
-                        key={cat.id}
-                        className="text-[12px] bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-full shadow-sm"
-                      >
-                        {cat.name}
-                      </span>
-                    ))}
+                    <span
+                      className="text-[12px] bg-white border border-gray-200 text-gray-700 px-3 py-1 rounded-full shadow-sm"
+                    >
+                      {hotel.brandName}
+                    </span>
                   </div>
                 )}
 
                 <div className="flex items-start gap-2 text-[13px] text-[#555555] mb-4">
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>{hotel.address.fullAddress}</span>
+                  <span>{hotel.address}</span>
                 </div>
 
                 <div className="flex items-center gap-2 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${i < hotel.rating ? 'fill-amber-500 text-amber-500' : 'text-gray-300'}`}
+                      className={`w-5 h-5 ${i < (hotel.starRating || 0) ? 'fill-amber-500 text-amber-500' : 'text-gray-300'}`}
                     />
                   ))}
                   <span className="text-sm text-gray-600">({hotel.reviewCount} reviews)</span>
@@ -405,11 +416,11 @@ export default function HotelDetailPage() {
               </div>
 
               {/* Hotel main image */}
-              {hotel.imageUrls[0] && (
+              {mainImage && (
                 <div className="rounded-[24px] overflow-hidden">
                   <div className="relative aspect-[16/11]">
                     <ImageWithFallback
-                      src={hotel.imageUrls[0]}
+                      src={mainImage}
                       alt={hotel.name}
                       fill
                       className="object-cover"
@@ -422,11 +433,11 @@ export default function HotelDetailPage() {
             {/* Right Column - Tabs & Content */}
             <div className="relative overflow-y-auto no-scrollbar pl-2 mb-12">
               {/* Hero image */}
-              {hotel.imageUrls[0] && (
+              {mainImage && (
                 <div className="relative mb-6">
                   <div className="relative aspect-[16/8] rounded-[24px] overflow-hidden shadow-md bg-white">
                     <ImageWithFallback
-                      src={hotel.imageUrls[0]}
+                      src={mainImage}
                       alt={hotel.name}
                       fill
                       className="object-cover"

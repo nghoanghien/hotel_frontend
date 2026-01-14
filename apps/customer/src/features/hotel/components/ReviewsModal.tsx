@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { X, Search, Star, Sparkles, CheckCircle2, Key, MessageSquare, Map, Tag } from "@repo/ui/icons";
 import { ImageWithFallback } from "@repo/ui";
 import { motion, AnimatePresence } from "@repo/ui/motion";
-import type { Hotel } from "@repo/types";
+import type { HotelDetailDto as Hotel } from "@repo/types";
 
 interface ReviewsModalProps {
   hotel: Hotel;
@@ -37,9 +37,9 @@ export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
     { stars: 1, count: 0, percentage: 0 },
   ];
 
-  const filteredReviews = hotel.reviews?.filter(review =>
-    review.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    review.authorName.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredReviews = hotel.recentReviews?.filter(review =>
+    (review.comment?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+    review.userName.toLowerCase().includes(searchQuery.toLowerCase())
   ) || [];
 
   if (!mounted) return null;
@@ -89,7 +89,7 @@ export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
                       <div className="flex items-center justify-center gap-4 mb-3">
                         <span className="text-4xl">🏆</span>
                         <div className="text-[80px] leading-none font-bold text-[#1A1A1A]">
-                          {hotel.rating.toFixed(2).replace('.', ',')}
+                          {(hotel.averageRating || hotel.starRating || 0).toFixed(2).replace('.', ',')}
                         </div>
                         <span className="text-4xl">🏆</span>
                       </div>
@@ -186,21 +186,19 @@ export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
                             transition={{ duration: 0.3 }}
                             className="space-y-3 pb-6 border-b border-gray-100 last:border-0"
                           >
+                            {/* Review Item */}
                             {/* Author Info */}
                             <div className="flex items-start gap-3">
                               <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                                 <ImageWithFallback
-                                  src={review.authorAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${review.authorName}`}
-                                  alt={review.authorName}
+                                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.userName}`}
+                                  alt={review.userName}
                                   fill
                                   className="object-cover"
                                 />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-bold text-gray-900 text-sm">{review.authorName}</div>
-                                {review.tenure && (
-                                  <div className="text-xs text-gray-500">{review.tenure} trên Hotelzy</div>
-                                )}
+                                <div className="font-bold text-gray-900 text-sm">{review.userName}</div>
                               </div>
                             </div>
 
@@ -215,20 +213,13 @@ export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
                                 ))}
                               </div>
                               <span className="text-gray-400">·</span>
-                              <span className="text-gray-600">{review.date}</span>
+                              <span className="text-gray-600">{new Date(review.createdAt).toLocaleDateString('vi-VN')}</span>
                             </div>
 
                             {/* Review Content */}
                             <p className="text-gray-700 leading-relaxed text-[14px]">
-                              {review.content}
+                              {review.comment}
                             </p>
-
-                            {review.location && (
-                              <div className="text-xs text-gray-500 flex items-center gap-1">
-                                <Map className="w-3 h-3" />
-                                {review.location}
-                              </div>
-                            )}
                           </motion.div>
                         ))
                       )}

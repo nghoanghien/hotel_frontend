@@ -1,7 +1,8 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useBookingStore } from "@/features/booking/store/bookingStore";
-import type { PaymentMethod } from "@repo/types";
+
+type PaymentMethod = "EATZYPAY" | "CREDIT_CARD"; // Or whatever methods are supported
 
 export function useBookingCheckout() {
   const currentBooking = useBookingStore((s) => s.currentBooking);
@@ -22,7 +23,7 @@ export function useBookingCheckout() {
   // Calculate subtotal (price per night * nights * rooms)
   const subtotal = useMemo(() => {
     if (!currentBooking) return 0;
-    return currentBooking.roomType.price * nights * currentBooking.roomsCount;
+    return currentBooking.roomType.basePrice * nights * currentBooking.roomsCount;
   }, [currentBooking, nights]);
 
   // Service fee (5% of subtotal)

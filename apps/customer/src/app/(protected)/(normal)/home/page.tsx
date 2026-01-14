@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from '@repo/ui/motion';
 import CategoryScroller from '@/features/home/components/CategoryScroller';
 import dynamic from 'next/dynamic';
-const HotelSlider = dynamic(() => import('@/features/home/components/RestaurantSlider'), { ssr: false });
+const HotelSlider = dynamic(() => import('@/features/home/components/HotelSlider'), { ssr: false });
 import BackgroundTransition from '@/features/home/components/BackgroundTransition';
 import { useHomePage } from '@/features/home/hooks/useHomePage';
 import { useState, useEffect } from 'react';

@@ -7,7 +7,7 @@ import { useFavoritesStore } from "@/features/favorites/store/favoritesStore";
 import { getAllHotels } from "@/features/search/data/mockHotelData";
 import { getInitialFavorites } from "@/features/favorites/data/mockFavorites";
 import FavoriteHotelCard from "@/features/favorites/components/FavoriteHotelCard";
-import type { Hotel } from "@repo/types";
+import type { HotelDetailDto as Hotel } from "@repo/types";
 
 type ViewMode = "grid" | "list";
 type SortOption = "name" | "rating" | "price";
@@ -47,11 +47,9 @@ export default function FavoritesPage() {
         case "name":
           return a.name.localeCompare(b.name);
         case "rating":
-          return b.rating - a.rating;
+          return (b.starRating || 0) - (a.starRating || 0);
         case "price":
-          const minPriceA = Math.min(...a.roomTypes.map((r) => r.price));
-          const minPriceB = Math.min(...b.roomTypes.map((r) => r.price));
-          return minPriceA - minPriceB;
+          return (a.minPrice || 0) - (b.minPrice || 0);
         default:
           return 0;
       }

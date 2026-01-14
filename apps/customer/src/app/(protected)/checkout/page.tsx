@@ -260,12 +260,12 @@ export default function BookingCheckoutPage() {
                 {/* Hotel Info Card */}
                 <div className="bg-white rounded-2xl border-2 border-gray-300 p-6">
                   <div className="text-xl font-bold text-gray-900 mb-4">{currentBooking.hotelName}</div>
-                  <div className="text-sm text-gray-600 mb-6">{currentBooking.roomType.name}</div>
+                  <div className="text-sm text-gray-600 mb-6">{currentBooking.roomType.type || currentBooking.roomType.roomNumber}</div>
 
                   <div className="space-y-4 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Price per night</span>
-                      <span className="font-semibold">{formatVnd(currentBooking.roomType.price)}</span>
+                      <span className="font-semibold">{formatVnd(currentBooking.roomType.basePrice)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Nights</span>

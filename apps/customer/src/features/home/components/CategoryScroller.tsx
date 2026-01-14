@@ -1,9 +1,14 @@
 import { motion, useMotionValue, useTransform } from '@repo/ui/motion';
-import { HotelCategory } from '@repo/models';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
+export interface Category {
+  id: string;
+  name: string;
+  slug?: string;
+}
+
 interface CategoryScrollerProps {
-  categories: HotelCategory[];
+  categories: Category[];
   activeIndex: number;
   onCategoryChange: (index: number) => void;
 }

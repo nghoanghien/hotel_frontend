@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import type { Hotel, HotelSearchFilters } from '@repo/types';
-import { searchHotels } from '../data/mockHotelData';
+import type { HotelDetailDto as Hotel } from '@repo/types';
+import { searchHotels, HotelSearchFilters } from '../data/mockHotelData';
 import type { SearchFilters } from '../components/SearchOverlay';
 
 export interface HotelSearchResult {

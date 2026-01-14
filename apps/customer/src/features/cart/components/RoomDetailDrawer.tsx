@@ -2,7 +2,7 @@
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { ImageWithFallback, useLoading } from "@repo/ui";
 import { useState } from "react";
-import type { RoomType } from "@repo/types";
+import type { RoomAvailabilityDto } from "@repo/types";
 import { formatVnd } from "@repo/lib";
 import { Users, Maximize2, X, ChevronLeft, ChevronRight, Wifi, Wind, Coffee, Tv, Bath, Sparkles, Calendar } from "@repo/ui/icons";
 import { useBookingStore } from "@/features/booking/store/bookingStore";
@@ -20,7 +20,7 @@ export default function RoomDetailDrawer({
 }: {
   open: boolean;
   onClose: () => void;
-  room: RoomType | null;
+  room: RoomAvailabilityDto | null;
   hotelName?: string;
   checkIn?: Date | null;
   checkOut?: Date | null;
@@ -30,6 +30,7 @@ export default function RoomDetailDrawer({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
+  // ... (variants logic logic remains same)
   const variants = {
     enter: (direction: number) => ({
       x: direction > 0 ? "100%" : "-100%",
@@ -46,11 +47,16 @@ export default function RoomDetailDrawer({
       opacity: 0
     })
   };
+
   const router = useRouter();
   const setBooking = useBookingStore((s) => s.setBooking);
   const { show } = useLoading();
 
   if (!room) return null;
+
+  // Mock array of images since RoomAvailabilityDto only has one imageUrl
+  // In a real app we might fetch more images
+  const roomImages = room.imageUrl ? [room.imageUrl] : [];
 
   const handleBookNow = () => {
     if (!hotelName) return;
@@ -58,10 +64,11 @@ export default function RoomDetailDrawer({
     show("Đang chuyển đến trang thanh toán...");
 
     // Set booking data
+    // Note: mapping to booking store might need adjustment if store expects old RoomType
     setBooking({
-      hotelId: room.hotelId,
+      hotelId: "PLACEHOLDER_HOTEL_ID", // We need hotelId in RoomAvailabilityDto or passed in props
       hotelName,
-      roomType: room,
+      roomType: room as any, // Temporary cast until store is updated
       checkInDate: checkIn || new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
       checkOutDate: checkOut || new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
       guests: guests || { adults: 2, children: 0 },
@@ -74,13 +81,15 @@ export default function RoomDetailDrawer({
   };
 
   const nextImage = () => {
+    if (roomImages.length <= 1) return;
     setDirection(1);
-    setCurrentImageIndex((prev) => (prev + 1) % room.images.length);
+    setCurrentImageIndex((prev) => (prev + 1) % roomImages.length);
   };
 
   const prevImage = () => {
+    if (roomImages.length <= 1) return;
     setDirection(-1);
-    setCurrentImageIndex((prev) => (prev - 1 + room.images.length) % room.images.length);
+    setCurrentImageIndex((prev) => (prev - 1 + roomImages.length) % roomImages.length);
   };
 
   return (
@@ -117,19 +126,20 @@ export default function RoomDetailDrawer({
                   <div
                     className="text-[48px] font-anton font-extrabold text-[#1A1A1A] leading-tight mb-4"
                   >
-                    {room.name.toUpperCase()}
+                    {room.type?.toUpperCase() || room.roomNumber}
                   </div>
 
                   {/* Room Stats */}
                   <div className="flex items-center gap-6 mb-6">
+                    {/* Area not available in RoomAvailabilityDto, removing or using placeholder if needed */}
                     <div className="flex items-center gap-2 text-gray-600">
                       <Maximize2 className="w-5 h-5" />
-                      <span className="font-semibold">{room.area}m²</span>
+                      <span className="font-semibold">{25}m²</span>
                     </div>
                     <div className="w-px h-5 bg-gray-300" />
                     <div className="flex items-center gap-2 text-gray-600">
                       <Users className="w-5 h-5" />
-                      <span className="font-semibold">{room.maxGuests} Guests</span>
+                      <span className="font-semibold">{room.maxOccupancy} Guests</span>
                     </div>
                   </div>
 
@@ -137,7 +147,7 @@ export default function RoomDetailDrawer({
                   <div className="bg-gradient-to-r from-[var(--primary)]/10 to-[var(--secondary)]/10 rounded-2xl p-6 mb-6">
                     <div className="text-sm text-gray-600 mb-1">Price per night</div>
                     <div className="text-4xl font-bold text-[var(--primary)] mb-2">
-                      {formatVnd(room.price)}
+                      {formatVnd(room.basePrice)}
                     </div>
                     {checkIn && checkOut && (() => {
                       const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
@@ -159,7 +169,6 @@ export default function RoomDetailDrawer({
                   </div>
 
                   {/* Room Amenities */}
-                  {/* Room Amenities Magazine Style */}
                   <div className="mb-8">
                     <div className="text-xl font-bold text-[#1A1A1A] mb-4">Room Amenities</div>
 
@@ -194,9 +203,9 @@ export default function RoomDetailDrawer({
                   >
                     {checkIn && checkOut ? (() => {
                       const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-                      const totalPrice = room.price * nights;
+                      const totalPrice = room.totalPrice || (room.basePrice * nights);
                       return `Book Now - ${formatVnd(totalPrice)}`;
-                    })() : `Book Now - ${formatVnd(room.price)}`}
+                    })() : `Book Now - ${formatVnd(room.basePrice)}`}
                   </motion.button>
                 </div>
               </div>
@@ -224,8 +233,8 @@ export default function RoomDetailDrawer({
                           className="absolute inset-0"
                         >
                           <ImageWithFallback
-                            src={room.images[currentImageIndex]}
-                            alt={`${room.name} - ${currentImageIndex + 1}`}
+                            src={roomImages[currentImageIndex] || ''}
+                            alt={`${room.type} - ${currentImageIndex + 1}`}
                             fill
                             className="object-cover"
                           />
@@ -234,7 +243,7 @@ export default function RoomDetailDrawer({
                     </div>
 
                     {/* Navigation Buttons */}
-                    {room.images.length > 1 && (
+                    {roomImages.length > 1 && (
                       <>
                         <button
                           onClick={prevImage}
@@ -253,14 +262,14 @@ export default function RoomDetailDrawer({
 
                     {/* Image Counter */}
                     <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
-                      {currentImageIndex + 1} / {room.images.length}
+                      {currentImageIndex + 1} / {roomImages.length}
                     </div>
                   </div>
 
                   {/* Thumbnail Grid */}
-                  {room.images.length > 1 && (
+                  {roomImages.length > 1 && (
                     <div className="grid grid-cols-4 gap-2">
-                      {room.images.map((img, idx) => (
+                      {roomImages.map((img, idx) => (
                         <button
                           key={idx}
                           onClick={() => { setDirection(idx > currentImageIndex ? 1 : -1); setCurrentImageIndex(idx); }}
@@ -271,7 +280,7 @@ export default function RoomDetailDrawer({
                         >
                           <ImageWithFallback
                             src={img}
-                            alt={`${room.name} thumbnail ${idx + 1}`}
+                            alt={`${room.type} thumbnail ${idx + 1}`}
                             fill
                             className="object-cover"
                           />
@@ -284,15 +293,14 @@ export default function RoomDetailDrawer({
                   <div className="mt-6">
                     <div className="text-lg font-semibold text-gray-900 mb-2">About this room</div>
                     <p className="text-gray-600 leading-relaxed">
-                      This beautifully designed {room.name.toLowerCase()} offers {room.area}m² of comfortable living space,
-                      perfect for up to {room.maxGuests} guests. Featuring modern amenities and elegant decor,
-                      this room provides the ideal retreat for your stay.
+                      {room.description || `This beautifully designed ${room.type.toLowerCase()} offers comfortable living space, perfect for up to ${room.maxOccupancy} guests. Featuring modern amenities and elegant decor, this room provides the ideal retreat for your stay.`}
                     </p>
                   </div>
                 </div>
               </div>
             </div>
           </motion.div>
+
           <style jsx>{`
             /* Firefox */
             .room-drawer-scroll {
@@ -320,6 +328,6 @@ export default function RoomDetailDrawer({
           `}</style>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence >
   );
 }

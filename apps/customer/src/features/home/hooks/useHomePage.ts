@@ -1,9 +1,37 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-  getUniqueCategories,
-  getHotelsByCategory,
-  getCategoryBackgroundImage,
-} from '../data/mockRestaurants';
+import { mockHotels } from '@/features/search/data/mockHotelData';
+import type { HotelDetailDto } from '@repo/types';
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+const getUniqueCategories = (): Category[] => {
+  // Synthesize categories from Cities in mockHotels
+  const cities = Array.from(new Set(mockHotels.map(h => h.city || 'Other')));
+  return cities.map((city, index) => ({
+    id: `cat-${index}`,
+    name: city,
+    slug: city.toLowerCase().replace(/ /g, '-')
+  }));
+};
+
+const getHotelsByCategory = (categoryId: string): HotelDetailDto[] => {
+  const categories = getUniqueCategories();
+  const cat = categories.find(c => c.id === categoryId);
+  if (!cat) return [];
+  return mockHotels.filter(h => h.city === cat.name);
+};
+
+export const getCategoryBackgroundImage = (slug: string): string => {
+  // Return a generic background or based on city
+  if (slug.includes('nha-trang')) return 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1200';
+  if (slug.includes('da-nang')) return 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200';
+  if (slug.includes('da-lat')) return 'https://images.unsplash.com/photo-1549294413-26f195200c16?w=1200';
+  return 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200';
+};
 
 export function useHomePage() {
   const categories = getUniqueCategories();

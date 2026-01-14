@@ -1,11 +1,11 @@
 "use client";
 import { create } from "@repo/store";
-import type { RoomType } from "@repo/types";
+import type { RoomAvailabilityDto } from "@repo/types";
 
 export interface BookingRoom {
   hotelId: string;
   hotelName: string;
-  roomType: RoomType;
+  roomType: RoomAvailabilityDto;
   checkInDate: Date | null;
   checkOutDate: Date | null;
   guests: {

@@ -18,10 +18,10 @@ export default function BookingSummaryCard({ booking, nights }: BookingSummaryCa
         <div className="p-4 border-b border-gray-200">
           <div className="flex gap-3">
             <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
-              {booking.roomType.images[0] && (
+              {booking.roomType.imageUrl && (
                 <ImageWithFallback
-                  src={booking.roomType.images[0]}
-                  alt={booking.roomType.name}
+                  src={booking.roomType.imageUrl}
+                  alt={booking.roomType.type || booking.roomType.roomNumber}
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
@@ -30,9 +30,9 @@ export default function BookingSummaryCard({ booking, nights }: BookingSummaryCa
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-gray-900 mb-1">{booking.hotelName}</div>
-              <div className="text-sm text-gray-600">{booking.roomType.name}</div>
+              <div className="text-sm text-gray-600">{booking.roomType.type || booking.roomType.roomNumber}</div>
               <div className="text-xs text-gray-500 mt-1">
-                {booking.roomType.area}m² • Max {booking.roomType.maxGuests} guests
+                Max {booking.roomType.maxOccupancy} guests
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@ export default function BookingSummaryCard({ booking, nights }: BookingSummaryCa
 
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-600">Price per night</div>
-            <div className="font-semibold text-gray-900">{formatVnd(booking.roomType.price)}</div>
+            <div className="font-semibold text-gray-900">{formatVnd(booking.roomType.basePrice)}</div>
           </div>
         </div>
       </div>

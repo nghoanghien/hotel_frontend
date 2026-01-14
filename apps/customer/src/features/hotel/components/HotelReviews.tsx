@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Star, Sparkles, CheckCircle2, Key, MessageSquare, Map, Tag } from "@repo/ui/icons";
 import { ImageWithFallback } from "@repo/ui";
-import type { Hotel } from "@repo/types";
+import type { HotelDetailDto as Hotel } from "@repo/types";
 import { ReviewsModal } from "./ReviewsModal";
 
 interface HotelReviewsProps {
@@ -38,7 +38,7 @@ export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
 
           {/* Main Rating */}
           <div className="text-[120px] leading-none font-bold text-[#1A1A1A]">
-            {hotel.rating.toFixed(2).replace('.', ',')}
+            {(hotel.averageRating || hotel.starRating || 0).toFixed(2).replace('.', ',')}
           </div>
 
           {/* Right decoration */}
@@ -88,23 +88,20 @@ export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
 
       {/* Reviews Grid */}
       <div className="grid grid-cols-2 gap-x-20 gap-y-12">
-        {hotel.reviews?.slice(0, 6).map((review) => (
+        {hotel.recentReviews?.slice(0, 6).map((review) => (
           <div key={review.id} className="space-y-4">
             {/* Author Info */}
             <div className="flex items-start gap-4">
               <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                 <ImageWithFallback
-                  src={review.authorAvatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + review.authorName}
-                  alt={review.authorName}
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.userName}`}
+                  alt={review.userName}
                   fill
                   className="object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-gray-900 text-base">{review.authorName}</div>
-                {review.tenure && (
-                  <div className="text-sm text-gray-500">{review.tenure} trên Hotelzy</div>
-                )}
+                <div className="font-bold text-gray-900 text-base">{review.userName}</div>
               </div>
             </div>
 
@@ -119,12 +116,12 @@ export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
                 ))}
               </div>
               <span className="text-gray-400">·</span>
-              <span className="text-gray-600">{review.date}</span>
+              <span className="text-gray-600">{new Date(review.createdAt).toLocaleDateString('vi-VN')}</span>
             </div>
 
             {/* Review Content */}
             <p className="text-gray-700 leading-relaxed text-[15px]">
-              {review.content}
+              {review.comment}
             </p>
 
             <button onClick={() => setIsModalOpen(true)} className="font-semibold text-gray-900 underline decoration-gray-900 underline-offset-2 text-[15px] hover:decoration-2 transition-all">
