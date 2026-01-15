@@ -6,6 +6,8 @@ import { X, MapPin, Building2, Calendar, Users, BedDouble, CheckCircle2, Clock, 
 import { formatVnd, formatDate } from "@repo/lib";
 import { mockBookingHistory } from "@/features/history/data/mockBookingHistory";
 import { useLoading, CurrentBookingsDrawerShimmer } from "@repo/ui";
+import { useSwipeConfirmation } from "@repo/ui/providers/SwipeConfirmationProvider";
+import { useNotification } from "@repo/ui/providers/NotificationProvider";
 
 // Mock Map View component for now to avoid crashes if real one depends on unmatched props
 const BookingMapView = dynamic(() => import("@/features/orders/components/BookingMapView"), {
@@ -15,12 +17,20 @@ const BookingMapView = dynamic(() => import("@/features/orders/components/Bookin
 
 export default function CurrentBookingsDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   // Filter active bookings: Not Completed (CheckedOut) and Not Cancelled
-  const bookings = useMemo(() => mockBookingHistory.filter(b =>
-    b.status !== "CheckedOut" &&
-    b.status !== "Cancelled" &&
-    b.status !== "Refunded" &&
-    b.status !== "NoShow"
-  ), []);
+  // Use state to allow local simulation of cancellation (removing item)
+  const [bookings, setBookings] = useState<typeof mockBookingHistory>([]);
+  const { showNotification } = useNotification();
+
+  useEffect(() => {
+    // Initial load from mock
+    const initialBookings = mockBookingHistory.filter(b =>
+      b.status !== "CheckedOut" &&
+      b.status !== "Cancelled" &&
+      b.status !== "Refunded" &&
+      b.status !== "NoShow"
+    );
+    setBookings(initialBookings);
+  }, []);
 
   const [activeBookingId, setActiveBookingId] = useState<string>("");
 
@@ -34,6 +44,35 @@ export default function CurrentBookingsDrawer({ open, onClose }: { open: boolean
 
   const { hide: hideLoading } = useLoading(); // Mock hooks if needed
   const [isLoading, setIsLoading] = useState(false);
+
+  // Cancellation
+  const { confirm } = useSwipeConfirmation();
+
+  const handleCancelClick = () => {
+    confirm({
+      title: "Hủy đặt phòng?",
+      description: "Bạn có chắc chắn muốn hủy đặt phòng này không? Hành động này không thể hoàn tác.",
+      confirmText: "Vuốt để Hủy",
+      type: "danger",
+      confirmDetails: {
+        "Hotel": activeBooking.hotelName,
+        "Total": formatVnd(activeBooking.totalAmount),
+        "Check-in": formatDate(activeBooking.checkInDate)
+      },
+      onConfirm: async () => {
+        // Remove from list
+        setBookings(prev => prev.filter(b => b.id !== activeBooking.id));
+        setActiveBookingId(""); // Reset
+
+        showNotification({
+          message: "Hủy đặt phòng thành công!",
+          type: "success",
+          format: "Bạn sẽ nhận được email xác nhận trong giây lát.",
+          autoHideDuration: 4000,
+        });
+      }
+    });
+  };
 
   useEffect(() => {
     if (open) {
@@ -234,6 +273,19 @@ export default function CurrentBookingsDrawer({ open, onClose }: { open: boolean
                         })()}
                       </div>
 
+                      {/* Cancel Button (Moved Here) */}
+                      {activeBooking.status === 'Pending' && (
+                        <div className="px-4 pb-2">
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            onClick={handleCancelClick}
+                            className="w-full h-12 rounded-xl bg-red-50 border border-red-200 text-red-600 font-bold text-sm hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <XCircle className="w-5 h-5" /> Cancel Booking
+                          </motion.button>
+                        </div>
+                      )}
+
                       {/* Detailed Information Blocks */}
                       <div className="space-y-6 mt-2">
 
@@ -396,6 +448,7 @@ export default function CurrentBookingsDrawer({ open, onClose }: { open: boolean
           </motion.div>
         )}
       </AnimatePresence>
+
     </>
   );
 }

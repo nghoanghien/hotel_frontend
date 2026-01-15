@@ -337,6 +337,47 @@ export const mockBookingHistory: BookingDetailDto[] = [
       }
     ]
     // Cancelled, Paid, No Refund Payment -> Should show Completed payment, no refund info in payment card.
+  },
+  {
+    id: "booking-007",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    hotelId: "hotel-7",
+    hotelName: "Ocean Breeze Resort",
+    hotelImageUrl: "https://images.unsplash.com/photo-1571896349842-6e5a5dd95147?w=800",
+    hotelAddress: "101 Beach Road",
+    hotelCity: "Phu Quoc",
+    hotelPhoneNumber: "+84 297 399 9999",
+    guestId: "user-1",
+    guestName: "Nguyen Van A",
+    guestEmail: "nguyen.vana@example.com",
+    confirmationNumber: "HBZ-2024-007",
+    checkInDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+    checkOutDate: new Date(Date.now() + 35 * 24 * 60 * 60 * 1000).toISOString(),
+    numberOfGuests: 2,
+    numberOfRooms: 1,
+    totalAmount: 9000000,
+    status: "Pending",
+    isPaid: false,
+    subtotal: 8000000,
+    taxAmount: 800000,
+    serviceFee: 200000,
+    discountAmount: 0,
+    cancellationPolicy: "Free cancellation until confirmed.",
+    specialRequests: "Sea view requested.",
+    rooms: [
+      {
+        id: "detail-room-7",
+        roomId: "room-701",
+        roomType: "Suite",
+        roomNumber: "Pending",
+        price: 1800000,
+        numberOfAdults: 2,
+        numberOfChildren: 0,
+        numberOfInfants: 0
+      }
+    ],
+    payments: []
   }
 ];
 

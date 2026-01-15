@@ -13,6 +13,7 @@ interface SwipeConfirmationConfig {
   confirmText?: string;
   onConfirm: () => void | Promise<void>;
   type?: 'warning' | 'success' | 'danger' | 'info';
+  confirmDetails?: Record<string, string | number | null | undefined> | null;
 }
 
 const SwipeConfirmationContext = createContext<SwipeConfirmationContextType | undefined>(undefined);
@@ -62,6 +63,7 @@ export function SwipeConfirmationProvider({ children }: { children: ReactNode })
         description={config.description}
         confirmText={config.confirmText || 'Xác nhận'}
         type={config.type || 'warning'}
+        confirmDetails={config.confirmDetails}
         isProcessing={isProcessing}
       />
     </SwipeConfirmationContext.Provider>
