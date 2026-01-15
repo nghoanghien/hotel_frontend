@@ -37,7 +37,7 @@ const adminMenuItems: MenuItem[] = [
     title: 'ROOM MANAGEMENT',
     children: [
       { id: 'rooms-ops', text: 'Vận hành phòng', path: '/rooms', icon: DoorOpen },
-      { id: 'rooms-settings', text: 'Cấu hình phòng', path: '/rooms/settings', icon: Settings }
+      { id: 'rooms-settings', text: 'Cấu hình phòng', path: '/room-configuration', icon: Settings }
     ]
   },
   { id: 'reception', icon: ConciergeBell, text: 'Lễ tân', title: 'RECEPTION' },
