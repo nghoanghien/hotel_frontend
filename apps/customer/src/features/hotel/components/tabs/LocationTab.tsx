@@ -1,5 +1,6 @@
 import { MapPin, Phone, Mail, Globe } from '@repo/ui/icons';
 import type { HotelDetailDto } from "@repo/types";
+import HotelLocationMap from '../HotelLocationMap';
 
 interface Props {
   hotel: HotelDetailDto;
@@ -9,7 +10,7 @@ export function LocationTab({ hotel }: Props) {
   return (
     <div className="space-y-6">
       <h3 className="text-2xl font-bold mb-4">Location & Contact</h3>
-      <div className="bg-gray-100 rounded-2xl p-6 space-y-6">
+      <div className="bg-gray-100 rounded-3xl p-6 space-y-6">
         {/* Address */}
         <div className="flex items-start gap-3">
           <MapPin className="w-5 h-5 text-[var(--primary)] mt-1 flex-shrink-0" />
@@ -48,14 +49,19 @@ export function LocationTab({ hotel }: Props) {
           </div>
         )}
 
-        {/* Map Placeholder */}
-        <div className="aspect-video bg-gray-200 rounded-xl flex items-center justify-center text-gray-500 relative overflow-hidden group cursor-pointer hover:bg-gray-300 transition-colors">
-          <div className="text-center">
-            <MapPin className="w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:scale-110 transition-transform" />
-            <p>View on Map</p>
-            <p className="text-xs mt-1 opacity-60">Lat: {hotel.latitude}, Long: {hotel.longitude}</p>
+        {/* Map */}
+        {(hotel.latitude && hotel.longitude) ? (
+          <div className="aspect-video w-full rounded-[32px] overflow-hidden shadow-sm border-2 border-gray-200">
+            <HotelLocationMap latitude={hotel.latitude} longitude={hotel.longitude} />
           </div>
-        </div>
+        ) : (
+          <div className="aspect-video bg-gray-200 rounded-3xl flex items-center justify-center text-gray-500 relative overflow-hidden group cursor-pointer hover:bg-gray-300 transition-colors">
+            <div className="text-center">
+              <MapPin className="w-8 h-8 mx-auto mb-2 text-gray-400 group-hover:scale-110 transition-transform" />
+              <p>Map not available</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
