@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "@repo/ui/motion";
 import { ArrowLeft, Receipt, Filter, Search, X } from "@repo/ui/icons";
 import { getBookingHistory } from "@/features/history/data/mockBookingHistory";
 import BookingHistoryCard from "@/features/history/components/BookingHistoryCard";
-// import OrderDetailDrawer from "@/features/orders/components/OrderDetailDrawer"; // Need BookingDetailDrawer later
+import BookingDetailDrawer from "@/features/history/components/BookingDetailDrawer";
 import type { BookingDetailDto, BookingStatus } from "@repo/types";
 
 // Filter configuration
@@ -70,8 +70,7 @@ export default function HistoryPage() {
 
   const handleBookingClick = (booking: BookingDetailDto) => {
     setSelectedBooking(booking);
-    // setDrawerOpen(true); // TODO: Implement Drawer
-    console.log("Open drawer for", booking.id);
+    setDrawerOpen(true);
   };
 
   const handleFilterChange = (newFilter: BookingStatus | "The_Rest" | "ALL") => {
@@ -219,8 +218,12 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {/* Drawer will go here */}
-      {/* <BookingDetailDrawer ... /> */}
+      {/* Drawer */}
+      <BookingDetailDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        booking={selectedBooking}
+      />
     </div>
   );
 }

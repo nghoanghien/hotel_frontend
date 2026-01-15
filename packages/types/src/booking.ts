@@ -1,5 +1,6 @@
 import { BaseDto } from './common';
 import { RoomType } from './room';
+import { ReviewDto } from './hotel';
 
 export type BookingStatus = 'Pending' | 'Confirmed' | 'CheckedIn' | 'CheckedOut' | 'Cancelled' | 'NoShow' | 'Refunded';
 
@@ -66,6 +67,9 @@ export interface PaymentDto {
   status: string;
   transactionId?: string;
   paidAt?: string;
+  refundedAt?: string;
+  refundAmount?: number;
+  refundReason?: string;
 }
 
 export interface BookingDetailDto extends BookingDto {
@@ -85,4 +89,5 @@ export interface BookingDetailDto extends BookingDto {
   hotelCity?: string;
   hotelPhoneNumber?: string;
   appliedCouponCode?: string;
+  review?: ReviewDto;
 }

@@ -52,7 +52,10 @@ export default function BookingHistoryCard({ booking, onClick }: { booking: Book
         })
       }
       onMouseLeave={clearHover}
-      className="relative bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 flex flex-row h-[140px] md:flex-col md:h-auto"
+      className={`relative rounded-[24px] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border flex flex-row h-[140px] md:flex-col md:h-auto ${booking.status === 'Cancelled'
+          ? 'bg-red-50/40 border-red-200 ring-1 ring-red-100'
+          : 'bg-white border-gray-100'
+        }`}
     >
       <HoverHighlightOverlay rect={rect} style={highlightStyle} />
 

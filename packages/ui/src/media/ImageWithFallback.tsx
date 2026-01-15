@@ -1,31 +1,67 @@
 "use client";
 import Image, { ImageProps } from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Building2 } from "lucide-react";
 
-type Props = Omit<ImageProps, "onError"> & {
+type Props = ImageProps & {
   containerClassName?: string;
+  fallbackIcon?: React.ReactNode;
 };
 
-export default function ImageWithFallback({ containerClassName, className, ...props }: Props) {
-  const [errored, setErrored] = useState(false);
-  const isFill = (props as any).fill === true;
+export default function ImageWithFallback({ containerClassName, className, fallbackIcon, onLoad, onError, ...props }: Props) {
   const hasSrc = !!props.src;
+  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>(() => !hasSrc ? 'error' : 'loading');
+  const isFill = (props as any).fill === true;
 
-  if (!hasSrc || errored) {
-    if (isFill) {
-      return (
-        <div className={`absolute inset-0 flex items-center justify-center bg-gray-200 ${containerClassName ?? ""}`}>
-          <Building2 className="w-1/3 h-1/3 text-gray-400" />
-        </div>
-      );
+  // React to src changes
+  useEffect(() => {
+    if (!hasSrc) {
+      setStatus('error');
+    } else {
+      setStatus('loading');
     }
-    return (
-      <div className={`flex items-center justify-center bg-gray-100 ${containerClassName ?? ""}`}>
-        <Building2 className="w-1/3 h-1/3 text-gray-400" />
-      </div>
-    );
-  }
+  }, [hasSrc, props.src]);
 
-  return <Image {...props} className={className} onError={() => setErrored(true)} />;
+  const handleLoad = (e: any) => {
+    setStatus('loaded');
+    if (onLoad) onLoad(e);
+  };
+
+  const handleError = (e: any) => {
+    setStatus('error');
+    if (onError) onError(e);
+  };
+
+  const showFallback = !hasSrc || status === 'loading' || status === 'error';
+
+  // Determine the base class for the container
+  const baseContainerClasses = `relative overflow-hidden ${containerClassName ?? ""}`;
+
+  // Fallback Element
+  const Fallback = (
+    <div
+      className={`flex items-center justify-center bg-gray-200 transition-opacity duration-300
+        ${isFill ? "absolute inset-0" : "w-full h-full"}
+        ${showFallback ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}
+      `}
+    >
+      {fallbackIcon || <Building2 className="w-1/3 h-1/3 text-gray-400 opacity-50" />}
+    </div>
+  );
+
+  return (
+    <div className={baseContainerClasses}>
+      {Fallback}
+      {hasSrc && (
+        <Image
+          {...props}
+          className={`${className || ''} transition-opacity duration-500
+            ${status === 'loaded' ? 'opacity-100' : 'opacity-0'}
+          `}
+          onLoad={handleLoad}
+          onError={handleError}
+        />
+      )}
+    </div>
+  );
 }

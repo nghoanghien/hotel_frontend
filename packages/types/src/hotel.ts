@@ -8,13 +8,30 @@ export interface AmenityDto extends BaseDto {
   isActive: boolean;
 }
 
-export interface ReviewDto {
+export interface ReviewImageDto {
   id: string;
-  userId: string;
-  userName: string;
+  imageUrl: string;
+  caption?: string;
+}
+
+export interface ReviewDto extends BaseDto {
+  hotelId: string;
+  hotelName?: string;
+  guestId: string;
+  guestName: string;
+  guestAvatarUrl?: string;
   rating: number;
-  comment?: string;
-  createdAt: string;
+  title?: string;
+  comment: string;
+  cleanlinessRating?: number;
+  serviceRating?: number;
+  locationRating?: number;
+  valueRating?: number;
+  isVerified: boolean;
+  stayDate?: string;
+  publishedAt?: string;
+  managementResponse?: string;
+  images: ReviewImageDto[];
 }
 
 export interface HotelSettingsDto {

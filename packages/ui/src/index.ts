@@ -27,6 +27,7 @@ export { default as ProfileShimmer } from "./feedback/shimmer/ProfileShimmer";
 export { default as LiquidGlassMobileNavigationShimmer } from "./feedback/shimmer/LiquidGlassMobileNavigationShimmer";
 export { default as HotelCardShimmer } from "./feedback/shimmer/HotelCardShimmer";
 export { default as BookingHistoryCardShimmer } from "./feedback/shimmer/BookingHistoryCardShimmer";
+export { default as BookingDetailDrawerShimmer } from "./feedback/shimmer/BookingDetailDrawerShimmer";
 export { default as NumberInput } from "./forms/NumberInput";
 export { default as DateRangePicker } from "./forms/DateRangePicker";
 export { default as StatusBadge } from "./feedback/StatusBadge";
