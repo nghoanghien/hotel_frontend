@@ -1,16 +1,25 @@
 "use client";
 
-import { LoginForm, LoginIllustration, useLoading, useNotification } from "@repo/ui";
-import { useLogin } from "@/features/auth/hooks/useLogin";
+import { LoginForm, LoginIllustration, useLoading } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useZodForm, loginSchema, type LoginFormData } from "@repo/lib";
 import { motion, AnimatePresence } from "@repo/ui/motion";
+import { useEffect } from "react";
 
 export default function LoginPageContent() {
   const router = useRouter();
-  const { show } = useLoading();
-  const { showNotification } = useNotification();
-  const { handleLogin, isLoading, error } = useLogin();
+  const { show, hide } = useLoading();
+
+  // Show loading on page load, then hide after 2 seconds
+  useEffect(() => {
+    show("Đang tải trang đăng nhập...");
+
+    const timer = setTimeout(() => {
+      hide();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [show, hide]);
 
   const form = useZodForm<LoginFormData>({
     schema: loginSchema,
@@ -18,18 +27,11 @@ export default function LoginPageContent() {
     defaultValues: { email: "", password: "", rememberMe: false },
   });
 
-  const onSubmit = async (data: LoginFormData) => {
-    const success = await handleLogin(data);
-    if (success) {
-      showNotification({
-        message: "Đăng nhập thành công!",
-        type: "success",
-        format: "excel",
-        autoHideDuration: 3000
-      });
-      show("Đang chuyển hướng về trang quản lý...");
-      router.push("/orders");
-    }
+  const handleSuccess = () => {
+    show("Đang đăng nhập...");
+    document.cookie = "admin_auth=1; path=/";
+    router.push("/overview");
+    // Note: Loading will be hidden in overview page after 1.5s
   };
 
   return (
@@ -65,10 +67,7 @@ export default function LoginPageContent() {
                 <LoginForm
                   form={form}
                   onForgotPassword={() => router.push("/forgot-password")}
-                  onSubmit={onSubmit}
-                  isLoading={isLoading}
-                  error={error}
-                  onSuccess={() => { }}
+                  onSuccess={handleSuccess}
                 />
               </div>
             </div>
