@@ -7,8 +7,8 @@ import Providers from "./providers";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Hotelzy Admin",
-  description: "Restaurant management portal",
+  title: "Hotelzy Hotel Owner",
+  description: "Hotel Owner management portal",
 };
 
 export default function RootLayout({

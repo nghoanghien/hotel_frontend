@@ -8,24 +8,28 @@ import {
   LayoutDashboard,
   Building2,
   Users,
-  Settings,
   User,
-  LogOut
+  LogOut,
+  BedDouble,
+  ConciergeBell,
+  BarChart
 } from '@repo/ui/icons';
 import RestaurantNavItem from '../../../components/RestaurantNavItem';
 import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation, useLoading } from '@repo/ui';
 
 const adminMenuItems = [
-  { id: 'overview', icon: LayoutDashboard, text: 'Tổng quan', title: 'OVERVIEW' },
-  { id: 'hotels', icon: Building2, text: 'Quản lý khách sạn', title: 'HOTEL MANAGEMENT' },
-  { id: 'customers', icon: Users, text: 'Quản lý khách hàng', title: 'CUSTOMER MANAGEMENT' },
-  { id: 'settings', icon: Settings, text: 'Thông số hệ thống', title: 'SYSTEM SETTINGS' }
+  { id: 'dashboard', icon: LayoutDashboard, text: 'Tổng quan', title: 'OVERVIEW' },
+  { id: 'rooms', icon: BedDouble, text: 'Quản lý phòng', title: 'ROOM MANAGEMENT' },
+  { id: 'reception', icon: ConciergeBell, text: 'Lễ tân', title: 'RECEPTION' },
+  { id: 'hotel-info', icon: Building2, text: 'Thông tin khách sạn', title: 'HOTEL INFORMATION' },
+  { id: 'staff', icon: Users, text: 'Quản lý nhân viên', title: 'STAFF MANAGEMENT' },
+  { id: 'reports', icon: BarChart, text: 'Báo cáo', title: 'REPORTS' }
 ];
 
 export default function NormalLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [activeSection, setActiveSection] = useState('overview');
+  const [activeSection, setActiveSection] = useState('dashboard');
   const [profileData] = useState({ fullName: 'Super Admin', email: 'admin@hotel.com' });
   const [navHovered, setNavHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);

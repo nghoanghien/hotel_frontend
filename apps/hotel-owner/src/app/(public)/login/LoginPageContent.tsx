@@ -28,7 +28,7 @@ export default function LoginPageContent() {
   });
 
   const handleSuccess = () => {
-    show("Đang đăng nhập...");
+    show("Đăng nhập thành công, chuyển hướng đến Dashboard...");
     document.cookie = "admin_auth=1; path=/";
     router.push("/overview");
     // Note: Loading will be hidden in overview page after 1.5s
