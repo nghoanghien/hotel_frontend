@@ -19,6 +19,9 @@ export type DataTableProps<T> = {
   keyField?: keyof T;
   className?: string;
   headerClassName?: string;
+  headerCellClassName?: string;
+  tableContainerClassName?: string;
+  rowClassName?: string;
   renderActions?: (item: T) => React.ReactNode;
   emptyMessage?: string;
   isLoading?: boolean;
@@ -40,6 +43,9 @@ const DataTable = <T extends Record<string, any>>({
   keyField = 'id' as keyof T,
   className = "",
   headerClassName = "bg-gradient-to-r from-green-500 to-lime-600",
+  headerCellClassName = "text-white uppercase tracking-wider hover:bg-green-600/80 transition-colors",
+  tableContainerClassName = "bg-white rounded-2xl border border-green-100 shadow-[0_4px_24px_rgba(34,197,94,0.08)] overflow-hidden",
+  rowClassName = "hover:bg-green-50/60 transition-colors cursor-pointer",
   renderActions,
   emptyMessage = "Không có dữ liệu để hiển thị",
   isLoading = false,
@@ -189,13 +195,13 @@ const DataTable = <T extends Record<string, any>>({
         />
       )}
 
-      <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, layout: { type: "tween", ease: "easeOut" } }} ref={tableContainerRef} className={`bg-white rounded-2xl border border-green-100 shadow-[0_4px_24px_rgba(34,197,94,0.08)] overflow-hidden`} style={{ overflowY: 'hidden' }}>
+      <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, layout: { type: "tween", ease: "easeOut" } }} ref={tableContainerRef} className={tableContainerClassName} style={{ overflowY: 'hidden' }}>
         <div className="overflow-x-auto overflow-y-hidden">
-          <table className="min-w-full divide-y divide-green-100">
+          <table className="min-w-full divide-y divide-gray-100">
             <thead className={headerClassName}>
               <tr>
                 {columns.map((column) => (
-                  <th key={column.key} scope="col" className={`px-3 sm:px-4 lg:px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider cursor-pointer hover:bg-green-600/80 transition-colors ${column.className || ''}`} onClick={() => column.sortable !== false && handleSort(column.key)}>
+                  <th key={column.key} scope="col" className={`px-3 sm:px-4 lg:px-6 py-4 text-left text-xs font-semibold cursor-pointer ${headerCellClassName} ${column.className || ''}`} onClick={() => column.sortable !== false && handleSort(column.key)}>
                     <div className="flex items-center">
                       <span>{column.label}</span>
                       {sortField === column.key && (
@@ -204,10 +210,10 @@ const DataTable = <T extends Record<string, any>>({
                     </div>
                   </th>
                 ))}
-                <th scope="col" className="px-3 sm:px-4 lg:px-6 py-4 text-right text-xs font-medium text-white uppercase tracking-wider">Thao tác</th>
+                <th scope="col" className={`px-3 sm:px-4 lg:px-6 py-4 text-right text-xs font-medium uppercase tracking-wider ${headerCellClassName}`}>Thao tác</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-green-50">
+            <tbody className="bg-white divide-y divide-gray-100">
               <AnimatePresence mode="wait">
                 {showShimmer && (isFilteringData || displayedData.length === 0) ? (
                   Array.from({ length: itemsPerPage }, (_, index) => (<DataTableRowShimmer key={`filter-shimmer-${index}`} columnCount={columns.length} index={index} />))
@@ -215,14 +221,14 @@ const DataTable = <T extends Record<string, any>>({
                   <tr>
                     <td colSpan={columns.length + 1} className="px-6 py-10 text-center">
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center text-gray-500">
-                        {isLoading ? (<><RefreshCcw size={32} className="text-green-400 animate-spin mb-3" /><p>Đang tải dữ liệu...</p></>) : (<><svg className="w-12 h-12 text-green-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg><p>{Object.keys(activeFilters).length > 0 ? 'Không có dữ liệu phù hợp với bộ lọc' : emptyMessage}</p></>)}
+                        {isLoading ? (<><RefreshCcw size={32} className="text-gray-400 animate-spin mb-3" /><p>Đang tải dữ liệu...</p></>) : (<><svg className="w-12 h-12 text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg><p>{Object.keys(activeFilters).length > 0 ? 'Không có dữ liệu phù hợp với bộ lọc' : emptyMessage}</p></>)}
                       </motion.div>
                     </td>
                   </tr>
                 ) : !(showShimmer && (isFilteringData || displayedData.length === 0)) && (
                   <>
                     {displayedData.map((item, i) => (
-                      <motion.tr key={String(item[keyField])} custom={i} variants={tableRowVariants} initial="hidden" animate="visible" exit="exit" className="hover:bg-green-50/60 transition-colors cursor-pointer" onClick={() => onRowClick && onRowClick(item)} layout transition={{ layout: { type: "spring", damping: 15, stiffness: 100 }, opacity: { duration: 0.6 } }}>
+                      <motion.tr key={String(item[keyField])} custom={i} variants={tableRowVariants} initial="hidden" animate="visible" exit="exit" className={rowClassName} onClick={() => onRowClick && onRowClick(item)} layout transition={{ layout: { type: "spring", damping: 15, stiffness: 100 }, opacity: { duration: 0.6 } }}>
                         {columns.map((column) => {
                           if (column.type === 'status') { return (<td key={column.key} className={`px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap ${column.className || ''}`}><StatusBadge status={item[column.key]} /></td>); }
                           let value = item[column.key]; if (column.key.includes('.')) { const keys = column.key.split('.'); value = keys.reduce((obj: any, k: string) => obj && obj[k], item); }
@@ -256,7 +262,7 @@ const DataTable = <T extends Record<string, any>>({
       </motion.div>
       {!hasMoreData() && displayedData.length > 0 && !showShimmer && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex flex-col items-center justify-center text-gray-500 py-6 mt-4">
-          <svg className="w-8 h-8 text-green-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <svg className="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           <p className="text-sm font-medium text-gray-600">Đã hiển thị tất cả dữ liệu</p>
           <p className="text-xs text-gray-400 mt-1">Tổng cộng {filteredData.length} mục</p>
         </motion.div>

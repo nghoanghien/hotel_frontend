@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { motion } from '@repo/ui/motion';
+import { motion, AnimatePresence } from '@repo/ui/motion';
 import {
   LayoutDashboard,
   Building2,
@@ -12,14 +12,34 @@ import {
   LogOut,
   BedDouble,
   ConciergeBell,
-  BarChart
+  BarChart,
+  Settings,
+  DoorOpen
 } from '@repo/ui/icons';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import RestaurantNavItem from '../../../components/RestaurantNavItem';
 import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation, useLoading } from '@repo/ui';
 
-const adminMenuItems = [
+interface MenuItem {
+  id: string;
+  icon: any;
+  text: string;
+  title: string;
+  children?: { id: string; text: string; path: string; icon: any }[];
+}
+
+const adminMenuItems: MenuItem[] = [
   { id: 'dashboard', icon: LayoutDashboard, text: 'Tổng quan', title: 'OVERVIEW' },
-  { id: 'rooms', icon: BedDouble, text: 'Quản lý phòng', title: 'ROOM MANAGEMENT' },
+  {
+    id: 'rooms',
+    icon: BedDouble,
+    text: 'Quản lý phòng',
+    title: 'ROOM MANAGEMENT',
+    children: [
+      { id: 'rooms-ops', text: 'Vận hành phòng', path: '/rooms', icon: DoorOpen },
+      { id: 'rooms-settings', text: 'Cấu hình phòng', path: '/rooms/settings', icon: Settings }
+    ]
+  },
   { id: 'reception', icon: ConciergeBell, text: 'Lễ tân', title: 'RECEPTION' },
   { id: 'hotel-info', icon: Building2, text: 'Thông tin khách sạn', title: 'HOTEL INFORMATION' },
   { id: 'staff', icon: Users, text: 'Quản lý nhân viên', title: 'STAFF MANAGEMENT' },
@@ -33,6 +53,8 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
   const [profileData] = useState({ fullName: 'Super Admin', email: 'admin@hotel.com' });
   const [navHovered, setNavHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+
   const { confirm } = useSwipeConfirmation();
   const { show } = useLoading();
 
@@ -46,48 +68,77 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
   // Update active section based on pathname
   useEffect(() => {
     const currentPath = pathname.split('/').pop();
+    // Check if current path matches any top level item
     if (currentPath && adminMenuItems.some(item => item.id === currentPath)) {
       setActiveSection(currentPath);
+    }
+    // Check if current path matches any child item
+    else {
+      // Logic to find if we are in a sub-route (e.g. /rooms/settings)
+      // This is a simplified check. Ideally we match against actual paths.
+      for (const item of adminMenuItems) {
+        if (item.children) {
+          const childMatch = item.children.find(child => child.path === pathname || child.path.endsWith(`/${currentPath}`));
+          if (childMatch) {
+            setActiveSection(childMatch.id);
+            // Auto expand the parent if a child is active
+            setExpandedMenus(prev => prev.includes(item.id) ? prev : [...prev, item.id]);
+            return;
+          }
+        }
+      }
+      // Fallback for direct 'rooms' access which maps to 'rooms-ops' child visually but URL is /rooms
+      if (pathname === '/rooms') {
+        setActiveSection('rooms-ops');
+        setExpandedMenus(prev => prev.includes('rooms') ? prev : [...prev, 'rooms']);
+      }
     }
   }, [pathname]);
 
   const handleLogout = () => {
+    // ... existing logout logic ...
     confirm({
       title: "Xác nhận đăng xuất",
       description: "Bạn có chắc chắn muốn đăng xuất khỏi trang quản trị?",
       confirmText: "Vuốt để đăng xuất",
       type: "danger",
       onConfirm: async () => {
-        // Simulate 2 second loading
         await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // Show loading overlay
         show("Đang đăng xuất...");
-
-        // Clear any auth data (if needed)
-        // localStorage.removeItem('authToken');
-        // sessionStorage.clear();
-
-        // Redirect to login page
         router.replace('/login');
       }
     });
   };
 
-  const handleSectionChange = (sectionId: string) => {
-    if (sectionId === 'logout') {
-      handleLogout();
-    } else {
-      setActiveSection(sectionId);
-      router.push(`/${sectionId}`);
+  const handleSectionChange = (item: MenuItem) => {
+    // If item has children, toggle expansion
+    if (item.children) {
+      setExpandedMenus(prev =>
+        prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]
+      );
+      // Optional: Navigate to the first child if clicking parent? Or just toggle?
+      // User said "click vào sẽ hiển thị các tab con", so toggle is primary. 
+      return;
     }
+
+    // Normal navigation
+    setActiveSection(item.id);
+    router.push(`/${item.id}`);
   };
 
+  const handleChildClick = (path: string, id: string) => {
+    setActiveSection(id);
+    router.push(path);
+  }
+
+  // ... rest of component ...
   const handleProfileClick = () => {
     router.push('/profile');
   };
 
-  const activeItem = adminMenuItems.find(item => item.id === activeSection) || adminMenuItems[0];
+  const activeItem = adminMenuItems.find(item => item.id === activeSection) ||
+    adminMenuItems.flatMap(i => i.children || []).find(c => c.id === activeSection) ||
+    adminMenuItems[0];
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -133,6 +184,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
             onClick={handleProfileClick}
             layoutId="profile-section"
           >
+            {/* Profile content stays same */}
             <div
               className="absolute inset-0 rounded-t-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
               style={{
@@ -188,7 +240,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
         )}
 
         {/* Navigation items */}
-        <div className="relative flex-1 py-6 px-3 flex flex-col overflow-hidden">
+        <div className="relative flex-1 py-6 px-3 flex flex-col overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
           <div className={`mb-4 ${navHovered ? "px-4" : "text-center"}`}>
             <p className="text-xs text-gray-600 uppercase font-medium mb-3 drop-shadow-sm whitespace-nowrap overflow-hidden tracking-wider">
               {navHovered ? "Quản trị hệ thống" : "QT"}
@@ -206,22 +258,81 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
           ) : (
             adminMenuItems.map((item) => {
               const IconComponent = item.icon;
+              const isExpanded = expandedMenus.includes(item.id);
+              const hasChildren = item.children && item.children.length > 0;
+              // Active if explicit match or child active (handled by useEffect logic but visual here)
+              const isActive = activeSection === item.id || (item.children?.some(c => c.id === activeSection) ?? false);
+
               return (
-                <RestaurantNavItem
-                  key={item.id}
-                  icon={
-                    <IconComponent
-                      size={20}
-                      className="text-gray-600"
-                      strokeWidth={2.3}
+                <div key={item.id} className="flex flex-col relative">
+                  <div className="relative z-10">
+                    <RestaurantNavItem
+                      key={item.id}
+                      icon={
+                        <IconComponent
+                          size={20}
+                          className="text-gray-600"
+                          strokeWidth={2.3}
+                        />
+                      }
+                      text={item.text}
+                      expanded={navHovered}
+                      active={isActive && !hasChildren} // only active highlight if it's a leaf or specific strict match? Maybe highlight parent too? standard is highlight parent.
+                      // Let's rely on standard styling but keep parent generic if expanded.
+                      className={`${isActive ? "bg-white/10" : ""}`}
+                      onClick={() => handleSectionChange(item)}
                     />
-                  }
-                  text={item.text}
-                  expanded={navHovered}
-                  active={activeSection === item.id}
-                  onClick={() => handleSectionChange(item.id)}
-                  className=""
-                />
+                    {/* Toggle Icon for Parents - Thicker and Bigger */}
+                    {hasChildren && navHovered && (
+                      <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
+                        {isExpanded ? <ChevronDown size={20} strokeWidth={3} /> : <ChevronRight size={20} strokeWidth={3} />}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Children Items with Tree Line */}
+                  <AnimatePresence>
+                    {hasChildren && isExpanded && navHovered && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="relative ml-[37px] space-y-1 my-1">
+                          {/* Vertical Tree Line */}
+                          <div className="absolute rounded-full left-[-12px] top-0 bottom-2.5 w-[2.5px] bg-gray-400"></div>
+
+                          {item.children!.map((child, idx) => {
+                            const ChildIcon = child.icon;
+                            return (
+                              <div key={child.id} className="relative">
+                                {/* Horizontal Connector */}
+                                <div className="absolute rounded-full left-[-12px] top-[24px] w-3 h-[2.5px] bg-gray-400"></div>
+
+                                <RestaurantNavItem
+                                  icon={
+                                    <ChildIcon
+                                      size={18}
+                                      className="text-gray-500"
+                                      strokeWidth={2.3}
+                                    />
+                                  }
+                                  text={child.text}
+                                  expanded={true} // Always expanded in this view context
+                                  active={activeSection === child.id}
+                                  onClick={() => handleChildClick(child.path, child.id)}
+                                  className="!py-2 !px-3" // Slightly compact
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               );
             })
           )}
@@ -248,7 +359,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
               text="Đăng xuất"
               expanded={navHovered}
               active={false}
-              onClick={() => handleSectionChange('logout')}
+              onClick={handleLogout}
               className="logout-item"
             />
           )}

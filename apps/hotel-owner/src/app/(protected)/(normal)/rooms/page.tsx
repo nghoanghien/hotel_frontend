@@ -1,8 +1,37 @@
-export default function Page() {
+'use client';
+
+import { useState, useEffect } from 'react';
+import RoomOperationsTable from '@/features/rooms/components/RoomOperationsTable';
+import { useLoading } from '@repo/ui';
+
+export default function RoomsPage() {
+  const { hide } = useLoading();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    hide();
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [hide]);
+
+  if (isLoading) {
+    return <div className="min-h-screen bg-transparent" />;
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh]">
-      <h1 className="text-2xl font-bold text-gray-400">Section Under Construction</h1>
-      <p className="text-gray-500 mt-2">Tính năng này đang được phát triển.</p>
+    <div className="min-h-screen pb-20 px-6 pt-8 w-full max-w-full overflow-x-hidden">
+      {/* Header Section */}
+      <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
+        <h1 className="text-4xl font-anton font-bold text-[#1A1A1A] mb-2">Room Operations</h1>
+        <p className="text-gray-500 font-medium text-lg">Manage room status, availability and maintenance.</p>
+      </div>
+
+      {/* Main Table Content - Full Width */}
+      <div className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+        <RoomOperationsTable />
+      </div>
     </div>
-  )
+  );
 }
