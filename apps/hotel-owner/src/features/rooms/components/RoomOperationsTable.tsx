@@ -2,12 +2,13 @@ import { DataTable, ColumnDef, useNotification } from '@repo/ui';
 import { motion } from '@repo/ui/motion';
 import { mockRooms } from '../data/mockRooms';
 import { RoomDto, RoomStatus, RoomType } from '@repo/types';
-import { Search, Filter, Download, FileText, CheckCircle, AlertTriangle, X, Clock, BedDouble, Layers, MoreVertical, Settings, CheckSquare, User, MapPin, AlertCircle } from '@repo/ui/icons';
+import { Search, Filter, Download, FileText, CheckCircle, AlertTriangle, X, Clock, BedDouble, Layers, MoreVertical, Settings, CheckSquare, User, MapPin, AlertCircle, Eye } from '@repo/ui/icons';
 import { useState, useMemo } from 'react';
 import RoomFilterModal, { RoomFilterFields } from './RoomFilterModal';
 import RoomSearchPopup from './RoomSearchPopup';
 import RoomExportModal from './RoomExportModal';
 import RoomActionModal from './RoomActionModal';
+import RoomDetailModal from './RoomDetailModal';
 
 const columns: ColumnDef<RoomDto>[] = [
   {
@@ -168,6 +169,14 @@ export default function RoomOperationsTable() {
   const openActionModal = (room: RoomDto) => {
     setSelectedRoom(room);
     setIsActionModalOpen(true);
+  };
+
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+
+  const handleViewDetail = (e: React.MouseEvent, room: RoomDto) => {
+    e.stopPropagation();
+    setSelectedRoom(room);
+    setIsDetailModalOpen(true);
   };
 
   const handleUpdateStatus = async (roomId: string, status: RoomStatus) => {
@@ -376,6 +385,17 @@ export default function RoomOperationsTable() {
                 </motion.button>
               )}
 
+              {/* View Detail Action */}
+              <motion.button
+                onClick={(e) => handleViewDetail(e, item)}
+                className="p-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 shadow-sm transition-colors"
+                whileHover={{ scale: 1.12 }}
+                whileTap={{ scale: 0.92 }}
+                title="View Details"
+              >
+                <Eye size={18} />
+              </motion.button>
+
               {/* General Actions */}
               <motion.button
                 onClick={(e) => { e.stopPropagation(); openActionModal(item); }}
@@ -401,6 +421,12 @@ export default function RoomOperationsTable() {
         onClose={() => setIsFilterModalOpen(false)}
         filterFields={filterFields}
         onApply={setFilterFields}
+      />
+
+      <RoomDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        roomId={selectedRoom?.id || null}
       />
 
       <RoomActionModal
