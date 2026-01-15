@@ -13,8 +13,6 @@ import type { BookingDetailDto, BookingStatus } from "@repo/types";
 // Filter configuration
 const statusFilters: { value: BookingStatus | "The_Rest" | "ALL"; label: string }[] = [
   { value: "ALL", label: "Tất cả" },
-  { value: "Confirmed", label: "Sắp tới" }, // Representing Upcoming (Pending + Confirmed) usually, or just Confirmed
-  { value: "CheckedIn", label: "Đang ở" },
   { value: "CheckedOut", label: "Hoàn thành" },
   { value: "Cancelled", label: "Đã hủy" },
 ];
@@ -48,17 +46,20 @@ export default function HistoryPage() {
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((booking) => {
-      // Filter logic
+      // 1. GLOBAL FILTER: Only show Completed (CheckedOut) or Cancelled
+      if (booking.status !== "CheckedOut" && booking.status !== "Cancelled") {
+        return false;
+      }
+
+      // 2. Status Filter
       let matchesStatus = false;
       if (statusFilter === "ALL") {
         matchesStatus = true;
-      } else if (statusFilter === "Confirmed") {
-        // Group Pending and Confirmed as "Upcoming/Confirmed"
-        matchesStatus = booking.status === "Confirmed" || booking.status === "Pending";
       } else {
         matchesStatus = booking.status === statusFilter;
       }
 
+      // 3. Search Filter
       const matchesSearch =
         !actualSearchQuery ||
         booking.confirmationNumber.toLowerCase().includes(actualSearchQuery.toLowerCase()) ||

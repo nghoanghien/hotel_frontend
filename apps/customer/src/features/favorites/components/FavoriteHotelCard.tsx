@@ -117,7 +117,7 @@ export default function FavoriteHotelCard({ hotel, onClick, onRemove }: Favorite
 
         {/* Amenities */}
         <div className="flex flex-wrap gap-x-2 md:gap-x-4 gap-y-1.5 md:gap-y-2 mb-3 md:mb-4">
-          {amenities.slice(0, 3).map((amenity) => (
+          {amenities.filter(Boolean).slice(0, 3).map((amenity) => (
             <div key={amenity.id} className="flex items-center gap-1 md:gap-1.5 text-[10px] md:text-xs text-gray-600">
               <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-green-500/80"></div>
               <span className="font-medium line-clamp-1">{amenity.name}</span>

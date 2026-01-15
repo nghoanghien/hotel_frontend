@@ -1,4 +1,5 @@
-import { ImageWithFallback } from "@repo/ui";
+import { ImageWithFallback, useLoading } from "@repo/ui";
+import { useRouter } from "next/navigation";
 import { formatVnd, formatDate } from "@repo/lib";
 import {
   MapPin, Building, ShieldCheck, BedDouble, User, Clock, Calendar,
@@ -12,6 +13,15 @@ interface BookingDetailInfoProps {
 }
 
 export function BookingDetailInfo({ booking }: BookingDetailInfoProps) {
+  const router = useRouter();
+  const { show } = useLoading();
+
+  const handleHotelClick = () => {
+    show("Loading hotel details...");
+    const target = (booking as any).hotelSlug || booking.hotelId;
+    router.push(`/hotels/${target}`);
+  };
+
   return (
     <motion.div
       key="details"
@@ -31,7 +41,10 @@ export function BookingDetailInfo({ booking }: BookingDetailInfoProps) {
           {/* Left Side: Hotel Card + Safety */}
           <div className="flex flex-col gap-4 w-full md:w-[240px] flex-shrink-0">
             {/* Hotel Card */}
-            <div className="bg-white rounded-[32px] p-5 shadow-[0_6px_20px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col items-center text-center relative overflow-hidden">
+            <div
+              onClick={handleHotelClick}
+              className="bg-white rounded-[32px] p-5 shadow-[0_6px_20px_rgba(0,0,0,0.06)] border border-gray-100 flex flex-col items-center text-center relative overflow-hidden cursor-pointer hover:bg-gray-50 hover:shadow-xl hover:border-[var(--primary)]/20 hover:-translate-y-1 transition-all duration-300 group"
+            >
               {/* Avatar/Image */}
               <div className="relative w-20 h-20 mb-3">
                 <div className="w-full h-full rounded-full overflow-hidden relative z-10 bg-gray-50 border border-gray-100">

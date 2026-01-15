@@ -3,7 +3,8 @@
 import { motion, AnimatePresence, PanInfo } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
 import { ChevronLeft, ChevronRight } from '@repo/ui/icons';
-import { ImageWithFallback } from '@repo/ui';
+import { ImageWithFallback, useLoading } from '@repo/ui';
+import { useRouter } from 'next/navigation';
 
 interface HotelSliderProps {
   hotels: Hotel[];
@@ -16,6 +17,16 @@ export default function HotelSlider({
   activeIndex,
   onHotelChange,
 }: HotelSliderProps) {
+  const router = useRouter();
+  const { show } = useLoading();
+
+  const handleHotelClick = (hotel: Hotel) => {
+    show();
+    // Navigate to hotel detail page
+    const identifier = (hotel as any).slug || hotel.id;
+    router.push(`/hotels/${identifier}`);
+  };
+
   const handlePrevious = () => {
     const newIndex = activeIndex === 0 ? hotels.length - 1 : activeIndex - 1;
     onHotelChange(newIndex);
@@ -108,9 +119,9 @@ export default function HotelSlider({
                       exit={{ scale: 0.9, opacity: 0 }}
                       transition={{ duration: 0.35, ease: [0.33, 1, 0.68, 1] }}
                       onClick={() =>
-                        !isCenter && onHotelChange(actualIndex)
+                        isCenter ? handleHotelClick(hotel) : onHotelChange(actualIndex)
                       }
-                      className={`${isCenter ? "" : "cursor-pointer"} flex-shrink-0 origin-top`}
+                      className="cursor-pointer flex-shrink-0 origin-top"
                       style={{
                         width: isCenter ? `${centerWidth}px` : `${sideWidth}px`,
                         transformOrigin: "top center",
@@ -162,6 +173,10 @@ export default function HotelSlider({
                                   backgroundColor: "rgba(255, 255, 255, 0.24)",
                                 }}
                                 whileTap={{ scale: 0.96 }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleHotelClick(hotel);
+                                }}
                                 className="inline-flex items-center gap-2.5 rounded-full text-[13px] font-bold text-white transition-colors uppercase tracking-[0.12em]"
                               >
                                 KHÁM PHÁ
