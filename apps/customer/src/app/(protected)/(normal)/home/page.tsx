@@ -1,5 +1,6 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from '@repo/ui/motion';
 import CategoryScroller from '@/features/home/components/CategoryScroller';
 import dynamic from 'next/dynamic';
@@ -19,7 +20,9 @@ declare global {
 
 export default function HomePage() {
   const { hide } = useLoading();
+  const searchParams = useSearchParams();
 
+  // Fake loading on mount
   useEffect(() => {
     const timer = setTimeout(() => {
       hide();
@@ -27,6 +30,11 @@ export default function HomePage() {
 
     return () => clearTimeout(timer);
   }, [hide]);
+
+  // Force hide loading when navigation occurs (params change)
+  useEffect(() => {
+    hide();
+  }, [searchParams, hide]);
 
   const {
     categories,

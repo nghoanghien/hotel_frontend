@@ -1,23 +1,85 @@
-import type { HotelDetailDto, AmenityDto, HotelSearchResultDto, RoomType, HotelImageDto, RoomAvailabilityDto } from '@repo/types';
+import type { HotelDetailDto, AmenityDto, HotelSearchResultDto, RoomType, HotelImageDto, RoomAvailabilityDto, BrandDto } from '@repo/types';
+
+// Mock Brands (Hotel Chains)
+export const mockBrands: Record<string, BrandDto> = {
+  'brand-1': {
+    id: 'brand-1',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    name: 'Sunset Group',
+    description: 'Chuỗi khách sạn và resort cao cấp hàng đầu Việt Nam',
+    logoUrl: 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200',
+    website: 'https://sunsetgroup.com',
+    email: 'contact@sunsetgroup.com',
+    phoneNumber: '+84 28 1234 5678',
+    city: 'Ho Chi Minh City',
+    country: 'Vietnam',
+    isActive: true,
+    hotelCount: 12
+  },
+  'brand-2': {
+    id: 'brand-2',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    name: 'Heritage Hotels',
+    description: 'Mang đến trải nghiệm lưu trú đậm chất Việt Nam',
+    logoUrl: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=200',
+    website: 'https://heritagehotels.vn',
+    email: 'info@heritagehotels.vn',
+    phoneNumber: '+84 24 9876 5432',
+    city: 'Hanoi',
+    country: 'Vietnam',
+    isActive: true,
+    hotelCount: 8
+  },
+  'brand-3': {
+    id: 'brand-3',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    name: 'Paradise Resorts',
+    description: 'Resort biển đẳng cấp 5 sao',
+    logoUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200',
+    website: 'https://paradiseresorts.vn',
+    email: 'booking@paradiseresorts.vn',
+    phoneNumber: '+84 236 123 4567',
+    city: 'Da Nang',
+    country: 'Vietnam',
+    isActive: true,
+    hotelCount: 6
+  }
+};
 
 // Common Amenities
-// type: 1 = General (Mock)
+// Updated to use amenity names that have icon mappings
 const commonAmenities: Record<string, AmenityDto> = {
   wifi: { id: 'wifi', createdAt: '', updatedAt: '', name: 'WiFi miễn phí', icon: 'wifi', type: 1, isActive: true },
   pool: { id: 'pool', createdAt: '', updatedAt: '', name: 'Hồ bơi', icon: 'pool', type: 1, isActive: true },
-  restaurant: { id: 'restaurant', createdAt: '', updatedAt: '', name: 'Nhà hàng', icon: 'utensils', type: 1, isActive: true },
-  bar: { id: 'bar', createdAt: '', updatedAt: '', name: 'Quầy bar', icon: 'glass-martini', type: 1, isActive: true },
+  restaurant: { id: 'restaurant', createdAt: '', updatedAt: '', name: 'Nhà hàng', icon: 'restaurant', type: 1, isActive: true },
+  bar: { id: 'bar', createdAt: '', updatedAt: '', name: 'Quầy bar', icon: 'bar', type: 1, isActive: true },
   spa: { id: 'spa', createdAt: '', updatedAt: '', name: 'Spa & Massage', icon: 'spa', type: 1, isActive: true },
-  gym: { id: 'gym', createdAt: '', updatedAt: '', name: 'Phòng gym', icon: 'dumbbell', type: 1, isActive: true },
-  parking: { id: 'parking', createdAt: '', updatedAt: '', name: 'Bãi đỗ xe', icon: 'parking', type: 1, isActive: true },
-  airport: { id: 'airport', createdAt: '', updatedAt: '', name: 'Đưa đón sân bay', icon: 'plane', type: 1, isActive: true },
-  breakfast: { id: 'breakfast', createdAt: '', updatedAt: '', name: 'Ăn sáng', icon: 'coffee', type: 1, isActive: true },
-  beachVolley: { id: 'beachVolley', createdAt: '', updatedAt: '', name: 'Bóng chuyền bãi biển', icon: 'volleyball-ball', type: 1, isActive: true },
-  bikeRent: { id: 'bikeRent', createdAt: '', updatedAt: '', name: 'Cho thuê xe đạp', icon: 'bicycle', type: 1, isActive: true },
-  motoRent: { id: 'motoRent', createdAt: '', updatedAt: '', name: 'Cho thuê xe máy', icon: 'motorcycle', type: 1, isActive: true },
-  rooftop: { id: 'rooftop', createdAt: '', updatedAt: '', name: 'Sân thượng', icon: 'building', type: 1, isActive: true },
-  laundry: { id: 'laundry', createdAt: '', updatedAt: '', name: 'Giặt ủi', icon: 'tshirt', type: 1, isActive: true },
-  concierge: { id: 'concierge', createdAt: '', updatedAt: '', name: 'Lễ tân 24/7', icon: 'bell', type: 1, isActive: true }
+  gym: { id: 'gym', createdAt: '', updatedAt: '', name: 'Phòng tập gym', icon: 'gym', type: 1, isActive: true },
+  parking: { id: 'parking', createdAt: '', updatedAt: '', name: 'Bãi đỗ xe miễn phí', icon: 'parking', type: 1, isActive: true },
+  airport: { id: 'airport', createdAt: '', updatedAt: '', name: 'Đưa đón sân bay', icon: 'airport', type: 1, isActive: true },
+  breakfast: { id: 'breakfast', createdAt: '', updatedAt: '', name: 'Ăn sáng buffet', icon: 'breakfast', type: 1, isActive: true },
+
+  // Room amenities with icons
+  tv: { id: 'tv', createdAt: '', updatedAt: '', name: 'TV màn hình phẳng', icon: 'tv', type: 2, isActive: true },
+  airConditioning: { id: 'ac', createdAt: '', updatedAt: '', name: 'Điều hòa không khí', icon: 'air', type: 2, isActive: true },
+  balcony: { id: 'balcony', createdAt: '', updatedAt: '', name: 'Ban công view biển', icon: 'balcony', type: 2, isActive: true },
+
+  // Service amenities with icons
+  laundry: { id: 'laundry', createdAt: '', updatedAt: '', name: 'Dịch vụ giặt ủi', icon: 'laundry', type: 5, isActive: true },
+  concierge: { id: 'concierge', createdAt: '', updatedAt: '', name: 'Lễ tân 24/7', icon: 'concierge', type: 5, isActive: true },
+  security: { id: 'security', createdAt: '', updatedAt: '', name: 'An ninh 24/7', icon: 'security', type: 5, isActive: true },
+
+  // Facilities with icons
+  beachAccess: { id: 'beach', createdAt: '', updatedAt: '', name: 'Truy cập bãi biển', icon: 'volleyball', type: 6, isActive: true },
+  bikeRental: { id: 'bike', createdAt: '', updatedAt: '', name: 'Cho thuê xe đạp', icon: 'bike', type: 6, isActive: true },
+  garden: { id: 'garden', createdAt: '', updatedAt: '', name: 'Vườn cảnh quan', icon: 'garden', type: 6, isActive: true },
+
+  // Some amenities without specific icons (fallback to default)
+  kidsClub: { id: 'kids', createdAt: '', updatedAt: '', name: 'Câu lạc bộ trẻ em', icon: 'baby', type: 6, isActive: true },
+  petFriendly: { id: 'pet', createdAt: '', updatedAt: '', name: 'Thân thiện thú cưng', icon: 'pet', type: 1, isActive: true },
 };
 
 const createImages = (urls: string[]): HotelImageDto[] => {
@@ -57,8 +119,10 @@ export const mockHotels: HotelDetailDto[] = [
     amenities: [
       commonAmenities.wifi, commonAmenities.pool, commonAmenities.restaurant,
       commonAmenities.spa, commonAmenities.gym, commonAmenities.airport,
-      commonAmenities.breakfast, commonAmenities.beachVolley
+      commonAmenities.breakfast, commonAmenities.beachAccess, commonAmenities.tv,
+      commonAmenities.airConditioning, commonAmenities.balcony, commonAmenities.laundry
     ],
+    brand: mockBrands['brand-1'],
     settings: {
       checkInTime: '14:00',
       checkOutTime: '12:00',

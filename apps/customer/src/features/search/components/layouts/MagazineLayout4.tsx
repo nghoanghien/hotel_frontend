@@ -1,133 +1,158 @@
 import { motion } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
-import { Star, MapPin, Users } from '@repo/ui/icons';
-import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
-import { ImageWithFallback } from '@repo/ui';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { ImageWithFallback, useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, getAmenityIcon } from '@repo/ui';
+import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
+import { formatVnd } from '@repo/lib';
+import { ChevronRight } from '@repo/ui/icons';
 
 interface Props {
   hotel: Hotel;
 }
 
-// Layout 1: Editorial Hero - Large featured hotel with editorial typography
-export default function MagazineLayout1({ hotel }: Props) {
-  const featured = hotel.images[0]?.imageUrl || '';
+export default function MagazineLayout4({ hotel }: Props) {
+  // Combine Images and Amenities for the grid
+  const mainImage = hotel.images[0];
+  const gallery = hotel.images.slice(1, 4);
+  const amenities = hotel.amenities?.filter(a => a).slice(0, 4) || []; // Take 4 amenities, filter nulls
+
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
   const { show } = useLoading();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
+    <motion.section
+      className="bg-white rounded-3xl overflow-hidden shadow-xl mb-24 border border-gray-100"
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.6 }}
-      className="mb-16 px-4"
     >
-      <div className="max-w-[1200px] mx-auto">
-        {/* Magazine page indicator */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="text-xs text-gray-400 font-mono">P.{Math.floor(Math.random() * 50) + 1}</div>
-          <div className="h-px flex-1 mx-8 bg-gray-200" />
-          <div className="text-xs text-gray-400 uppercase tracking-wider">{hotel.brandName || 'Hotel'}</div>
+      <div
+        ref={setRefs}
+        onMouseLeave={clearHover}
+        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Loading...'); router.push(`/hotels/${hotel.id}`); }, 300); }}
+        className="relative flex flex-col md:flex-row min-h-auto md:min-h-[700px] cursor-pointer"
+      >
+        <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
+        <TapRippleOverlay ripple={ripple} />
+
+        {/* Mobile Header (Horizontal) */}
+        <div className="md:hidden w-full bg-white border-b border-gray-200 p-6 flex flex-col items-center justify-center relative z-10 cursor-pointer">
+          <h1 className="text-3xl font-bold text-[#1A1A1A] tracking-tight">{hotel.name}</h1>
+          <p className="text-sm text-gray-500 mt-1">{hotel.city}</p>
+          {(hotel.brand?.name || hotel.brandName) && (
+            <p className="text-xs uppercase tracking-widest text-gray-400 font-bold mt-2">
+              {hotel.brand?.name || hotel.brandName}
+            </p>
+          )}
         </div>
 
-        {/* Hotel title - editorial style */}
-        <div className="mb-12">
-          <h2 className="text-7xl font-bold leading-none mb-4" style={{ fontFamily: 'serif' }}>
-            {hotel.name}
-          </h2>
-          <div className="flex items-center gap-6 text-sm text-gray-600">
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-4 h-4 ${i < (hotel.starRating || 0) ? 'fill-amber-500 text-amber-500' : 'text-gray-300'}`}
-                />
-              ))}
-              <span className="font-semibold ml-1">({hotel.reviewCount} đánh giá)</span>
-            </div>
-            <span className="text-gray-300">|</span>
-            <div className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
-              <span>{hotel.city}</span>
-            </div>
-          </div>
-        </div>
-
+        {/* Desktop Header (Vertical) */}
         <div
-          ref={setRefs}
-          onMouseLeave={clearHover}
-          onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết khách sạn'); router.push(`/hotels/${hotel.id}?${searchParams.toString()}`); }, 300); }}
-          className="relative grid grid-cols-12 gap-8 cursor-pointer"
+          onMouseEnter={(e) => moveHighlight(e, { borderRadius: 0, backgroundColor: '#f9fafb', opacity: 1 })}
+          className="hidden md:flex w-[120px] bg-white border-r border-gray-100 items-start justify-center pt-8 relative z-10 cursor-pointer group"
         >
-          <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
-          <TapRippleOverlay ripple={ripple} />
+          <div className="h-full flex flex-col justify-between pb-8 items-center">
+            <div className="text-2xl font-bold text-gray-200">04</div>
+            <h1
+              className="text-[52px] font-bold text-[#1A1A1A] leading-none whitespace-nowrap mt-8"
+              style={{
+                writingMode: 'vertical-rl',
+                textOrientation: 'mixed',
+                transform: 'rotate(180deg)',
+                fontFamily: 'var(--font-anton), sans-serif',
+                letterSpacing: '0.05em'
+              }}
+            >
+              {hotel.name}
+            </h1>
+            {(hotel.brand?.name || hotel.brandName) && (
+              <p
+                className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-4"
+                style={{
+                  writingMode: 'vertical-rl',
+                  transform: 'rotate(180deg)'
+                }}
+              >
+                {hotel.brand?.name || hotel.brandName}
+              </p>
+            )}
+            <div className="w-px h-24 bg-gray-200" />
+          </div>
+        </div>
 
-          {/* Large featured image */}
-          <div onMouseEnter={(e) => moveHighlight(e, { borderRadius: 12, backgroundColor: '#f5efe6', opacity: 1, scaleEnabled: true, scale: 1.12 })} className="col-span-8 relative z-10 cursor-pointer">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl mb-4">
-              <ImageWithFallback
-                src={featured}
-                alt={hotel.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {hotel.amenities?.slice(0, 5).map(amenity => (
-                    <span key={amenity.id} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                      {amenity.name}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-gray-600 text-lg leading-relaxed max-w-xl">
-                  {hotel.description}
-                </p>
-                <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
-                  <MapPin className="w-4 h-4" />
-                  <span>{hotel.address}</span>
+        <div className="relative flex-1 flex flex-col">
+          {/* Row 1 - Main Feature */}
+          <div className="border-b border-gray-100 p-0 flex-shrink-0 relative z-10 cursor-pointer" style={{ height: 'auto' }}>
+            <div className="flex flex-col md:flex-row h-full min-h-[400px]">
+
+              {/* Text Content */}
+              <div
+                className="flex-1 p-8 md:p-12 flex flex-col justify-center order-2 md:order-1"
+                onMouseEnter={(e) => moveHighlight(e, { borderRadius: 0, backgroundColor: 'rgba(0,0,0,0.01)', opacity: 1 })}
+              >
+                <span className="text-sm font-bold text-amber-600 uppercase tracking-widest mb-4 block">Most Popular Choice</span>
+                <h3 className="text-3xl md:text-5xl font-bold text-[#1A1A1A] mb-4 font-anton">{formatVnd(hotel.minPrice || 0)} <span className="text-lg text-gray-400 font-sans font-normal">/night</span></h3>
+                <p className="text-gray-600 leading-relaxed text-lg mb-6 max-w-md">{hotel.description}</p>
+
+                <div className="flex gap-2 flex-wrap">
+                  {amenities.map(a => {
+                    const Icon = getAmenityIcon(a.name);
+                    return (
+                      <span key={a.id} className="text-xs font-bold px-3 py-1.5 bg-gray-100 rounded-full text-gray-600 flex items-center gap-1.5">
+                        <Icon className="w-3.5 h-3.5" />
+                        {a.name}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-500 mb-1">Từ</div>
-                <div className="text-3xl font-bold text-amber-600">
-                  {((hotel.minPrice || 0) / 1000).toFixed(0)}K
+
+              {/* Main Image */}
+              <div
+                className="relative w-full md:w-[55%] h-[300px] md:h-auto order-1 md:order-2 overflow-hidden group"
+                onMouseEnter={(e) => moveHighlight(e, { borderRadius: 0, backgroundColor: 'rgba(0,0,0,0.03)', opacity: 1 })}
+              >
+                <div className="absolute inset-0 p-4 flex flex-col justify-end z-20 pointer-events-none">
+                  <p className="text-white font-bold text-lg drop-shadow-md translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center gap-2">
+                    View detail <ChevronRight className="w-5 h-5" />
+                  </p>
                 </div>
-                <div className="text-sm text-gray-500 mt-1">/đêm</div>
+                <ImageWithFallback src={mainImage?.imageUrl || ''} alt={hotel.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300" />
               </div>
             </div>
           </div>
 
-          {/* Side info instead of room types */}
-          <div className="col-span-4 space-y-6">
-            <div className="text-xs uppercase tracking-widest text-gray-400 font-semibold border-b border-gray-200 pb-2">
-              Thông tin
-            </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="mb-2 font-medium">Tiện nghi nổi bật:</p>
-              <ul className="space-y-2">
-                {hotel.amenities?.slice(0, 5).map(a => (
-                  <li key={a.id} className="flex items-center gap-2 text-sm text-gray-600">
-                    <span>• {a.name}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="mb-2 font-medium">Chính sách:</p>
-              <p className="text-sm text-gray-600">Check-in: {hotel.settings?.checkInTime}</p>
-              <p className="text-sm text-gray-600">Check-out: {hotel.settings?.checkOutTime}</p>
-            </div>
+          {/* Row 2 - Gallery Grid */}
+          <div className="grid grid-cols-3 flex-1 min-h-[250px] border-b border-gray-100">
+            {gallery.map((img, idx) => (
+              <div
+                key={idx}
+                className={`relative border-r border-gray-100 last:border-r-0 group overflow-hidden`}
+                onMouseEnter={(e) => moveHighlight(e, { borderRadius: 0, backgroundColor: 'rgba(0,0,0,0.03)', opacity: 1 })}
+              >
+                <div className="absolute inset-0 p-4 flex flex-col justify-end z-20 pointer-events-none">
+                  <p className="text-white font-bold text-lg drop-shadow-md translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center gap-2">
+                    {img.caption || "View detail"} <ChevronRight className="w-5 h-5" />
+                  </p>
+                </div>
+                <ImageWithFallback src={img.imageUrl} alt="Gallery" fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300" />
+              </div>
+            ))}
+            {/* If less than 3 gallery images, fill with something? Or just let grid handle it. */}
+            {gallery.length < 3 && (
+              <div className="bg-gray-50 flex items-center justify-center text-gray-400 text-sm p-4">
+                More photos available
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </motion.article>
+    </motion.section>
   );
 }

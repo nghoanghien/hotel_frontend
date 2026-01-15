@@ -2,8 +2,8 @@ import { BaseDto } from './common';
 import { AmenityDto, ReviewDto } from './hotel';
 
 // Enums
-export type RoomType = 'Standard' | 'Deluxe' | 'Suite' | 'Executive' | 'Family' | 'Studio' | 'Penthouse' | 'Accessible'; // Inferred from backend usage, refine if needed
-export type BedType = 'Single' | 'Double' | 'Queen' | 'King' | 'Twin' | 'Bunk'; // Inferred
+export type RoomType = 'Standard' | 'Deluxe' | 'Suite' | 'Family' | 'Presidential' | 'Dormitory' | 'Studio' | 'Penthouse';
+export type BedType = 'Single' | 'Double' | 'Queen' | 'King' | 'Twin' | 'Bunk' | 'SofaBed';
 export type RoomStatus = 'Available' | 'Occupied' | 'Dirty' | 'Cleaning' | 'Maintenance' | 'OutOfOrder'; // Inferred
 
 export interface CreateRoomDto {

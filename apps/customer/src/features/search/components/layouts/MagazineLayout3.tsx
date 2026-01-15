@@ -1,132 +1,155 @@
 import { motion } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
-import { Star, MapPin, Users } from '@repo/ui/icons';
-import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading } from '@repo/ui';
-import { ImageWithFallback } from '@repo/ui';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Star, MapPin } from '@repo/ui/icons';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, ImageWithFallback, getAmenityIcon } from '@repo/ui';
 import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { formatVnd } from '@repo/lib';
 
 interface Props {
   hotel: Hotel;
 }
 
-// Layout 1: Editorial Hero - Large featured hotel with editorial typography
-export default function MagazineLayout1({ hotel }: Props) {
-  const featured = hotel.images[0]?.imageUrl || '';
+export default function MagazineLayout3({ hotel }: Props) {
+  const hero = hotel.images[0];
+  const secondary = hotel.images.slice(1, 4);
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
   const { show } = useLoading();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
+
+  if (!hero) return null;
 
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6 }}
-      className="mb-16 px-4"
+      className="mb-24 px-2"
     >
-      <div className="max-w-[1200px] mx-auto">
-        {/* Magazine page indicator */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="text-xs text-gray-400 font-mono">P.{Math.floor(Math.random() * 50) + 1}</div>
-          <div className="h-px flex-1 mx-8 bg-gray-200" />
-          <div className="text-xs text-gray-400 uppercase tracking-wider">{hotel.brandName || 'Hotel'}</div>
-        </div>
+      <div
+        ref={setRefs}
+        onMouseLeave={clearHover}
+        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Loading...'); router.push(`/hotels/${hotel.id}`); }, 300); }}
+        className="relative max-w-[1240px] mx-auto cursor-pointer"
+      >
+        <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
+        <TapRippleOverlay ripple={ripple} />
 
-        {/* Hotel title - editorial style */}
-        <div className="mb-12">
-          <h2 className="text-7xl font-bold leading-none mb-4" style={{ fontFamily: 'serif' }}>
-            {hotel.name}
-          </h2>
-          <div className="flex items-center gap-6 text-sm text-gray-600">
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-4 h-4 ${i < (hotel.starRating || 0) ? 'fill-amber-500 text-amber-500' : 'text-gray-300'}`}
-                />
-              ))}
-              <span className="font-semibold ml-1">({hotel.reviewCount} đánh giá)</span>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16">
+          {/* Left: Editorial text */}
+          <div className="col-span-1 md:col-span-5 flex flex-col justify-center py-8">
+            <div className="text-xs text-gray-400 uppercase tracking-widest mb-6">
+              <span className="inline-block w-12 h-px bg-gray-300 mr-3 align-middle" />
+              Featured Hotel
             </div>
-            <span className="text-gray-300">|</span>
-            <div className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
-              <span>{hotel.city}</span>
+
+            <h2 className="text-6xl md:text-8xl font-black leading-none mb-6 text-[#1A1A1A]" style={{ fontFamily: 'var(--font-anton), serif' }}>
+              Experience<br />
+              True<br />
+              <span className="italic text-gray-400 font-serif">Luxury</span>
+            </h2>
+
+            <div className="mb-8 pl-4 border-l-4 border-[#1A1A1A]">
+              <h3 className="text-2xl md:text-3xl font-bold mb-2 text-[#1A1A1A]">{hotel.name}</h3>
+              {(hotel.brand?.name || hotel.brandName) && (
+                <p className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-3">
+                  {hotel.brand?.name || hotel.brandName}
+                </p>
+              )}
+              <div className="flex items-center gap-2 mb-4 text-sm font-medium">
+                <div className="flex text-amber-500">
+                  {[...Array(5)].map((_, i) => <Star key={i} className={`w-4 h-4 ${i < hotel.starRating ? 'fill-current' : 'text-gray-300 fill-gray-300'}`} />)}
+                </div>
+                <span className="text-gray-400">|</span>
+                <span className="text-gray-600">{hotel.reviewCount} Reviews</span>
+              </div>
+              <p className="text-gray-600 leading-relaxed line-clamp-3">
+                {hotel.description}
+              </p>
+            </div>
+
+            {/* Price Tag */}
+            <div className="mt-4">
+              <span className="text-sm text-gray-400 uppercase tracking-wider block mb-1">Starting from</span>
+              <div className="text-4xl font-bold text-[#1A1A1A] font-anton">
+                {formatVnd(hotel.minPrice || 0)}
+              </div>
+            </div>
+
+            {/* Amenities */}
+            <div className="mt-6">
+              <h4 className="text-xs uppercase tracking-widest text-gray-400 font-bold mb-3">Highlights</h4>
+              <div className="flex flex-wrap gap-2">
+                {hotel.amenities?.filter(a => a).slice(0, 6).map(a => {
+                  const Icon = getAmenityIcon(a.name);
+                  return (
+                    <span key={a.id} className="px-3 py-1.5 bg-gray-50 text-gray-700 text-xs font-semibold rounded-lg border border-gray-100 flex items-center gap-1.5">
+                      <Icon className="w-3.5 h-3.5" />
+                      {a.name}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div
-          ref={setRefs}
-          onMouseLeave={clearHover}
-          onClick={(e) => { triggerTap(e); setTimeout(() => { show('Đang mở chi tiết khách sạn'); router.push(`/hotels/${hotel.id}?${searchParams.toString()}`); }, 300); }}
-          className="relative grid grid-cols-12 gap-8 cursor-pointer"
-        >
-          <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
-          <TapRippleOverlay ripple={ripple} />
-
-          {/* Large featured image */}
-          <div onMouseEnter={(e) => moveHighlight(e, { borderRadius: 12, backgroundColor: '#f5efe6', opacity: 1, scaleEnabled: true, scale: 1.12 })} className="col-span-8 relative z-10 cursor-pointer">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl mb-4">
+          {/* Right: Hero Image */}
+          <div
+            onMouseEnter={(e) => moveHighlight(e, { borderRadius: 40, backgroundColor: 'rgba(0,0,0,0.15)', opacity: 1, scale: 1.06 })}
+            className="col-span-1 md:col-span-7 relative z-10"
+          >
+            <div className="relative aspect-[3/4] md:aspect-[4/5] overflow-hidden rounded-[40px] shadow-2xl">
               <ImageWithFallback
-                src={featured}
+                src={hero.imageUrl}
                 alt={hotel.name}
                 fill
                 className="object-cover"
               />
             </div>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {hotel.amenities?.slice(0, 5).map(amenity => (
-                    <span key={amenity.id} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                      {amenity.name}
-                    </span>
-                  ))}
+            {/* Floating Badge */}
+            <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl max-w-xs hidden md:block">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                  <MapPin className="w-6 h-6" />
                 </div>
-                <p className="text-gray-600 text-lg leading-relaxed max-w-xl">
-                  {hotel.description}
-                </p>
-                <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
-                  <MapPin className="w-4 h-4" />
-                  <span>{hotel.address}</span>
+                <div>
+                  <div className="text-xs uppercase font-bold text-gray-400 mb-1">Located in</div>
+                  <div className="font-bold text-lg text-[#1A1A1A] leading-tight">{hotel.city}, {hotel.country}</div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-500 mb-1">Từ</div>
-                <div className="text-3xl font-bold text-amber-600">
-                  {((hotel.minPrice || 0) / 1000).toFixed(0)}K
-                </div>
-                <div className="text-sm text-gray-500 mt-1">/đêm</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Side info instead of room types */}
-          <div className="col-span-4 space-y-6">
-            <div className="text-xs uppercase tracking-widest text-gray-400 font-semibold border-b border-gray-200 pb-2">
-              Thông tin
-            </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="mb-2 font-medium">Tiện nghi nổi bật:</p>
-              <ul className="space-y-2">
-                {hotel.amenities?.slice(0, 5).map(a => (
-                  <li key={a.id} className="flex items-center gap-2 text-sm text-gray-600">
-                    <span>• {a.name}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="mb-2 font-medium">Chính sách:</p>
-              <p className="text-sm text-gray-600">Check-in: {hotel.settings?.checkInTime}</p>
-              <p className="text-sm text-gray-600">Check-out: {hotel.settings?.checkOutTime}</p>
             </div>
           </div>
         </div>
+
+        {/* Bottom row - secondary images */}
+        {secondary.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 mt-16 pt-12 border-t border-gray-100">
+            {secondary.map((img, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                onMouseEnter={(e) => moveHighlight(e, { borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.08)', opacity: 1, scale: 1.06 })}
+                className="relative z-10 group"
+              >
+                <div className="relative aspect-square overflow-hidden mb-3 rounded-2xl bg-gray-100">
+                  <ImageWithFallback
+                    src={img.imageUrl}
+                    alt={hotel.name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
+                </div>
+                <h4 className="font-bold text-sm md:text-base text-[#1A1A1A] mt-2">{img.caption || "Gallery View"}</h4>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </motion.article>
   );

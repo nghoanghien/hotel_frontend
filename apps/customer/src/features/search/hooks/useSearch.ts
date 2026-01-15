@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import type { HotelDetailDto as Hotel } from '@repo/types';
 import { searchHotels, HotelSearchFilters } from '../data/mockHotelData';
@@ -25,6 +25,8 @@ export function useSearch() {
   const [searchResults, setSearchResults] = useState<HotelSearchResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
 
+  const activeSearchRef = useRef(0);
+
   // Check if we're in search mode (has search query param)
   const isSearchMode = searchParams.has('q');
 
@@ -33,6 +35,9 @@ export function useSearch() {
     if (!filters.query.trim()) {
       return;
     }
+
+    // Increment search ID to invalidate previous searches
+    const searchId = ++activeSearchRef.current;
 
     const alreadyInSearchMode = searchParams.has('q');
     setIsSearching(true);
@@ -52,6 +57,9 @@ export function useSearch() {
     // Simulate loading for 2 seconds
     await new Promise(resolve => setTimeout(resolve, 2000));
 
+    // Check if this search is still relevant
+    if (searchId !== activeSearchRef.current) return;
+
     // Get search results
     const hotelFilters: HotelSearchFilters = {
       query: filters.query,
@@ -66,7 +74,7 @@ export function useSearch() {
     // Prepare results with random layout types
     const resultsWithLayout: HotelSearchResult[] = hotels.map(hotel => ({
       hotel,
-      layoutType: Math.floor(Math.random() * 10) + 1,
+      layoutType: Math.floor(Math.random() * 4) + 1,
     }));
 
     setSearchResults(resultsWithLayout);
@@ -89,6 +97,9 @@ export function useSearch() {
 
   // Clear search and return to home
   const clearSearch = useCallback(() => {
+    // Invalidate any pending search
+    activeSearchRef.current++;
+
     setSearchFilters({
       query: '',
       checkIn: null,

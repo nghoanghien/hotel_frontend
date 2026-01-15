@@ -1,5 +1,20 @@
 import { BaseDto } from './common';
 
+// Brand (Hotel Chain) DTO
+export interface BrandDto extends BaseDto {
+  name: string;
+  description?: string;
+  logoUrl?: string;
+  website?: string;
+  phoneNumber?: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  isActive: boolean;
+  hotelCount: number;
+}
+
 export interface AmenityDto extends BaseDto {
   name: string;
   description?: string;
@@ -114,6 +129,7 @@ export interface HotelDetailDto extends HotelDto {
   images: HotelImageDto[];
   amenities: AmenityDto[];
   recentReviews: ReviewDto[];
+  brand?: BrandDto; // Optional full brand details
 }
 
 export interface HotelSearchResultDto extends HotelDto {

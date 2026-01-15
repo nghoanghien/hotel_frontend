@@ -105,6 +105,12 @@ export default function CompactDateSelector({ open, onClose, value, onChange, la
             const isRowStart = dayOfWeek === 0;
             const isRowEnd = dayOfWeek === 6;
 
+            // Check if date is in the past
+            const currentDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + monthOffset, day);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const isPastDate = currentDate < today;
+
             return (
               <div key={day} className="relative">
                 {inRange && (
@@ -119,14 +125,17 @@ export default function CompactDateSelector({ open, onClose, value, onChange, la
                 )}
 
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleDateClick(day, monthOffset)}
-                  className={`relative aspect-square w-full flex items-center justify-center text-sm font-medium transition-all ${isStart || isEnd
-                    ? 'bg-[var(--primary)] text-white rounded-full z-10 shadow-md shadow-[var(--primary)]/30'
-                    : inRange
-                      ? 'text-[var(--primary)]'
-                      : 'hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-full'
+                  whileHover={!isPastDate ? { scale: 1.05 } : {}}
+                  whileTap={!isPastDate ? { scale: 0.95 } : {}}
+                  onClick={() => !isPastDate && handleDateClick(day, monthOffset)}
+                  disabled={isPastDate}
+                  className={`relative aspect-square w-full flex items-center justify-center text-sm font-medium transition-all ${isPastDate
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : isStart || isEnd
+                        ? 'bg-[var(--primary)] text-white rounded-full z-10 shadow-md shadow-[var(--primary)]/30'
+                        : inRange
+                          ? 'text-[var(--primary)]'
+                          : 'hover:bg-gray-100 text-gray-700 hover:text-gray-900 rounded-full'
                     }`}
                 >
                   {day}

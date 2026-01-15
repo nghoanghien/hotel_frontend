@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "@repo/ui/motion";
-import { X, Calendar, KeyRound, CircleParking, Bath, SlidersHorizontal } from "@repo/ui/icons";
+import { X, Calendar, KeyRound, CircleParking, Bath, SlidersHorizontal, Star } from "@repo/ui/icons";
 import { useState, useRef, useEffect, useCallback } from "react";
+import { mockBrands } from "../data/mockHotelData";
+import type { BrandDto } from "@repo/types";
 
 interface FilterModalProps {
   open: boolean;
@@ -24,6 +26,8 @@ const MAX_PRICE = 5000000;
 export default function FilterModal({ open, onClose, layoutId }: FilterModalProps) {
   const [priceRange, setPriceRange] = useState<[number, number]>([260000, 4500000]);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedStars, setSelectedStars] = useState<number[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
 
   const trackRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef<'min' | 'max' | null>(null);
@@ -31,6 +35,18 @@ export default function FilterModal({ open, onClose, layoutId }: FilterModalProp
   const toggleAmenity = (id: string) => {
     setSelectedAmenities(prev =>
       prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
+    );
+  };
+
+  const toggleStar = (star: number) => {
+    setSelectedStars(prev =>
+      prev.includes(star) ? prev.filter(s => s !== star) : [...prev, star]
+    );
+  };
+
+  const toggleBrand = (brandId: string) => {
+    setSelectedBrands(prev =>
+      prev.includes(brandId) ? prev.filter(b => b !== brandId) : [...prev, brandId]
     );
   };
 
@@ -64,7 +80,8 @@ export default function FilterModal({ open, onClose, layoutId }: FilterModalProp
 
     const rect = trackRef.current.getBoundingClientRect();
     const percent = Math.min(100, Math.max(0, ((e.clientX - rect.left) / rect.width) * 100));
-    const value = Math.round(MIN_PRICE + (percent / 100) * (MAX_PRICE - MIN_PRICE));
+    const rawValue = MIN_PRICE + (percent / 100) * (MAX_PRICE - MIN_PRICE);
+    const value = Math.round(rawValue / 5000) * 5000; // Round to nearest 5000
 
     setPriceRange(prev => {
       const newRange = [...prev] as [number, number];
@@ -93,6 +110,8 @@ export default function FilterModal({ open, onClose, layoutId }: FilterModalProp
   }, [open, handleMouseMove, handleMouseUp]);
 
   if (!open) return null;
+
+  const brands: BrandDto[] = Object.values(mockBrands);
 
   return (
     <>
@@ -152,9 +171,9 @@ export default function FilterModal({ open, onClose, layoutId }: FilterModalProp
 
                 {/* Range Slider Visualization */}
                 <div className="relative h-6 mb-8" ref={trackRef}>
-                  <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 rounded-full -translate-y-1/2"></div>
+                  <div className="absolute top-1/2 left-0 right-0 h-2 bg-gray-200 rounded-full -translate-y-1/2"></div>
                   <div
-                    className="absolute top-1/2 h-1 bg-[var(--primary)] rounded-full -translate-y-1/2"
+                    className="absolute top-1/2 h-2 bg-[var(--primary)] rounded-full -translate-y-1/2"
                     style={{
                       left: `${getPercentage(priceRange[0])}%`,
                       right: `${100 - getPercentage(priceRange[1])}%`
@@ -170,7 +189,7 @@ export default function FilterModal({ open, onClose, layoutId }: FilterModalProp
                     <div className="w-2 h-2 rounded-full bg-gray-300"></div>
                   </div>
                   <div
-                    className="absolute top-1/2 w-8 h-8 bg-white border border-gray-200 shadow-lg rounded-full -translate-y-1/2 translate-x-1/2 cursor-grab active:cursor-grabbing hover:scale-110 transition-transform z-10 flex items-center justify-center"
+                    className="absolute top-1/2 w-8 h-8 bg-white border border-gray-200 shadow-lg rounded-full -translate-y-1/2 -translate-x-1/2 cursor-grab active:cursor-grabbing hover:scale-110 transition-transform z-10 flex items-center justify-center"
                     style={{ left: `${getPercentage(priceRange[1])}%` }}
                     onMouseDown={handleMouseDown('max')}
                   >
@@ -186,11 +205,13 @@ export default function FilterModal({ open, onClose, layoutId }: FilterModalProp
                     <div className="flex items-center">
                       <span className="text-gray-400 mr-1">₫</span>
                       <input
-                        type="number"
-                        value={priceRange[0]}
-                        onChange={(e) => handlePriceInputChange(0, e.target.value)}
+                        type="text"
+                        value={priceRange[0].toLocaleString('vi-VN')}
+                        onChange={(e) => {
+                          const numVal = parseInt(e.target.value.replace(/\./g, ''), 10);
+                          if (!isNaN(numVal)) handlePriceInputChange(0, numVal.toString());
+                        }}
                         className="w-full font-semibold text-lg outline-none text-gray-900 bg-transparent placeholder-gray-300"
-                        min={0}
                       />
                     </div>
                   </div>
@@ -203,15 +224,75 @@ export default function FilterModal({ open, onClose, layoutId }: FilterModalProp
                     <div className="flex items-center">
                       <span className="text-gray-400 mr-1">₫</span>
                       <input
-                        type="number"
-                        value={priceRange[1]}
-                        onChange={(e) => handlePriceInputChange(1, e.target.value)}
+                        type="text"
+                        value={priceRange[1].toLocaleString('vi-VN')}
+                        onChange={(e) => {
+                          const numVal = parseInt(e.target.value.replace(/\./g, ''), 10);
+                          if (!isNaN(numVal)) handlePriceInputChange(1, numVal.toString());
+                        }}
                         className="w-full font-semibold text-lg outline-none text-gray-900 bg-transparent placeholder-gray-300"
-                        min={0}
                       />
                     </div>
                   </div>
                 </div>
+              </div>
+            </section>
+
+            {/* Star Rating Section */}
+            <section>
+              <h3 className="text-xl font-bold mb-2">Hạng sao</h3>
+              <p className="text-gray-500 text-sm mb-6">Chọn mức sao khách sạn</p>
+              <div className="flex gap-3">
+                {[1, 2, 3, 4, 5].map(star => {
+                  const isSelected = selectedStars.includes(star);
+                  return (
+                    <button
+                      key={star}
+                      onClick={() => toggleStar(star)}
+                      className={`flex-1 aspect-square rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all border-2 ${isSelected
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                        : 'border-gray-100 hover:border-gray-200 bg-white hover:bg-gray-50'
+                        }`}
+                    >
+                      <Star className={`w-8 h-8 ${isSelected ? 'fill-amber-500 text-amber-500' : 'text-gray-300 fill-gray-300'}`} />
+                      <span className={`text-sm font-bold ${isSelected ? 'text-[var(--primary)]' : 'text-gray-600'}`}>
+                        {star} sao
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* Brand Section */}
+            <section>
+              <h3 className="text-xl font-bold mb-2">Chuỗi khách sạn</h3>
+              <p className="text-gray-500 text-sm mb-6">Lọc theo thương hiệu</p>
+              <div className="grid grid-cols-1 gap-3">
+                {brands.map(brand => {
+                  const isSelected = selectedBrands.includes(brand.id);
+                  return (
+                    <button
+                      key={brand.id}
+                      onClick={() => toggleBrand(brand.id)}
+                      className={`p-4 rounded-2xl flex items-center justify-between transition-all border-2 ${isSelected
+                        ? 'border-[var(--primary)] bg-[var(--primary)]/5'
+                        : 'border-gray-100 hover:border-gray-200 bg-white hover:bg-gray-50'
+                        }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full border-2 ${isSelected ? 'border-[var(--primary)] bg-[var(--primary)]' : 'border-gray-300'
+                          }`} />
+                        <div className="text-left">
+                          <p className={`font-bold ${isSelected ? 'text-[var(--primary)]' : 'text-gray-900'}`}>
+                            {brand.name}
+                          </p>
+                          <p className="text-xs text-gray-500">{brand.hotelCount} khách sạn</p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </section>
 
@@ -248,7 +329,12 @@ export default function FilterModal({ open, onClose, layoutId }: FilterModalProp
           {/* Footer */}
           <div className="p-6 border-t border-gray-100 bg-white flex items-center justify-between">
             <button
-              onClick={() => { setSelectedAmenities([]); setPriceRange([260000, 4500000]); }}
+              onClick={() => {
+                setSelectedAmenities([]);
+                setPriceRange([260000, 4500000]);
+                setSelectedStars([]);
+                setSelectedBrands([]);
+              }}
               className="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 hover:bg-gray-100 rounded-xl transition-colors"
             >
               Xóa tất cả

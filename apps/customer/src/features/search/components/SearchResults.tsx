@@ -5,12 +5,7 @@ import MagazineLayout1 from './layouts/MagazineLayout1';
 import MagazineLayout2 from './layouts/MagazineLayout2';
 import MagazineLayout3 from './layouts/MagazineLayout3';
 import MagazineLayout4 from './layouts/MagazineLayout4';
-import MagazineLayout5 from './layouts/MagazineLayout5';
-import MagazineLayout6 from './layouts/MagazineLayout6';
-import MagazineLayout7 from './layouts/MagazineLayout7';
-import MagazineLayout8 from './layouts/MagazineLayout8';
-import MagazineLayout9 from './layouts/MagazineLayout9';
-import MagazineLayout10 from './layouts/MagazineLayout10';
+import { MagazineLayout1Shimmer, Skeleton } from '@repo/ui';
 
 interface Props {
   results: HotelSearchResult[];
@@ -69,18 +64,6 @@ export default function SearchResults({ results, searchQuery, isLoading = false 
         return <MagazineLayout3 key={hotel.id} {...props} />;
       case 4:
         return <MagazineLayout4 key={hotel.id} {...props} />;
-      case 5:
-        return <MagazineLayout5 key={hotel.id} {...props} />;
-      case 6:
-        return <MagazineLayout6 key={hotel.id} {...props} />;
-      case 7:
-        return <MagazineLayout7 key={hotel.id} {...props} />;
-      case 8:
-        return <MagazineLayout8 key={hotel.id} {...props} />;
-      case 9:
-        return <MagazineLayout9 key={hotel.id} {...props} />;
-      case 10:
-        return <MagazineLayout10 key={hotel.id} {...props} />;
       default:
         return <MagazineLayout1 key={hotel.id} {...props} />;
     }
@@ -94,7 +77,19 @@ export default function SearchResults({ results, searchQuery, isLoading = false 
       transition={{ duration: 0.4, delay: 1.0 }}
       className="min-h-screen bg-white pt-32 pb-20 px-6 magazine-scroll"
     >
-      {!isLoading && (
+      {isLoading ? (
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-12">
+            <Skeleton width="w-64" height="h-12" className="mb-4 rounded-xl" />
+            <Skeleton width="w-96" height="h-6" rounded="lg" />
+          </div>
+          <div>
+            {[...Array(3)].map((_, i) => (
+              <MagazineLayout1Shimmer key={i} />
+            ))}
+          </div>
+        </div>
+      ) : (
         <div className="max-w-7xl mx-auto">
           {/* Search header */}
           <motion.div
