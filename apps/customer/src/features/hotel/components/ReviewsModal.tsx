@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { X, Search, Star, Sparkles, CheckCircle2, Key, MessageSquare, Map, Tag } from "@repo/ui/icons";
+import { X, Search, Star, Sparkles, MessageSquare, Map, Tag, ChevronDown, CheckCircle2 } from "@repo/ui/icons";
 import { ImageWithFallback } from "@repo/ui";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import type { HotelDetailDto as Hotel } from "@repo/types";
@@ -14,33 +14,67 @@ interface ReviewsModalProps {
 export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("relevant");
+  const [selectedRating, setSelectedRating] = useState<number | null>(null);
+  const [isSortOpen, setIsSortOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  const reviews = useMemo(() => hotel.recentReviews || [], [hotel.recentReviews]);
+
+  const ratingDistribution = useMemo(() => {
+    const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+    if (reviews.length > 0) {
+      reviews.forEach(r => {
+        const star = Math.floor(r.rating || 5) as 1 | 2 | 3 | 4 | 5;
+        if (counts[star] !== undefined) counts[star]++;
+      });
+    }
+    const total = reviews.length || 1;
+    return [5, 4, 3, 2, 1].map(star => ({
+      stars: star,
+      count: counts[star as keyof typeof counts],
+      percentage: (counts[star as keyof typeof counts] / total) * 100
+    }));
+  }, [reviews]);
+
+  const filteredReviews = useMemo(() => {
+    let result = reviews.filter(review =>
+      ((review.comment?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
+        (review.guestName?.toLowerCase() || "").includes(searchQuery.toLowerCase())) &&
+      (selectedRating === null || Math.floor(review.rating) === selectedRating)
+    );
+
+    if (sortBy === 'highest') result.sort((a, b) => b.rating - a.rating);
+    else if (sortBy === 'lowest') result.sort((a, b) => a.rating - b.rating);
+
+    return result;
+  }, [reviews, searchQuery, sortBy, selectedRating]);
+
+  const scores = useMemo(() => reviews.reduce((acc, review) => ({
+    cleanliness: acc.cleanliness + (review.cleanlinessRating || 5),
+    service: acc.service + (review.serviceRating || 5),
+    location: acc.location + (review.locationRating || 5),
+    value: acc.value + (review.valueRating || 5),
+  }), { cleanliness: 0, service: 0, location: 0, value: 0 }), [reviews]);
+
+  const getAverage = (sum: number) => reviews.length > 0 ? sum / reviews.length : 5.0;
+
   const categories = [
-    { label: "Mức độ sạch sẽ", score: 4.9, icon: Sparkles },
-    { label: "Độ chính xác", score: 4.9, icon: CheckCircle2 },
-    { label: "Nhận phòng", score: 5.0, icon: Key },
-    { label: "Giao tiếp", score: 5.0, icon: MessageSquare },
-    { label: "Vị trí", score: 4.8, icon: Map },
-    { label: "Giá trị", score: 5.0, icon: Tag },
+    { label: "Mức độ sạch sẽ", score: getAverage(scores.cleanliness), icon: Sparkles },
+    { label: "Dịch vụ", score: getAverage(scores.service), icon: MessageSquare },
+    { label: "Vị trí", score: getAverage(scores.location), icon: Map },
+    { label: "Giá trị", score: getAverage(scores.value), icon: Tag },
   ];
 
-  const ratingDistribution = [
-    { stars: 5, count: hotel.reviewCount, percentage: 100 },
-    { stars: 4, count: 0, percentage: 0 },
-    { stars: 3, count: 0, percentage: 0 },
-    { stars: 2, count: 0, percentage: 0 },
-    { stars: 1, count: 0, percentage: 0 },
+  const sortOptions = [
+    { value: 'relevant', label: 'Phù hợp nhất' },
+    { value: 'recent', label: 'Gần đây nhất' },
+    { value: 'highest', label: 'Đánh giá cao nhất' },
+    { value: 'lowest', label: 'Đánh giá thấp nhất' },
   ];
-
-  const filteredReviews = hotel.recentReviews?.filter(review =>
-    (review.comment?.toLowerCase() || "").includes(searchQuery.toLowerCase()) ||
-    review.userName.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
 
   if (!mounted) return null;
 
@@ -61,10 +95,10 @@ export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
           {/* Modal Container - Centered with max-width */}
           <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 md:p-6 lg:p-8">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 100, damping: 18 }}
               className="w-full max-w-[1050px] h-[90vh] bg-white rounded-[36px] shadow-2xl flex flex-col overflow-hidden"
             >
               {/* Fixed Header with Close Button */}
@@ -101,19 +135,34 @@ export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
                     </div>
 
                     {/* Rating Distribution */}
-                    <div className="space-y-2.5">
-                      <h4 className="font-semibold text-gray-900 text-sm mb-3">Xếp hạng tổng thể</h4>
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold text-gray-900 text-sm">Xếp hạng tổng thể</h4>
+                        {selectedRating !== null && (
+                          <button
+                            onClick={() => setSelectedRating(null)}
+                            className="text-xs text-[var(--primary)] font-bold hover:underline"
+                          >
+                            Xóa lọc
+                          </button>
+                        )}
+                      </div>
                       {ratingDistribution.map((item) => (
-                        <div key={item.stars} className="flex items-center gap-2.5">
-                          <span className="text-xs text-gray-600 w-2">{item.stars}</span>
+                        <div
+                          key={item.stars}
+                          className={`flex items-center gap-2.5 cursor-pointer p-1 rounded-lg transition-colors ${selectedRating === item.stars ? 'bg-gray-100 ring-1 ring-gray-200' : 'hover:bg-gray-50'}`}
+                          onClick={() => setSelectedRating(selectedRating === item.stars ? null : item.stars)}
+                        >
+                          <span className={`text-xs w-2 ${selectedRating === item.stars ? 'text-[#1A1A1A] font-bold' : 'text-gray-600'}`}>{item.stars}</span>
                           <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${item.percentage}%` }}
                               transition={{ duration: 0.8, delay: 0.2 }}
-                              className="h-full bg-gray-900 rounded-full"
+                              className={`h-full rounded-full ${selectedRating === item.stars ? 'bg-[var(--primary)]' : 'bg-gray-900'}`}
                             />
                           </div>
+                          {selectedRating === item.stars && <CheckCircle2 className="w-3 h-3 text-[var(--primary)]" />}
                         </div>
                       ))}
                     </div>
@@ -146,16 +195,37 @@ export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
                       </h2>
 
                       <div className="relative">
-                        <select
-                          value={sortBy}
-                          onChange={(e) => setSortBy(e.target.value)}
-                          className="appearance-none pl-3 pr-8 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:border-gray-400 focus:outline-none cursor-pointer"
+                        <button
+                          onClick={() => setIsSortOpen(!isSortOpen)}
+                          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:border-gray-300 transition-colors text-gray-700 min-w-[160px] justify-between"
                         >
-                          <option value="relevant">Phù hợp nhất</option>
-                          <option value="recent">Gần đây nhất</option>
-                          <option value="highest">Đánh giá cao nhất</option>
-                          <option value="lowest">Đánh giá thấp nhất</option>
-                        </select>
+                          <span>{sortOptions.find(o => o.value === sortBy)?.label}</span>
+                          <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        <AnimatePresence>
+                          {isSortOpen && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                              transition={{ duration: 0.1 }}
+                              className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 py-2 z-30 overflow-hidden"
+                            >
+                              {sortOptions.map(option => (
+                                <button
+                                  key={option.value}
+                                  onClick={() => { setSortBy(option.value); setIsSortOpen(false); }}
+                                  className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${sortBy === option.value ? 'text-[var(--primary)] font-bold bg-[var(--primary)]/5' : 'text-gray-700'
+                                    }`}
+                                >
+                                  {option.label}
+                                  {sortBy === option.value && <CheckCircle2 className="w-4 h-4" />}
+                                </button>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     </div>
 
@@ -191,14 +261,14 @@ export const ReviewsModal = ({ hotel, isOpen, onClose }: ReviewsModalProps) => {
                             <div className="flex items-start gap-3">
                               <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                                 <ImageWithFallback
-                                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.userName}`}
-                                  alt={review.userName}
+                                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.guestName}`}
+                                  alt={review.guestName}
                                   fill
                                   className="object-cover"
                                 />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-bold text-gray-900 text-sm">{review.userName}</div>
+                                <div className="font-bold text-gray-900 text-sm">{review.guestName}</div>
                               </div>
                             </div>
 

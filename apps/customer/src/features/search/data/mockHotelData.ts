@@ -149,7 +149,20 @@ export const mockHotels: HotelDetailDto[] = [
       enableStripePayment: true,
       enablePayAtHotel: true
     },
-    recentReviews: []
+    recentReviews: [
+      {
+        id: 'r1', createdAt: new Date().toISOString(), updatedAt: '',
+        hotelId: 'hotel-1', guestId: 'g1', guestName: 'Nguyễn Thanh Tùng', rating: 5,
+        comment: 'Khách sạn tuyệt vời, nhân viên nhiệt tình.',
+        isVerified: true, images: [], cleanlinessRating: 5, serviceRating: 5, locationRating: 5, valueRating: 5
+      },
+      {
+        id: 'r2', createdAt: new Date().toISOString(), updatedAt: '',
+        hotelId: 'hotel-1', guestId: 'g2', guestName: 'Sarah Jenkins', rating: 4,
+        comment: 'Nice place but a bit noisy.',
+        isVerified: true, images: [], cleanlinessRating: 4, serviceRating: 4, locationRating: 5, valueRating: 4
+      }
+    ]
   },
   {
     id: 'hotel-2',
@@ -204,7 +217,14 @@ export const mockHotels: HotelDetailDto[] = [
       enableStripePayment: true,
       enablePayAtHotel: true
     },
-    recentReviews: []
+    recentReviews: [
+      {
+        id: 'r3', createdAt: new Date().toISOString(), updatedAt: '',
+        hotelId: 'hotel-2', guestId: 'g3', guestName: 'Trần Văn B', rating: 4,
+        comment: 'Sạch sẽ, giá tốt.',
+        isVerified: true, images: [], cleanlinessRating: 5, serviceRating: 4, locationRating: 4, valueRating: 5
+      }
+    ]
   },
   {
     id: 'hotel-3',
@@ -258,7 +278,14 @@ export const mockHotels: HotelDetailDto[] = [
       enableStripePayment: true,
       enablePayAtHotel: false
     },
-    recentReviews: []
+    recentReviews: [
+      {
+        id: 'r4', createdAt: new Date().toISOString(), updatedAt: '',
+        hotelId: 'hotel-3', guestId: 'g4', guestName: 'Alice Wonderland', rating: 5,
+        comment: 'Amazing view!',
+        isVerified: true, images: [], cleanlinessRating: 5, serviceRating: 5, locationRating: 5, valueRating: 5
+      }
+    ]
   }
 ];
 

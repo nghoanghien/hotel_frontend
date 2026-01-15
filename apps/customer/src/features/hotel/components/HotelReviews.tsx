@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star, Sparkles, CheckCircle2, Key, MessageSquare, Map, Tag } from "@repo/ui/icons";
+import { Star, Sparkles, MessageSquare, Map, Tag } from "@repo/ui/icons";
 import { ImageWithFallback } from "@repo/ui";
 import type { HotelDetailDto as Hotel } from "@repo/types";
 import { ReviewsModal } from "./ReviewsModal";
@@ -11,13 +11,25 @@ interface HotelReviewsProps {
 export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Calculate average scores from recent reviews or default to mock values if empty
+  const reviews = hotel.recentReviews || [];
+  const reviewCount = reviews.length > 0 ? reviews.length : 1;
+
+  const scores = reviews.reduce((acc, review) => ({
+    cleanliness: acc.cleanliness + (review.cleanlinessRating || 5),
+    service: acc.service + (review.serviceRating || 5),
+    location: acc.location + (review.locationRating || 5),
+    value: acc.value + (review.valueRating || 5),
+  }), { cleanliness: 0, service: 0, location: 0, value: 0 });
+
+  // Fallback to 5.0 if no reviews exist (mock behavior)
+  const getAverage = (sum: number) => reviews.length > 0 ? sum / reviewCount : 5.0;
+
   const categories = [
-    { label: "Mức độ sạch sẽ", score: 4.9, icon: Sparkles },
-    { label: "Độ chính xác", score: 4.9, icon: CheckCircle2 },
-    { label: "Nhận phòng", score: 5.0, icon: Key },
-    { label: "Giao tiếp", score: 5.0, icon: MessageSquare },
-    { label: "Vị trí", score: 4.8, icon: Map },
-    { label: "Giá trị", score: 5.0, icon: Tag },
+    { label: "Mức độ sạch sẽ", score: getAverage(scores.cleanliness), icon: Sparkles },
+    { label: "Dịch vụ", score: getAverage(scores.service), icon: MessageSquare },
+    { label: "Vị trí", score: getAverage(scores.location), icon: Map },
+    { label: "Giá trị", score: getAverage(scores.value), icon: Tag },
   ];
 
   const ratingDistribution = [
@@ -53,7 +65,7 @@ export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
 
       {/* Categories Grid with Rating Distribution */}
       <div className="border-t border-b border-gray-200 py-8">
-        <div className="grid grid-cols-7 gap-x-8">
+        <div className="grid grid-cols-5 gap-x-8">
           {/* Left: Rating Distribution */}
           <div className="col-span-1 space-y-2 pr-4 border-r border-gray-200">
             <div className="font-semibold text-gray-900 text-sm mb-4">Xếp hạng tổng thể</div>
@@ -94,14 +106,14 @@ export const HotelReviews = ({ hotel }: HotelReviewsProps) => {
             <div className="flex items-start gap-4">
               <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                 <ImageWithFallback
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.userName}`}
-                  alt={review.userName}
+                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${review.guestName}`}
+                  alt={review.guestName}
                   fill
                   className="object-cover"
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-bold text-gray-900 text-base">{review.userName}</div>
+                <div className="font-bold text-gray-900 text-base">{review.guestName}</div>
               </div>
             </div>
 
