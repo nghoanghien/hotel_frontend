@@ -1,22 +1,20 @@
 import { motion } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
 import { Star, MapPin, ArrowRight, Heart } from '@repo/ui/icons';
-import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, ImageWithFallback, getAmenityIcon, useNotification } from '@repo/ui';
-import { useRouter } from 'next/navigation';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, ImageWithFallback, getAmenityIcon, useNotification } from '@repo/ui';
 import { useCallback, useState } from 'react';
 import { formatVnd } from '@repo/lib';
 
 interface Props {
   hotel: Hotel;
+  onClick: () => void;
 }
 
-export default function MagazineLayout1({ hotel }: Props) {
+export default function MagazineLayout1({ hotel, onClick }: Props) {
   const featured = hotel.images[0]?.imageUrl || '';
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
-  const { show } = useLoading();
   const { showNotification } = useNotification();
-  const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(false);
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
@@ -32,7 +30,10 @@ export default function MagazineLayout1({ hotel }: Props) {
         ref={setRefs}
         className="max-w-[1240px] mx-auto group cursor-pointer"
         onMouseLeave={clearHover}
-        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Loading...'); router.push(`/hotels/${hotel.id}`); }, 300); }}
+        onClick={(e) => {
+          triggerTap(e);
+          setTimeout(onClick, 300);
+        }}
       >
         {/* Title Section */}
         <div className="mb-8 text-center md:text-left">

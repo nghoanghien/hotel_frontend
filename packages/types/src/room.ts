@@ -103,6 +103,9 @@ export interface RoomAvailabilityDto {
   imageUrl?: string;
   description?: string;
   amenities: AmenityDto[];
+  sizeInSquareMeters?: number;
+  viewDescription?: string;
+  images?: string[];
 }
 
 export interface HotelAvailabilityDto {

@@ -9,6 +9,8 @@ import { useLoading, useNotification, useHoverHighlight, HoverHighlightOverlay }
 import type { HotelDetailDto as Hotel, RoomAvailabilityDto } from "@repo/types";
 import { getHotelBySlug, getRoomsByHotelId } from "@/features/search/data/mockHotelData";
 import RoomDetailDrawer from "@/features/cart/components/RoomDetailDrawer";
+import FloatingHotelCart from "@/features/cart/components/FloatingHotelCart";
+import { useBookingStore } from "@/features/booking/store/bookingStore";
 import { HotelReviews } from "@/features/hotel/components/HotelReviews";
 import { OverviewTab } from '@/features/hotel/components/tabs/OverviewTab';
 import { RoomsTab } from '@/features/hotel/components/tabs/RoomsTab';
@@ -33,6 +35,7 @@ export default function HotelDetailPage() {
   const router = useRouter();
   const { hide } = useLoading();
   const { showNotification } = useNotification();
+  const initializeSession = useBookingStore(s => s.initializeSession);
 
   useEffect(() => {
     const t = setTimeout(() => hide(), 1500);
@@ -78,6 +81,13 @@ export default function HotelDetailPage() {
     children: childrenParam ? parseInt(childrenParam) : 0,
     rooms: roomsParam ? parseInt(roomsParam) : 1,
   }), [checkInParam, checkOutParam, adultsParam, childrenParam, roomsParam]);
+
+  // Initialize Booking Store Session on Load
+  useEffect(() => {
+    if (hotel) {
+      initializeSession(hotel.id, hotel.name, bookingInfo.checkIn, bookingInfo.checkOut);
+    }
+  }, [hotel, bookingInfo, initializeSession]);
 
   const { containerRef: tabContainerRef, rect: tabRect, style: tabStyle, moveHighlight: tabMove, clearHover: tabClear } = useHoverHighlight<HTMLDivElement>();
 
@@ -133,7 +143,7 @@ export default function HotelDetailPage() {
         <div className="max-w-[1400px] mx-auto pr-16 px-8 pt-20 h-full">
           <div className="grid grid-cols-[30%_70%] gap-8 h-full">
             {/* Left Column - Hotel Info */}
-            <div className="relative overflow-y-auto no-scrollbar pr-2 space-y-6 mb-12">
+            <div className="relative overflow-y-auto no-scrollbar pr-2 space-y-6 mb-6">
               <div>
                 <h1
                   className="text-[62px] font-bold leading-tight text-[#1A1A1A] mb-3"
@@ -189,7 +199,7 @@ export default function HotelDetailPage() {
             </div>
 
             {/* Right Column - Tabs & Content */}
-            <div className="relative overflow-y-auto no-scrollbar pl-2 mb-12">
+            <div className="relative overflow-y-auto no-scrollbar pl-2 mb-6">
               {/* Gallery Slider */}
               {galleryImages.length > 0 && (
                 <div className="relative mb-6 group select-none">
@@ -327,6 +337,8 @@ export default function HotelDetailPage() {
         guests={{ adults: bookingInfo.adults, children: bookingInfo.children }}
         rooms={bookingInfo.rooms}
       />
+
+      <FloatingHotelCart />
     </div>
   );
 }

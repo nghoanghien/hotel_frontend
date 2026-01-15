@@ -2,15 +2,15 @@ import { motion } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
 import { formatVnd } from '@repo/lib';
 import { ChevronRight, Heart } from '@repo/ui/icons';
-import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, getAmenityIcon, useNotification, ImageWithFallback } from '@repo/ui';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, getAmenityIcon, useNotification, ImageWithFallback } from '@repo/ui';
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 
 interface Props {
   hotel: Hotel;
+  onClick: () => void;
 }
 
-export default function MagazineLayout4({ hotel }: Props) {
+export default function MagazineLayout4({ hotel, onClick }: Props) {
   // Combine Images and Amenities for the grid
   const mainImage = hotel.images[0];
   const gallery = [...hotel.images.slice(1)];
@@ -20,9 +20,7 @@ export default function MagazineLayout4({ hotel }: Props) {
 
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
-  const { show } = useLoading();
   const { showNotification } = useNotification();
-  const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(false);
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
@@ -37,7 +35,10 @@ export default function MagazineLayout4({ hotel }: Props) {
       <div
         ref={setRefs}
         onMouseLeave={clearHover}
-        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Loading...'); router.push(`/hotels/${hotel.id}`); }, 300); }}
+        onClick={(e) => {
+          triggerTap(e);
+          setTimeout(onClick, 300);
+        }}
         className="relative flex flex-col md:flex-row min-h-auto md:min-h-[700px] cursor-pointer"
       >
         <HoverHighlightOverlay rect={rect} style={style} preset="tail" />

@@ -1,16 +1,16 @@
 import { motion } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
 import { Star, MapPin, Heart } from '@repo/ui/icons';
-import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, ImageWithFallback, getAmenityIcon, useNotification } from '@repo/ui';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, ImageWithFallback, getAmenityIcon, useNotification } from '@repo/ui';
 import { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { formatVnd } from '@repo/lib';
 
 interface Props {
   hotel: Hotel;
+  onClick: () => void;
 }
 
-export default function MagazineLayout3({ hotel }: Props) {
+export default function MagazineLayout3({ hotel, onClick }: Props) {
   const hero = hotel.images[0];
   // Fill secondary images to always have 3
   const secondarySrc = [...hotel.images.slice(1)];
@@ -26,9 +26,7 @@ export default function MagazineLayout3({ hotel }: Props) {
 
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
-  const { show } = useLoading();
   const { showNotification } = useNotification();
-  const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(false);
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
@@ -45,7 +43,10 @@ export default function MagazineLayout3({ hotel }: Props) {
       <div
         ref={setRefs}
         onMouseLeave={clearHover}
-        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Loading...'); router.push(`/hotels/${hotel.id}`); }, 300); }}
+        onClick={(e) => {
+          triggerTap(e);
+          setTimeout(onClick, 300);
+        }}
         className="relative max-w-[1240px] mx-auto cursor-pointer"
       >
         <HoverHighlightOverlay rect={rect} style={style} preset="tail" />

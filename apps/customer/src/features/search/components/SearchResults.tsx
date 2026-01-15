@@ -7,6 +7,9 @@ import MagazineLayout3 from './layouts/MagazineLayout3';
 import MagazineLayout4 from './layouts/MagazineLayout4';
 import { MagazineLayout1Shimmer, Skeleton } from '@repo/ui';
 
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useLoading } from '@repo/ui';
+
 interface Props {
   results: HotelSearchResult[];
   searchQuery: string;
@@ -16,6 +19,9 @@ interface Props {
 export default function SearchResults({ results, searchQuery, isLoading = false }: Props) {
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { show } = useLoading();
 
   useEffect(() => {
     let ticking = false;
@@ -51,9 +57,18 @@ export default function SearchResults({ results, searchQuery, isLoading = false 
     }));
   }, [isHeaderVisible]);
 
+  const handleNavigate = (hotelId: string) => {
+    show('Loading hotel details...');
+    const currentParams = new URLSearchParams(searchParams.toString());
+    router.push(`/hotels/${hotelId}?${currentParams.toString()}`);
+  };
+
   const renderLayout = (item: HotelSearchResult) => {
     const { hotel, layoutType } = item;
-    const props = { hotel };
+    const props = {
+      hotel,
+      onClick: () => handleNavigate(hotel.id)
+    };
 
     switch (layoutType) {
       case 1:

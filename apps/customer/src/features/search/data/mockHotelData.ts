@@ -341,7 +341,14 @@ const mockRooms: Record<string, RoomAvailabilityDto[]> = {
       isAvailable: true,
       imageUrl: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800',
       description: 'Phòng tiêu chuẩn với giường đôi rộng rãi, đầy đủ tiện nghi.',
-      amenities: [commonAmenities.wifi, commonAmenities.breakfast]
+      amenities: [commonAmenities.wifi, commonAmenities.breakfast],
+      sizeInSquareMeters: 28,
+      viewDescription: 'Hướng phố',
+      images: [
+        'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800',
+        'https://images.unsplash.com/photo-1631049307208-95032e8dd7fb?w=800',
+        'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800'
+      ]
     },
     {
       roomId: 'room-102',
@@ -355,7 +362,14 @@ const mockRooms: Record<string, RoomAvailabilityDto[]> = {
       isAvailable: true,
       imageUrl: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
       description: 'Phòng Deluxe sang trọng, view biển, bồn tắm nằm.',
-      amenities: [commonAmenities.wifi, commonAmenities.spa, commonAmenities.breakfast]
+      amenities: [commonAmenities.wifi, commonAmenities.spa, commonAmenities.breakfast],
+      sizeInSquareMeters: 45,
+      viewDescription: 'Hướng biển',
+      images: [
+        'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800',
+        'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800',
+        'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800'
+      ]
     },
     {
       roomId: 'room-201',
@@ -369,7 +383,14 @@ const mockRooms: Record<string, RoomAvailabilityDto[]> = {
       isAvailable: true,
       imageUrl: 'https://images.unsplash.com/photo-1631049307208-95032e8dd7fb?w=800',
       description: 'Suite gia đình rộng 60m2, phòng khách riêng biệt.',
-      amenities: [commonAmenities.wifi, commonAmenities.pool, commonAmenities.breakfast]
+      amenities: [commonAmenities.wifi, commonAmenities.pool, commonAmenities.breakfast],
+      sizeInSquareMeters: 65,
+      viewDescription: 'Trực diện biển',
+      images: [
+        'https://images.unsplash.com/photo-1631049307208-95032e8dd7fb?w=800',
+        'https://images.unsplash.com/photo-1591088398-56fd9436ea52?w=800',
+        'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800'
+      ]
     }
   ],
   'hotel-2': [
@@ -385,7 +406,13 @@ const mockRooms: Record<string, RoomAvailabilityDto[]> = {
       isAvailable: true,
       imageUrl: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800',
       description: 'Phòng ấm cúng, sạch sẽ, phù hợp cho cặp đôi.',
-      amenities: [commonAmenities.wifi, commonAmenities.breakfast]
+      amenities: [commonAmenities.wifi, commonAmenities.breakfast],
+      sizeInSquareMeters: 25,
+      viewDescription: 'Hướng vườn',
+      images: [
+        'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800',
+        'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800'
+      ]
     },
     {
       roomId: 'room-302',
@@ -399,7 +426,13 @@ const mockRooms: Record<string, RoomAvailabilityDto[]> = {
       isAvailable: true,
       imageUrl: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800',
       description: 'Phòng gia đình rộng rãi với 1 giường đôi và 1 giường đơn.',
-      amenities: [commonAmenities.wifi, commonAmenities.breakfast]
+      amenities: [commonAmenities.wifi, commonAmenities.breakfast],
+      sizeInSquareMeters: 40,
+      viewDescription: 'Hướng hồ bơi',
+      images: [
+        'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800',
+        'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800'
+      ]
     }
   ],
   'hotel-3': [
@@ -415,7 +448,13 @@ const mockRooms: Record<string, RoomAvailabilityDto[]> = {
       isAvailable: true,
       imageUrl: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800',
       description: 'Studio phong cách mộc mạc, view rừng thông.',
-      amenities: [commonAmenities.wifi, commonAmenities.breakfast]
+      amenities: [commonAmenities.wifi, commonAmenities.breakfast],
+      sizeInSquareMeters: 35,
+      viewDescription: 'Rừng thông',
+      images: [
+        'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800',
+        'https://images.unsplash.com/photo-1549294413-26f195200c16?w=800'
+      ]
     }
   ]
 };

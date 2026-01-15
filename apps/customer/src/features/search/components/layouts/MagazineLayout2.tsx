@@ -1,16 +1,16 @@
 import { motion } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
 import { MapPin, Star, Heart } from '@repo/ui/icons';
-import { ImageWithFallback, useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, getAmenityIcon, useNotification } from '@repo/ui';
-import { useRouter } from 'next/navigation';
+import { ImageWithFallback, useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, getAmenityIcon, useNotification } from '@repo/ui';
 import { useCallback, useState } from 'react';
 import { formatVnd } from '@repo/lib';
 
 interface Props {
   hotel: Hotel;
+  onClick: () => void;
 }
 
-export default function MagazineLayout2({ hotel }: Props) {
+export default function MagazineLayout2({ hotel, onClick }: Props) {
   // Ensure 4 images for the grid
   const gridImages = [...hotel.images];
   // Helper to ensure we have 4 items for the grid layout
@@ -26,9 +26,7 @@ export default function MagazineLayout2({ hotel }: Props) {
 
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
-  const { show } = useLoading();
   const { showNotification } = useNotification();
-  const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(false);
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
@@ -107,7 +105,10 @@ export default function MagazineLayout2({ hotel }: Props) {
       <div
         ref={setRefs}
         onMouseLeave={clearHover}
-        onClick={(e) => { triggerTap(e); setTimeout(() => { show('Loading...'); router.push(`/hotels/${hotel.id}`); }, 300); }}
+        onClick={(e) => {
+          triggerTap(e);
+          setTimeout(onClick, 300);
+        }}
         className="relative grid grid-cols-2 gap-x-4 gap-y-8 md:gap-x-12 md:gap-y-12 cursor-pointer max-w-[1240px] mx-auto"
       >
         <HoverHighlightOverlay rect={rect} style={style} preset="tail" />
@@ -135,8 +136,6 @@ export default function MagazineLayout2({ hotel }: Props) {
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
-
-
             </div>
           </motion.div>
         ))}
