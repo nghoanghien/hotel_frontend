@@ -11,12 +11,12 @@ import {
 } from "lucide-react";
 import { mockDashboardData, mockRevenueChartData, mockBookingChartData } from "@/data/mockDashboard";
 import { DashboardHeader } from "@/features/dashboard/components/DashboardHeader";
-import { StatsCard } from "@/features/dashboard/components/StatsCard";
-import { RevenueChart } from "@/features/dashboard/components/RevenueChart";
+import { MetricCard } from "@/features/dashboard/components/MetricCard";
+import { OccupancyGoalCard } from "@/features/dashboard/components/OccupancyGoalCard";
+import { OverviewChart } from "@/features/dashboard/components/OverviewChart";
+import { TopRoomsScroll } from "@/features/dashboard/components/TopRoomsScroll";
+import { ModernActivityList } from "@/features/dashboard/components/ModernActivityList";
 import { BookingTrendChart } from "@/features/dashboard/components/BookingTrendChart";
-import { OccupancyChart } from "@/features/dashboard/components/OccupancyChart";
-import { RecentActivityList } from "@/features/dashboard/components/RecentActivityList";
-import { TopRoomsList } from "@/features/dashboard/components/TopRoomsList";
 
 export default function DashboardPage() {
   const data = mockDashboardData;
@@ -29,101 +29,82 @@ export default function DashboardPage() {
         <DashboardHeader
           title="Dashboard Overview"
           subtitle="Welcome back, here's what's happening today."
+          stats={{
+            arrivals: data.bookings.todayCheckIns,
+            departures: data.bookings.todayCheckOuts,
+            inHouse: data.occupancy.occupiedRooms,
+            available: data.occupancy.availableRooms
+          }}
         />
 
-        {/* Key Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard
-            title="Total Revenue"
-            value={new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.revenue.currency }).format(data.revenue.todayRevenue)}
-            subValue="Hôm nay"
-            icon={BadgeDollarSign}
-            trend={{ value: data.revenue.revenueGrowth, isPositive: data.revenue.revenueGrowth > 0 }}
-          />
+        {/* Glassmorphism Dashboard Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
 
-          <StatsCard
-            title="Available Rooms"
-            value={`${data.occupancy.availableRooms}/${data.occupancy.totalRooms}`}
-            subValue="Phòng trống"
-            icon={BedDouble}
-            className="border-l-4 border-l-primary"
-          />
-
-          <StatsCard
-            title="Total Bookings"
-            value={data.bookings.totalBookings}
-            subValue={`${data.bookings.todayCheckIns} đến hôm nay`}
-            icon={CalendarCheck}
-            trend={{ value: data.bookings.bookingGrowth, isPositive: data.bookings.bookingGrowth > 0 }}
-          />
-
-          <StatsCard
-            title="Review Score"
-            value={data.reviews.averageRating}
-            subValue={`/ 5.0 (${data.reviews.totalReviews} reviews)`}
-            icon={Star}
-            className="bg-gradient-to-br from-white to-yellow-50/50"
-          />
-        </div>
-
-        {/* Real-time Status */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-blue-500 rounded-[24px] p-6 text-white shadow-lg shadow-blue-200 relative overflow-hidden group">
-            <div className="relative z-10">
-              <p className="text-blue-100 font-medium mb-1">Arrivals</p>
-              <h3 className="text-4xl font-bold font-feature mb-4">{data.bookings.todayCheckIns}</h3>
-              <div className="flex items-center text-sm bg-white/20 w-fit px-3 py-1 rounded-full backdrop-blur-sm hover:bg-white/30 transition-colors cursor-pointer">
-                <span>Xem chi tiết</span>
-                <ArrowRightLeft size={14} className="ml-2" />
+          {/* Left Column (1/3) - Metrics Stack */}
+          <div className="space-y-6 xl:col-span-1">
+            {/* Stacked Cards Effect */}
+            <div className="relative h-[250px] md:h-[300px] xl:h-[220px]">
+              {/* 3rd Card */}
+              <div className="absolute top-8 left-0 right-0 transform scale-90 opacity-40 z-0">
+                <MetricCard
+                  label="Review Score"
+                  value={`${data.reviews.averageRating}/5`}
+                  subValue={`${data.reviews.totalReviews} reviews`}
+                  trend={data.reviews.ratingGrowth}
+                  color="purple"
+                  icon={Star}
+                />
+              </div>
+              {/* 2nd Card */}
+              <div className="absolute top-4 left-0 right-0 transform scale-95 opacity-70 z-10 transition-transform hover:translate-y-[-10px]">
+                <MetricCard
+                  label="Total Bookings"
+                  value={data.bookings.totalBookings.toString()}
+                  subValue={`${data.bookings.todayCheckIns} check-ins`}
+                  trend={data.bookings.bookingGrowth}
+                  color="orange"
+                  icon={CalendarCheck}
+                />
+              </div>
+              {/* 1st Card */}
+              <div className="relative z-20 transition-transform hover:translate-y-[-5px]">
+                <MetricCard
+                  label="Total Revenue"
+                  value={new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.revenue.currency, notation: "compact" }).format(data.revenue.todayRevenue)}
+                  subValue="Today's Revenue"
+                  trend={data.revenue.revenueGrowth}
+                  color="blue"
+                  icon={BadgeDollarSign}
+                />
               </div>
             </div>
-            <ArrowRightLeft className="absolute -bottom-4 -right-4 w-32 h-32 text-white/10 group-hover:scale-110 transition-transform duration-500" />
-          </div>
 
-          <div className="bg-orange-500 rounded-[24px] p-6 text-white shadow-lg shadow-orange-200 relative overflow-hidden group">
-            <div className="relative z-10">
-              <p className="text-orange-100 font-medium mb-1">Departures</p>
-              <h3 className="text-4xl font-bold font-feature mb-4">{data.bookings.todayCheckOuts}</h3>
-              <div className="flex items-center text-sm bg-white/20 w-fit px-3 py-1 rounded-full backdrop-blur-sm hover:bg-white/30 transition-colors cursor-pointer">
-                <span>Check-out ngay</span>
-                <ArrowRightLeft size={14} className="ml-2" />
-              </div>
-            </div>
-            <LogOut className="absolute -bottom-4 -right-4 w-32 h-32 text-white/10 group-hover:scale-110 transition-transform duration-500" />
-          </div>
+            {/* Occupancy Goal */}
+            <OccupancyGoalCard stats={data.occupancy} />
 
-          <div className="bg-purple-500 rounded-[24px] p-6 text-white shadow-lg shadow-purple-200 relative overflow-hidden group">
-            <div className="relative z-10">
-              <p className="text-purple-100 font-medium mb-1">In House</p>
-              <h3 className="text-4xl font-bold font-feature mb-4">{data.occupancy.occupiedRooms}</h3>
-              <div className="flex items-center text-sm bg-white/20 w-fit px-3 py-1 rounded-full backdrop-blur-sm hover:bg-white/30 transition-colors cursor-pointer">
-                <span>Khách đang ở</span>
-                <Users size={14} className="ml-2" />
-              </div>
-            </div>
-            <Users className="absolute -bottom-4 -right-4 w-32 h-32 text-white/10 group-hover:scale-110 transition-transform duration-500" />
-          </div>
-        </div>
-
-        {/* Charts & Content Grid */}
-        <div className="space-y-8">
-          {/* Charts Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <RevenueChart data={revenueChartData} />
+            {/* Booking Trend (Moved here as requested) */}
+            {/* Booking Trend */}
             <BookingTrendChart data={bookingTrendData} />
           </div>
 
-          {/* Bottom Row: Top Rooms (Left 2/3) + Booking Status & Activity (Right 1/3) */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-            <div className="xl:col-span-2">
-              <TopRoomsList rooms={data.topRooms} />
+          {/* Right Column (2/3) - Charts & Content */}
+          <div className="xl:col-span-2 space-y-8">
+            {/* Row 1: Overview Chart (Revenue Bar Chart) */}
+            <div className="h-[350px]">
+              <OverviewChart data={revenueChartData} />
             </div>
 
-            <div className="xl:col-span-1 space-y-8">
-              <OccupancyChart stats={data.bookings} />
-              <RecentActivityList activities={data.recentActivities} />
+            {/* Row 2: Top Rooms (Quick Transfer) */}
+            <div>
+              <TopRoomsScroll rooms={data.topRooms} />
+            </div>
+
+            {/* Row 3: Activity List (Full width of right column now since trend moved) */}
+            <div>
+              <ModernActivityList activities={data.recentActivities} />
             </div>
           </div>
+
         </div>
       </div>
     </div>

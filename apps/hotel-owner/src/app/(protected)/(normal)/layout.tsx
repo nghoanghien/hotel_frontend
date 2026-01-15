@@ -257,13 +257,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
 
       <div className="flex-1 ml-28 flex flex-col">
         {/* Header */}
-        <div className="border-b border-gray-200 px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-anton font-bold text-[#1A1A1A]">
-              {activeItem.title}
-            </h1>
-          </div>
-        </div>
+
 
         {/* Page Content */}
         <div className="flex-1">{children}</div>

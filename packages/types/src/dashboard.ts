@@ -37,6 +37,7 @@ export interface ReviewStats {
   threeStarCount: number;
   twoStarCount: number;
   oneStarCount: number;
+  ratingGrowth: number;
 }
 
 export interface TopRoom {

@@ -37,6 +37,7 @@ export const mockDashboardData: DashboardSummary = {
     threeStarCount: 15,
     twoStarCount: 5,
     oneStarCount: 0,
+    ratingGrowth: 4.5, // Added ratingGrowth
   },
   topRooms: [
     {
