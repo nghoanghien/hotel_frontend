@@ -108,7 +108,7 @@ export default function RoomDetailDrawer({
               <div className="relative h-full bg-[#F7F7F7]">
 
                 {/* Scrollable Content */}
-                <div className="absolute inset-0 overflow-y-auto room-drawer-scroll p-8 pb-48">
+                <div className="absolute inset-0 overflow-y-auto no-scrollbar room-drawer-scroll p-8 pb-48">
                   <button
                     onClick={onClose}
                     className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full backdrop-blur-sm shadow-lg border border-gray-200 hover:bg-white transition-all flex items-center justify-center"
