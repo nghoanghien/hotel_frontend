@@ -110,6 +110,8 @@ export const mockHotels: HotelDetailDto[] = [
     address: '123 Đường Trần Phú, Phường Lộc Thọ, Tp. Nha Trang, Khánh Hòa',
     state: 'Khánh Hòa',
     postalCode: '650000',
+    latitude: 12.2388,
+    longitude: 109.1967,
     images: createImages([
       'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200',
       'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200',
@@ -167,6 +169,8 @@ export const mockHotels: HotelDetailDto[] = [
     minPrice: 900000,
     address: '45 Võ Nguyên Giáp, P. Mỹ An, Q. Ngũ Hành Sơn, Đà Nẵng',
     state: 'Đà Nẵng',
+    latitude: 16.0544,
+    longitude: 108.2022,
     images: createImages([
       'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200',
       'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200',
@@ -220,6 +224,8 @@ export const mockHotels: HotelDetailDto[] = [
     minPrice: 1200000,
     address: '78 Đường Trần Hưng Đạo, P. 4, Tp. Đà Lạt, Lâm Đồng',
     state: 'Lâm Đồng',
+    latitude: 11.9404,
+    longitude: 108.4583,
     images: createImages([
       'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200',
       'https://images.unsplash.com/photo-1549294413-26f195200c16?w=1200'

@@ -1,8 +1,8 @@
 import { motion } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
-import { Star, MapPin } from '@repo/ui/icons';
-import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, ImageWithFallback, getAmenityIcon } from '@repo/ui';
-import { useCallback } from 'react';
+import { Star, MapPin, Heart } from '@repo/ui/icons';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, ImageWithFallback, getAmenityIcon, useNotification } from '@repo/ui';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatVnd } from '@repo/lib';
 
@@ -12,11 +12,24 @@ interface Props {
 
 export default function MagazineLayout3({ hotel }: Props) {
   const hero = hotel.images[0];
-  const secondary = hotel.images.slice(1, 4);
+  // Fill secondary images to always have 3
+  const secondarySrc = [...hotel.images.slice(1)];
+  while (secondarySrc.length < 3) {
+    secondarySrc.push({
+      id: `fallback-sec-${secondarySrc.length}`,
+      imageUrl: '',
+      caption: '',
+      displayOrder: 999
+    } as any);
+  }
+  const displaySecondary = secondarySrc.slice(0, 3);
+
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
   const { show } = useLoading();
+  const { showNotification } = useNotification();
   const router = useRouter();
+  const [isFavorite, setIsFavorite] = useState(false);
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
   if (!hero) return null;
@@ -108,6 +121,27 @@ export default function MagazineLayout3({ hotel }: Props) {
                 fill
                 className="object-cover"
               />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newState = !isFavorite;
+                  setIsFavorite(newState);
+                  showNotification({
+                    message: newState ? 'Đã lưu khách sạn vào danh sách yêu thích!' : 'Đã xóa khách sạn khỏi danh sách yêu thích.',
+                    type: 'success',
+                    autoHideDuration: 3000,
+                  });
+                }}
+                className="absolute top-6 right-6 z-30 px-4 py-2 rounded-full bg-white/80 hover:bg-white backdrop-blur-md flex items-center gap-2 transition-all shadow-sm group/fav hover:scale-105 active:scale-95 border border-white/20"
+              >
+                <Heart
+                  className={`w-5 h-5 transition-all ${isFavorite ? 'fill-rose-500 text-rose-500' : 'text-gray-700 group-hover/fav:text-rose-500'}`}
+                  strokeWidth={2}
+                />
+                <span className={`text-xs font-semibold transition-colors ${isFavorite ? 'text-rose-500' : 'text-gray-700 group-hover/fav:text-gray-900'}`}>
+                  {isFavorite ? 'Saved' : 'Save'}
+                </span>
+              </button>
             </div>
             {/* Floating Badge */}
             <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl max-w-xs hidden md:block">
@@ -125,31 +159,29 @@ export default function MagazineLayout3({ hotel }: Props) {
         </div>
 
         {/* Bottom row - secondary images */}
-        {secondary.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 mt-16 pt-12 border-t border-gray-100">
-            {secondary.map((img, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                onMouseEnter={(e) => moveHighlight(e, { borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.08)', opacity: 1, scale: 1.06 })}
-                className="relative z-10 group"
-              >
-                <div className="relative aspect-square overflow-hidden mb-3 rounded-2xl bg-gray-100">
-                  <ImageWithFallback
-                    src={img.imageUrl}
-                    alt={hotel.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                </div>
-                <h4 className="font-bold text-sm md:text-base text-[#1A1A1A] mt-2">{img.caption || "Gallery View"}</h4>
-              </motion.div>
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 mt-16 pt-12 border-t border-gray-100">
+          {displaySecondary.map((img, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              viewport={{ once: true }}
+              onMouseEnter={(e) => moveHighlight(e, { borderRadius: 16, backgroundColor: 'rgba(0,0,0,0.08)', opacity: 1, scale: 1.06 })}
+              className="relative z-10 group"
+            >
+              <div className="relative aspect-square overflow-hidden mb-3 rounded-2xl bg-gray-100">
+                <ImageWithFallback
+                  src={img.imageUrl}
+                  alt={hotel.name}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+              </div>
+              <h4 className="font-bold text-sm md:text-base text-[#1A1A1A] mt-2">{img.caption || "Gallery View"}</h4>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </motion.article>
   );

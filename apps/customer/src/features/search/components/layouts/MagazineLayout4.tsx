@@ -1,10 +1,10 @@
 import { motion } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
-import { ImageWithFallback, useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, getAmenityIcon } from '@repo/ui';
-import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
 import { formatVnd } from '@repo/lib';
-import { ChevronRight } from '@repo/ui/icons';
+import { ChevronRight, Heart } from '@repo/ui/icons';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, getAmenityIcon, useNotification, ImageWithFallback } from '@repo/ui';
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   hotel: Hotel;
@@ -13,13 +13,17 @@ interface Props {
 export default function MagazineLayout4({ hotel }: Props) {
   // Combine Images and Amenities for the grid
   const mainImage = hotel.images[0];
-  const gallery = hotel.images.slice(1, 4);
+  const gallery = [...hotel.images.slice(1)];
+  while (gallery.length < 3) gallery.push({ imageUrl: '', caption: '', id: `fallback-${gallery.length}` } as any);
+  const displayGallery = gallery.slice(0, 3);
   const amenities = hotel.amenities?.filter(a => a).slice(0, 4) || []; // Take 4 amenities, filter nulls
 
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
   const { show } = useLoading();
+  const { showNotification } = useNotification();
   const router = useRouter();
+  const [isFavorite, setIsFavorite] = useState(false);
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
   return (
@@ -123,13 +127,36 @@ export default function MagazineLayout4({ hotel }: Props) {
                 </div>
                 <ImageWithFallback src={mainImage?.imageUrl || ''} alt={hotel.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300" />
+
+                {/* Favorite Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const newState = !isFavorite;
+                    setIsFavorite(newState);
+                    showNotification({
+                      message: newState ? 'Đã lưu khách sạn vào danh sách yêu thích!' : 'Đã xóa khách sạn khỏi danh sách yêu thích.',
+                      type: 'success',
+                      autoHideDuration: 3000,
+                    });
+                  }}
+                  className="absolute top-6 right-6 z-30 px-4 py-2 rounded-full bg-white/80 hover:bg-white backdrop-blur-md flex items-center gap-2 transition-all shadow-sm group/fav hover:scale-105 active:scale-95 border border-white/20"
+                >
+                  <Heart
+                    className={`w-5 h-5 transition-all ${isFavorite ? 'fill-rose-500 text-rose-500' : 'text-gray-700 group-hover/fav:text-rose-500'}`}
+                    strokeWidth={2}
+                  />
+                  <span className={`text-xs font-semibold transition-colors ${isFavorite ? 'text-rose-500' : 'text-gray-700 group-hover/fav:text-gray-900'}`}>
+                    {isFavorite ? 'Saved' : 'Save'}
+                  </span>
+                </button>
               </div>
             </div>
           </div>
 
           {/* Row 2 - Gallery Grid */}
           <div className="grid grid-cols-3 flex-1 min-h-[250px] border-b border-gray-100">
-            {gallery.map((img, idx) => (
+            {displayGallery.map((img, idx) => (
               <div
                 key={idx}
                 className={`relative border-r border-gray-100 last:border-r-0 group overflow-hidden`}
@@ -144,15 +171,9 @@ export default function MagazineLayout4({ hotel }: Props) {
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300" />
               </div>
             ))}
-            {/* If less than 3 gallery images, fill with something? Or just let grid handle it. */}
-            {gallery.length < 3 && (
-              <div className="bg-gray-50 flex items-center justify-center text-gray-400 text-sm p-4">
-                More photos available
-              </div>
-            )}
           </div>
         </div>
       </div>
-    </motion.section>
+    </motion.section >
   );
 }

@@ -1,9 +1,9 @@
 import { motion } from '@repo/ui/motion';
 import type { HotelDetailDto as Hotel } from '@repo/types';
-import { Star, MapPin, ArrowRight } from '@repo/ui/icons';
-import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, ImageWithFallback, getAmenityIcon } from '@repo/ui';
+import { Star, MapPin, ArrowRight, Heart } from '@repo/ui/icons';
+import { useHoverHighlight, HoverHighlightOverlay, useTapRipple, TapRippleOverlay, useLoading, ImageWithFallback, getAmenityIcon, useNotification } from '@repo/ui';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { formatVnd } from '@repo/lib';
 
 interface Props {
@@ -15,7 +15,9 @@ export default function MagazineLayout1({ hotel }: Props) {
   const { containerRef, rect, style, moveHighlight, clearHover } = useHoverHighlight<HTMLDivElement>();
   const { containerRef: tapRef, ripple, triggerTap } = useTapRipple<HTMLDivElement>();
   const { show } = useLoading();
+  const { showNotification } = useNotification();
   const router = useRouter();
+  const [isFavorite, setIsFavorite] = useState(false);
   const setRefs = useCallback((el: HTMLDivElement | null) => { containerRef.current = el; tapRef.current = el; }, [containerRef, tapRef]);
 
   return (
@@ -72,6 +74,29 @@ export default function MagazineLayout1({ hotel }: Props) {
           >
             <div className="aspect-[16/10] relative overflow-hidden rounded-[32px] shadow-sm bg-gray-100">
               <ImageWithFallback src={featured} alt={hotel.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+
+              {/* Favorite Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const newState = !isFavorite;
+                  setIsFavorite(newState);
+                  showNotification({
+                    message: newState ? 'Đã lưu khách sạn vào danh sách yêu thích!' : 'Đã xóa khách sạn khỏi danh sách yêu thích.',
+                    type: 'success',
+                    autoHideDuration: 3000,
+                  });
+                }}
+                className="absolute top-6 right-6 z-30 px-4 py-2 rounded-full bg-white/80 hover:bg-white backdrop-blur-md flex items-center gap-2 transition-all shadow-sm group/fav hover:scale-105 active:scale-95 border border-white/20"
+              >
+                <Heart
+                  className={`w-5 h-5 transition-all ${isFavorite ? 'fill-rose-500 text-rose-500' : 'text-gray-700 group-hover/fav:text-rose-500'}`}
+                  strokeWidth={2}
+                />
+                <span className={`text-xs font-semibold transition-colors ${isFavorite ? 'text-rose-500' : 'text-gray-700 group-hover/fav:text-gray-900'}`}>
+                  {isFavorite ? 'Saved' : 'Save'}
+                </span>
+              </button>
 
               {/* Floating Price Badge */}
               <div className="absolute bottom-6 right-6 bg-white/95 backdrop-blur-md px-6 py-4 rounded-2xl shadow-lg border border-white/20">
