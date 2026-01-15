@@ -1,48 +1,63 @@
 "use client";
 import { useMemo, useState } from "react";
 import { useBookingStore } from "@/features/booking/store/bookingStore";
-
-type PaymentMethod = "EATZYPAY" | "CREDIT_CARD"; // Or whatever methods are supported
+import type { PaymentMethod } from "@repo/types";
 
 export function useBookingCheckout() {
-  const currentBooking = useBookingStore((s) => s.currentBooking);
+  const { cart, currentBooking, checkInDate, checkOutDate, hotelName, hotelId } = useBookingStore();
 
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("EATZYPAY");
+  // Normalize items to checkout
+  const checkoutItems = useMemo(() => {
+    if (cart.length > 0) return cart;
+    if (currentBooking) {
+      // Convert legacy booking to cart item format for uniform handling
+      return [{
+        id: 'legacy',
+        room: currentBooking.roomType,
+        quantity: currentBooking.roomsCount,
+        guests: currentBooking.guests
+      }];
+    }
+    return [];
+  }, [cart, currentBooking]);
+
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("Cash");
   const [guestName, setGuestName] = useState<string>("");
   const [guestEmail, setGuestEmail] = useState<string>("");
   const [guestPhone, setGuestPhone] = useState<string>("");
+  const [guestNationality, setGuestNationality] = useState<string>("");
+  const [guestAddress, setGuestAddress] = useState<string>("");
   const [specialRequests, setSpecialRequests] = useState<string>("");
 
   // Calculate number of nights
   const nights = useMemo(() => {
-    if (!currentBooking?.checkInDate || !currentBooking?.checkOutDate) return 0;
-    const diff = currentBooking.checkOutDate.getTime() - currentBooking.checkInDate.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  }, [currentBooking?.checkInDate, currentBooking?.checkOutDate]);
+    if (!checkInDate || !checkOutDate) return 0;
+    const diff = checkOutDate.getTime() - checkInDate.getTime();
+    return Math.max(1, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  }, [checkInDate, checkOutDate]);
 
-  // Calculate subtotal (price per night * nights * rooms)
+  // Calculate subtotal
   const subtotal = useMemo(() => {
-    if (!currentBooking) return 0;
-    return currentBooking.roomType.basePrice * nights * currentBooking.roomsCount;
-  }, [currentBooking, nights]);
+    return checkoutItems.reduce((acc, item) => {
+      return acc + (item.room.basePrice * item.quantity * nights);
+    }, 0);
+  }, [checkoutItems, nights]);
 
   // Service fee (5% of subtotal)
-  const serviceFee = useMemo(() => {
-    return Math.floor(subtotal * 0.05);
-  }, [subtotal]);
+  const serviceFee = useMemo(() => Math.floor(subtotal * 0.05), [subtotal]);
 
   // Tax (10% of subtotal)
-  const tax = useMemo(() => {
-    return Math.floor(subtotal * 0.1);
-  }, [subtotal]);
+  const tax = useMemo(() => Math.floor(subtotal * 0.1), [subtotal]);
 
   // Total
-  const total = useMemo(() => {
-    return subtotal + serviceFee + tax;
-  }, [subtotal, serviceFee, tax]);
+  const total = useMemo(() => subtotal + serviceFee + tax, [subtotal, serviceFee, tax]);
 
   return {
-    currentBooking,
+    checkoutItems,
+    hotelName,
+    hotelId,
+    checkInDate,
+    checkOutDate,
     paymentMethod,
     setPaymentMethod,
     guestName,
@@ -51,6 +66,10 @@ export function useBookingCheckout() {
     setGuestEmail,
     guestPhone,
     setGuestPhone,
+    guestNationality,
+    setGuestNationality,
+    guestAddress,
+    setGuestAddress,
     specialRequests,
     setSpecialRequests,
     nights,

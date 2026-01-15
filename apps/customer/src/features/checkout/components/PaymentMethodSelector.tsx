@@ -3,17 +3,18 @@ import { motion } from "@repo/ui/motion";
 import type { PaymentMethod } from "@repo/types";
 import { Wallet, CreditCard, Banknote, Check } from "@repo/ui/icons";
 
-const METHODS: { key: PaymentMethod; label: string; icon: React.ReactNode }[] = [
-  { key: "EATZYPAY", label: "HotelzyPay", icon: <Wallet className="w-5 h-5" /> },
-  { key: "VNPAY", label: "VnPay", icon: <CreditCard className="w-5 h-5" /> },
-  { key: "CASH", label: "Tiền mặt", icon: <Banknote className="w-5 h-5" /> },
+const METHODS: { key: PaymentMethod; label: string; icon: React.ReactNode; subLabel: string }[] = [
+  { key: "EWallet", label: "Ví điện tử", icon: <Wallet className="w-5 h-5" />, subLabel: "Momo, ZaloPay, v.v." },
+  { key: "BankTransfer", label: "Chuyển khoản", icon: <CreditCard className="w-5 h-5" />, subLabel: "VNPAY QR, Internet Banking" },
+  { key: "CreditCard", label: "Thẻ quốc tế", icon: <CreditCard className="w-5 h-5" />, subLabel: "Visa, Master, JCB" },
+  { key: "Cash", label: "Tiền mặt", icon: <Banknote className="w-5 h-5" />, subLabel: "Thanh toán khi nhận phòng" },
 ];
 
 export default function PaymentMethodSelector({ value, onChange }: { value: PaymentMethod; onChange: (m: PaymentMethod) => void }) {
   return (
     <div className="p-4">
       <div className="text-[14px] font-semibold text-[#1A1A1A] mb-2">Hình thức thanh toán</div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {METHODS.map((m, index) => (
           <motion.div
             key={m.key}
@@ -34,7 +35,7 @@ export default function PaymentMethodSelector({ value, onChange }: { value: Paym
               </div>
               <div>
                 <div className="text-[13px] font-semibold text-[#1A1A1A]">{m.label}</div>
-                <div className="text-[11px] text-[#666]">{m.key === 'EATZYPAY' ? 'Thanh toán Hotelzy' : m.key === 'VNPAY' ? 'VnPay QR' : 'Thanh toán khi nhận phòng'}</div>
+                <div className="text-[11px] text-[#666]">{m.subLabel}</div>
               </div>
               {/* Background icon */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">

@@ -2,7 +2,18 @@ import { BaseDto } from './common';
 import { RoomType } from './room';
 import { ReviewDto } from './hotel';
 
+
+export type PaymentMethod =
+  | 'CreditCard'
+  | 'DebitCard'
+  | 'BankTransfer'
+  | 'EWallet'
+  | 'Cash'
+  | 'Check'
+  | 'OnlinePayment';
+
 export type BookingStatus = 'Pending' | 'Confirmed' | 'CheckedIn' | 'CheckedOut' | 'Cancelled' | 'NoShow' | 'Refunded';
+
 
 export interface BookingRoomDto {
   roomId: string;

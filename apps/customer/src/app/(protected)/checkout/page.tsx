@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "@repo/ui/icons";
-import { useLoading, useHoverHighlight, HoverHighlightOverlay } from "@repo/ui";
+import { useLoading, useHoverHighlight, HoverHighlightOverlay, ImageWithFallback } from "@repo/ui";
 import { useBookingCheckout } from "@/features/booking/hooks/useBookingCheckout";
 import GuestInfoForm from "@/features/booking/components/GuestInfoForm";
 import SpecialRequestsInput from "@/features/booking/components/SpecialRequestsInput";
@@ -26,7 +26,10 @@ export default function BookingCheckoutPage() {
   }, []);
 
   const {
-    currentBooking,
+    checkoutItems,
+    hotelName,
+    checkInDate,
+    checkOutDate,
     paymentMethod,
     setPaymentMethod,
     guestName,
@@ -35,6 +38,10 @@ export default function BookingCheckoutPage() {
     setGuestEmail,
     guestPhone,
     setGuestPhone,
+    guestNationality,
+    setGuestNationality,
+    guestAddress,
+    setGuestAddress,
     specialRequests,
     setSpecialRequests,
     nights,
@@ -94,19 +101,36 @@ export default function BookingCheckoutPage() {
   };
 
   const handleConfirmBooking = () => {
-    // TODO: Implement booking confirmation
+    // TODO: Implement booking confirmation API call
+    console.log("Booking Confirmed:", {
+      hotelName,
+      checkInDate,
+      checkOutDate,
+      items: checkoutItems,
+      guest: {
+        name: guestName,
+        email: guestEmail,
+        phone: guestPhone,
+        nationality: guestNationality,
+        address: guestAddress
+      },
+      paymentMethod
+    });
     alert("Booking confirmed! (Demo)");
     router.push("/home");
   };
 
-  const canConfirm = guestName.trim() !== "" && guestEmail.trim() !== "" && guestPhone.trim() !== "";
+  const canConfirm =
+    guestName.trim() !== "" &&
+    guestEmail.trim() !== "" &&
+    guestPhone.trim() !== "";
 
-  // Redirect if no booking
-  if (!currentBooking && mounted) {
+  // Redirect if no booking items
+  if ((!checkoutItems || checkoutItems.length === 0) && mounted) {
     return (
       <div className="h-screen flex items-center justify-center bg-[#F7F7F7]">
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-900 mb-2">No booking found</div>
+          <div className="text-2xl font-bold text-gray-900 mb-2">No items in cart</div>
           <div className="text-gray-600 mb-6">Please select a room to continue</div>
           <button
             onClick={() => router.push("/home")}
@@ -119,7 +143,7 @@ export default function BookingCheckoutPage() {
     );
   }
 
-  if (!currentBooking) return null;
+  if (checkoutItems.length === 0) return null;
 
   return (
     <div className="h-screen flex flex-col bg-[#F7F7F7]">
@@ -194,9 +218,13 @@ export default function BookingCheckoutPage() {
                     guestName={guestName}
                     guestEmail={guestEmail}
                     guestPhone={guestPhone}
+                    guestNationality={guestNationality}
+                    guestAddress={guestAddress}
                     onNameChange={setGuestName}
                     onEmailChange={setGuestEmail}
                     onPhoneChange={setGuestPhone}
+                    onNationalityChange={setGuestNationality}
+                    onAddressChange={setGuestAddress}
                   />
                 </section>
 
@@ -207,7 +235,103 @@ export default function BookingCheckoutPage() {
                   }}
                   data-id="summary"
                 >
-                  {mounted && <BookingSummaryCard booking={currentBooking} nights={nights} />}
+                  <div className="mb-6">
+                    <h2 className="text-[18px] font-bold text-[#1A1A1A] mb-4">Your Stay</h2>
+                    <div className="rounded-2xl border-2 border-gray-200 p-5 grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+                      <div>
+                        <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">Check-in</div>
+                        <div className="text-base font-bold text-gray-900">
+                          {checkInDate?.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">From 14:00</div>
+                      </div>
+
+                      <div className="flex flex-col items-center px-4">
+                        <div className="w-px h-8 bg-gray-200 mb-2"></div>
+                        <div className="bg-gray-100 px-3 py-1 rounded-full text-xs font-semibold text-gray-600 whitespace-nowrap">
+                          {nights} Nights
+                        </div>
+                        <div className="w-px h-8 bg-gray-200 mt-2"></div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-xs text-gray-500 font-medium uppercase tracking-wider mb-1">Check-out</div>
+                        <div className="text-base font-bold text-gray-900">
+                          {checkOutDate?.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">Before 12:00</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-[16px] font-bold text-[#1A1A1A] mb-4 flex items-center gap-2">
+                      Selected Rooms
+                      <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{checkoutItems.length}</span>
+                    </h3>
+                    <div className="space-y-4">
+                      {checkoutItems.map((item, index) => (
+                        <div
+                          key={item.id || index}
+                          className="relative py-4 first:pt-0 last:pb-0"
+                        >
+                          <div className="flex gap-4">
+                            {/* Quantity - Placed before image */}
+                            <div className="font-bold font-anton text-[var(--primary)] text-[25px] pt-1 min-w-[30px]">
+                              {item.quantity}x
+                            </div>
+
+                            {/* Image */}
+                            <div className="w-20 h-20 rounded-3xl bg-gray-100 border-4 border-gray-200 overflow-hidden flex-shrink-0 relative">
+                              {item.room.imageUrl ? (
+                                <ImageWithFallback
+                                  src={item.room.imageUrl}
+                                  alt="Room"
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
+                              )}
+                            </div>
+
+                            {/* Info */}
+                            <div className="flex-1 min-w-0 flex flex-col">
+                              <div className="flex justify-between items-start gap-3">
+                                <h4 className="font-bold text-gray-900 text-[15px] leading-tight">
+                                  {item.room.type || `Room ${item.room.roomNumber}`}
+                                </h4>
+                                <span className="font-bold text-[var(--primary)] whitespace-nowrap text-[15px]">
+                                  {formatVnd(item.room.basePrice * item.quantity * nights)}
+                                </span>
+                              </div>
+
+                              <div className="mt-1 space-y-1">
+                                <div className="text-xs text-gray-500 font-medium">
+                                  {item.guests.adults} Adults{item.guests.children > 0 && `, ${item.guests.children} Children`}
+                                </div>
+                                <div className="text-xs text-gray-400">
+                                  {formatVnd(item.room.basePrice)} / night • {nights} nights
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Custom Dashed Divider */}
+                          {index < checkoutItems.length - 1 && (
+                            <div
+                              className="absolute bottom-0 left-0 right-0 h-[2px]"
+                              style={{
+                                backgroundImage: "linear-gradient(to right, #E5E7EB 50%, transparent 50%)",
+                                backgroundSize: "20px 2px",
+                                backgroundRepeat: "repeat-x"
+                              }}
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </section>
 
                 <section
@@ -258,22 +382,29 @@ export default function BookingCheckoutPage() {
             <div className="relative overflow-y-auto no-scrollbar pl-2 mb-6">
               <div className="sticky top-6 space-y-6">
                 {/* Hotel Info Card */}
-                <div className="bg-white rounded-2xl border-2 border-gray-300 p-6">
-                  <div className="text-xl font-bold text-gray-900 mb-4">{currentBooking.hotelName}</div>
-                  <div className="text-sm text-gray-600 mb-6">{currentBooking.roomType.type || currentBooking.roomType.roomNumber}</div>
+                <div className="bg-white rounded-[32px] border-2 border-gray-300 p-6">
+                  <div className="text-xl font-bold text-gray-900 mb-4">{hotelName}</div>
+
+                  {/* Summary of Items */}
+                  <div className="space-y-4 mb-6 border-b border-gray-100 pb-4">
+                    {checkoutItems.map((item, idx) => (
+                      <div key={idx} className="flex justify-between text-sm">
+                        <div className="text-gray-600 truncate max-w-[180px]">
+                          {item.quantity} × {item.room.type || item.room.roomNumber}
+                        </div>
+                        <div className="font-semibold">{formatVnd(item.room.basePrice * item.quantity * nights)}</div>
+                      </div>
+                    ))}
+                  </div>
 
                   <div className="space-y-4 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Price per night</span>
-                      <span className="font-semibold">{formatVnd(currentBooking.roomType.basePrice)}</span>
+                      <span className="text-gray-600">Total Rooms</span>
+                      <span className="font-semibold">{checkoutItems.reduce((acc, i) => acc + i.quantity, 0)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Nights</span>
                       <span className="font-semibold">{nights}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Rooms</span>
-                      <span className="font-semibold">{currentBooking.roomsCount}</span>
                     </div>
                     <div className="h-px bg-gray-200" />
                     <div className="flex justify-between text-lg">
@@ -284,8 +415,7 @@ export default function BookingCheckoutPage() {
                 </div>
 
                 {/* Policies Card */}
-                {/* Policies Card */}
-                <div className="bg-white rounded-2xl border-2 border-gray-300 p-6">
+                <div className="bg-white rounded-[32px] border-2 border-gray-300 p-6">
                   <h3 className="text-lg font-bold text-gray-900 mb-4">Accommodation Policies</h3>
 
                   <div className="space-y-4">
