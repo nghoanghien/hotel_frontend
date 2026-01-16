@@ -39,5 +39,6 @@ export const useLogin = () => {
     isPending: mutation.isPending,
     isLoading: mutation.isPending,
     error: mutation.error ? (mutation.error as any).message || "Đăng nhập thất bại" : null,
+    reset: mutation.reset,
   };
 };

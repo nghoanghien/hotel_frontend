@@ -11,7 +11,7 @@ import { useLogin } from "../../../features/auth/hooks/useLogin";
 export default function LoginPageContent() {
   const router = useRouter();
   const { show, hide } = useLoading();
-  const { mutate, isPending } = useLogin();
+  const { mutate, isPending, error, reset } = useLogin();
 
   // Show loading on page load, then hide after 2 seconds
   useEffect(() => {
@@ -64,6 +64,7 @@ export default function LoginPageContent() {
                   form={form}
                   onForgotPassword={() => router.push("/forgot-password")}
                   onSuccess={(data) => {
+                    reset(); // Clear previous errors
                     show("Đang đăng nhập...");
                     mutate(data, {
                       onSuccess: () => {
@@ -74,6 +75,7 @@ export default function LoginPageContent() {
                     });
                   }}
                   isLoading={isPending}
+                  error={error}
                 />
               </div>
             </div>

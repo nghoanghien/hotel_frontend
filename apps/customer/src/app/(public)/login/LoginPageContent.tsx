@@ -14,7 +14,7 @@ import { useEffect } from "react";
 export default function LoginPageContent() {
   const router = useRouter();
   const { show, hide } = useLoading();
-  const { mutate, isPending } = useLogin();
+  const { mutate, isPending, error, reset } = useLogin();
 
   const form = useZodForm<LoginFormData>({
     schema: loginSchema,
@@ -64,6 +64,7 @@ export default function LoginPageContent() {
                   form={form}
                   onForgotPassword={() => router.push("/forgot-password")}
                   onSuccess={(data) => {
+                    reset(); // Clear previous errors
                     show("Đang đăng nhập...");
                     mutate(data, {
                       onSuccess: () => {
@@ -77,6 +78,7 @@ export default function LoginPageContent() {
                   }}
                   onRegister={handleRegisterClick}
                   isLoading={isPending}
+                  error={error}
                 />
               </div>
             </div>
