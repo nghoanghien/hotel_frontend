@@ -121,7 +121,7 @@ export default function FloatingHotelCart() {
                     </div>
                   </div>
 
-                  {/* Body - Eatzy Style List */}
+                  {/* Body - Room List */}
                   <div className="overflow-y-auto p-6 flex-1 bg-white divide-y divide-gray-200">
                     {cart.map(item => (
                       <motion.div
@@ -131,7 +131,7 @@ export default function FloatingHotelCart() {
                         animate={{ opacity: 1, y: 0 }}
                         className="flex gap-4 py-5 first:pt-0 last:pb-0"
                       >
-                        {/* Image - Rounded-3xl, Border-4 like Eatzy */}
+                        {/* Image - Room thumbnail */}
                         <div className="relative w-24 h-24 rounded-3xl overflow-hidden bg-gray-100 flex-shrink-0 border-4 border-gray-200 shadow-sm">
                           <ImageWithFallback src={item.room.imageUrl || ""} alt={item.room.type} fill className="object-cover" />
                         </div>
@@ -157,7 +157,7 @@ export default function FloatingHotelCart() {
                             {formatVnd(item.room.totalPrice || item.room.basePrice)} × {nights} nights
                           </div>
 
-                          {/* Action Buttons - Eatzy Style */}
+                          {/* Action Buttons */}
                           <div className="flex items-center gap-3 mt-auto">
                             <button
                               onClick={() => item.quantity > 1 ? updateItemQuantity(item.id, item.quantity - 1) : removeFromCart(item.id)}

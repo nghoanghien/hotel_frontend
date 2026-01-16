@@ -5,7 +5,6 @@ import LoginPageContent from "./login/LoginPageContent";
 import ForgotPasswordPageContent from "./forgot-password/ForgotPasswordPageContent";
 import RegisterPageContent from "./register/RegisterPageContent";
 import BackgroundTransition from "@/features/home/components/BackgroundTransition";
-import { getCategoryBackgroundImage } from "@/features/home/data/mockRestaurants";
 
 /**
  * Layout Pattern from RoleManagement.jsx

@@ -10,7 +10,7 @@ export const roomConfigService = {
     const newRoom: RoomDto = {
       id: `room-${Date.now()}`,
 
-      hotelName: 'Eatzy Hotel',
+      hotelName: 'Grand Hotel',
       status: 'Available',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

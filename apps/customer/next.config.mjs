@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["@repo/ui", "@repo/models", "@repo/types", "@repo/lib", "@repo/store"],
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:5293/:path*', // Proxy to Hotel SAAS Backend
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
@@ -10,6 +18,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'api.dicebear.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pub-2f884047d0ec47659cb43e0b335d7d23.r2.dev',
       },
     ],
   },

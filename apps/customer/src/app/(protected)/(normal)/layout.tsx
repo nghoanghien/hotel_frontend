@@ -22,11 +22,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { isSearching, performSearch } = useSearch();
   const { show } = useLoading();
   const isSearchMode = searchParams.has("q");
-  const isRestaurantDetail = pathname?.startsWith("/restaurants/") ?? false;
   const isHotelDetail = pathname?.startsWith("/hotels/") ?? false;
   const isFavoritesPage = pathname === "/favorites";
   const isHistoryPage = pathname === "/history";
-  const isDetailPage = isRestaurantDetail || isHotelDetail || isFavoritesPage || isHistoryPage;
+  const isDetailPage = isHotelDetail || isFavoritesPage || isHistoryPage;
   const isSearchBarCompact = !isHeaderVisible && isSearchMode && !isHotelDetail;
 
   useEffect(() => {

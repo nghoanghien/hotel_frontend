@@ -5,6 +5,4 @@ export const PATH = {
   register: '/register',
   home: '/home',
   profile: '/profile',
-  order: '/order',
-  restaurant: '/restaurant',
 } as const;

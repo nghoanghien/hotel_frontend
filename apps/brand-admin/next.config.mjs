@@ -9,7 +9,7 @@ const nextConfig = {
     return [
       {
         source: '/api/proxy/:path*',
-        destination: 'https://eatzy-be.hoanduong.net/:path*', // Proxy to Backend
+        destination: 'http://localhost:5293/:path*', // Proxy to Hotel SAAS Backend
       },
     ];
   },

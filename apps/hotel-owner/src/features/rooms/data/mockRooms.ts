@@ -64,7 +64,7 @@ export const mockRooms: RoomDto[] = Array.from({ length: 50 }).map((_, index) =>
   return {
     id: `room-${index}`,
     hotelId: 'hotel-1',
-    hotelName: 'Eatzy Hotel',
+    hotelName: 'Grand Hotel',
     roomNumber,
     floor: floor.toString(),
     type,

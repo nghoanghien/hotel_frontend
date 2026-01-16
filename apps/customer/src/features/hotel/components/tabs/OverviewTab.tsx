@@ -115,7 +115,7 @@ export function OverviewTab({ hotel }: Props) {
         <div className="border-t border-gray-200 pt-8 mt-8 flex items-start gap-4">
           <ShieldCheck className="w-6 h-6 text-[var(--primary)] flex-shrink-0 mt-0.5" />
           <p className="text-[14px] text-gray-500 leading-tight">
-            Để bảo vệ quyền lợi của bạn, vui lòng chỉ thực hiện giao dịch và liên lạc thông qua nền tảng Eatzy.
+            Để bảo vệ quyền lợi của bạn, vui lòng chỉ thực hiện giao dịch và liên lạc thông qua nền tảng Hotel SAAS.
           </p>
         </div>
 
