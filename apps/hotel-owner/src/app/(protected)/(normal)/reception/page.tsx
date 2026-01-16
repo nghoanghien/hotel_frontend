@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ReceptionTable from '../../../../features/reception/components/ReceptionTable';
-// Assuming standard import path
-// import ReceptionTable from '../../../features/reception/components/ReceptionTable'; 
+import ReceptionOperationsTable from '../../../../features/reception/components/ReceptionOperationsTable';
 import { useLoading } from '@repo/ui';
 
 export default function ReceptionPage() {
@@ -32,7 +30,7 @@ export default function ReceptionPage() {
 
       {/* Main Table Content - Full Width */}
       <div className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
-        <ReceptionTable />
+        <ReceptionOperationsTable />
       </div>
     </div>
   );

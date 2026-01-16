@@ -2,7 +2,6 @@ import { BaseDto } from './common';
 import { RoomType } from './room';
 import { ReviewDto } from './hotel';
 
-
 export type PaymentMethod =
   | 'CreditCard'
   | 'DebitCard'
@@ -12,8 +11,15 @@ export type PaymentMethod =
   | 'Check'
   | 'OnlinePayment';
 
+export interface LateCheckoutCalculation {
+  hoursLate: number;
+  penaltyAmount: number;
+  penaltyPercentage: number;
+}
+
 export type BookingStatus = 'Pending' | 'Confirmed' | 'CheckedIn' | 'CheckedOut' | 'Cancelled' | 'NoShow' | 'Refunded';
 
+export type PaymentStatus = 'Unpaid' | 'Partial' | 'Paid';
 
 export interface BookingRoomDto {
   roomId: string;
@@ -40,22 +46,45 @@ export interface CreateBookingDto {
   couponCode?: string;
 }
 
+// Guest info for reception view
+export interface GuestDto {
+  id: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  idCardNumber?: string;
+  address?: string;
+}
+
 export interface BookingDto extends BaseDto {
   hotelId: string;
-  hotelName: string;
+  hotelName?: string;
   guestId: string;
-  guestName?: string;
-  guestEmail?: string;
-  confirmationNumber: string;
+  guest?: GuestDto; // Added for Reception view
+  guestName?: string; // Kept for backward compatibility
+  guestEmail?: string; // Kept for backward compatibility
+  guestPhoneNumber?: string; // Kept for backward compatibility
+  confirmationNumber: string; // This maps to bookingCode
+  bookingCode?: string; // Alias for confirmationNumber
   checkInDate: string;
   checkOutDate: string;
+  actualCheckInDate?: string;
+  actualCheckOutDate?: string;
   numberOfGuests: number;
   numberOfRooms: number;
   totalAmount: number;
+  depositAmount?: number; // Added for Reception view
   currency?: string;
   status: BookingStatus;
   isPaid: boolean;
+  paymentStatus?: PaymentStatus; // Added for Reception view
+  specialRequests?: string;
   bookedAt?: string;
+
+  // Flattened room info for simple lists (optional)
+  roomNumber?: string;
+  roomType?: string;
+  roomId?: string;
 }
 
 export interface BookingRoomDetailDto {
@@ -83,18 +112,27 @@ export interface PaymentDto {
   refundReason?: string;
 }
 
+export interface AdditionalChargeDto {
+  id: string;
+  bookingId: string;
+  name: string;
+  amount: number;
+  quantity: number;
+  createdAt: string;
+}
+
 export interface BookingDetailDto extends BookingDto {
   subtotal: number;
   taxAmount: number;
   serviceFee: number;
   discountAmount: number;
-  specialRequests?: string;
   cancellationPolicy?: string;
   confirmedAt?: string;
   checkedInAt?: string;
   checkedOutAt?: string;
   rooms: BookingRoomDetailDto[];
   payments: PaymentDto[];
+  additionalCharges?: AdditionalChargeDto[];
   hotelImageUrl?: string;
   hotelAddress?: string;
   hotelCity?: string;

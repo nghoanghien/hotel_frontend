@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from '@repo/ui/motion';
 import { Fragment, useEffect, useState } from 'react';
-import { BookingDto, AdditionalChargeDto, LateCheckoutCalculation } from '../types';
+import { BookingDto, AdditionalChargeDto, LateCheckoutCalculation } from '@repo/types';
 import { receptionService } from '../services/receptionService';
 import { Dialog, Transition } from '@headlessui/react';
 import { X, CheckCircle, AlertTriangle, Plus, Trash2 } from '@repo/ui/icons';
@@ -72,7 +72,7 @@ export default function CheckOutModal({ isOpen, onClose, booking, onSuccess }: C
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-8 shadow-2xl transition-all">
             <Dialog.Title className="text-2xl font-anton text-gray-900 mb-6 flex justify-between items-center">
-              Check Out - {booking.roomNumber} ({booking.guest.fullName})
+              Check Out - {booking.roomNumber} ({booking.guest?.fullName || booking.guestName || 'Guest'})
               <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full text-gray-500"><X size={24} /></button>
             </Dialog.Title>
 
@@ -136,7 +136,7 @@ export default function CheckOutModal({ isOpen, onClose, booking, onSuccess }: C
                   <p className="text-gray-500 max-w-md mx-auto">
                     Confirm that the guest has returned the key and paid the total balance of
                     <strong className="text-gray-900 ml-1">
-                      {((booking.totalAmount + charges.reduce((acc, c) => acc + c.amount * c.quantity, 0) + (lateCheckout?.penaltyAmount || 0)) - booking.depositAmount).toLocaleString()} VND
+                      {((booking.totalAmount + charges.reduce((acc, c) => acc + c.amount * c.quantity, 0) + (lateCheckout?.penaltyAmount || 0)) - (booking.depositAmount || 0)).toLocaleString()} VND
                     </strong>
                   </p>
 
