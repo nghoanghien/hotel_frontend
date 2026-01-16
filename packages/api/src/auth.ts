@@ -1,5 +1,4 @@
 import { http } from "./http";
-import { LoginFormData } from "@repo/lib";
 
 export const login = async (data: any) => {
   return http.post("/auth/login", data);
