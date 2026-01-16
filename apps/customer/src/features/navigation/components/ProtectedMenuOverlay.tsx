@@ -4,6 +4,8 @@ import { History, Home, Heart, LogOut, LucideIcon } from "@repo/ui/icons";
 import { NavItem, NavItemShimmer, ProfileShimmer, useLoading, useSwipeConfirmation } from "@repo/ui";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "../../auth/hooks/useAuth";
+import { useLogout } from "../../auth/hooks/useLogout";
 
 interface MenuItem {
   id: string;
@@ -19,6 +21,9 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
   const params = useSearchParams();
   const { show } = useLoading();
   const { confirm } = useSwipeConfirmation();
+  const { user } = useAuth();
+  const { mutate: logout } = useLogout();
+
   useEffect(() => { const t = setTimeout(() => setIsLoading(false), 400); return () => clearTimeout(t); }, []);
 
 
@@ -50,14 +55,8 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
       confirmText: "Vuốt để đăng xuất",
       type: "danger",
       onConfirm: async () => {
-        // Simulate 2 second loading
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // Show loading overlay
         show("Đang đăng xuất...");
-
-        // Redirect to login page
-        router.replace('/login');
+        logout();
       }
     });
   };
@@ -95,11 +94,20 @@ export default function ProtectedMenuOverlay({ open, onClose }: { open: boolean;
             ) : (
               <div className="relative flex items-center p-6 border-b border-white/10 text-white/90">
                 <div className="relative h-12 w-12 rounded-2xl flex items-center justify-center shadow-[inset_0_0_12px_8px_rgba(255,255,255,0.2)] bg-white/10 border border-white/20">
-                  <div className="w-5 h-5 rounded-md bg-white/40" />
+                  {/* User Avatar Placeholder or Image */}
+                  {user?.firstName ? (
+                    <span className="text-lg font-bold text-white">{user.firstName[0]}</span>
+                  ) : (
+                    <div className="w-5 h-5 rounded-md bg-white/40" />
+                  )}
                 </div>
                 <div className="ml-4">
-                  <p className="font-semibold text-sm">Người dùng</p>
-                  <p className="text-xs text-white/80">user@example.com</p>
+                  <p className="font-semibold text-sm">
+                    {user ? `${user.firstName} ${user.lastName}` : "Khách"}
+                  </p>
+                  <p className="text-xs text-white/80 overflow-hidden text-ellipsis w-32">
+                    {user?.email || "user@example.com"}
+                  </p>
                 </div>
               </div>
             )}

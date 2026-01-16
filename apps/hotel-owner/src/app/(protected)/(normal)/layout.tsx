@@ -19,6 +19,8 @@ import {
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import RestaurantNavItem from '../../../components/RestaurantNavItem';
 import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation, useLoading } from '@repo/ui';
+import { useAuth } from "../../../features/auth/hooks/useAuth";
+import { useLogout } from "../../../features/auth/hooks/useLogout";
 
 interface MenuItem {
   id: string;
@@ -50,20 +52,15 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [activeSection, setActiveSection] = useState('dashboard');
-  const [profileData] = useState({ fullName: 'Super Admin', email: 'admin@hotel.com' });
+
+  const { user, isLoading } = useAuth();
+  const { mutate: logout } = useLogout();
+
   const [navHovered, setNavHovered] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
 
   const { confirm } = useSwipeConfirmation();
   const { show } = useLoading();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Update active section based on pathname
   useEffect(() => {
@@ -103,9 +100,8 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
       confirmText: "Vuốt để đăng xuất",
       type: "danger",
       onConfirm: async () => {
-        await new Promise(resolve => setTimeout(resolve, 2000));
         show("Đang đăng xuất...");
-        router.replace('/login');
+        logout();
       }
     });
   };
@@ -213,13 +209,13 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
                     layoutId="profile-name"
                     className="font-semibold text-sm text-gray-800 tracking-wide drop-shadow-sm whitespace-nowrap overflow-hidden text-ellipsis"
                   >
-                    {profileData.fullName}
+                    {user?.firstName ? `${user.firstName} ${user.lastName}` : 'Admin'}
                   </motion.p>
                   <motion.p
                     layoutId="profile-email"
                     className="text-xs text-gray-600 drop-shadow-sm tracking-wide whitespace-nowrap overflow-hidden text-ellipsis"
                   >
-                    {profileData.email}
+                    {user?.email || 'admin@hotel.com'}
                   </motion.p>
                 </div>
               </>

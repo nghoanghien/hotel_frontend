@@ -11,7 +11,7 @@ import { Hotel } from "../icons";
 
 type Props = {
   onForgotPassword?: () => void;
-  onSuccess?: () => void;
+  onSuccess?: (data: LoginFormData) => void;
   onRegister?: () => void;
   // Lưu ý:
   // - form dùng any để tránh phụ thuộc type cross‑package.
@@ -20,10 +20,12 @@ type Props = {
   // - Nếu cần kiểm tra kiểu chặt chẽ: thay any bằng interface tối thiểu hoặc UseFormReturn<LoginFormData>
   //   (khi đó phải thêm type deps và đảm bảo module resolution).
   form: any;
+  isLoading?: boolean;
 };
 
-export default function LoginForm({ onForgotPassword, onSuccess, onRegister, form }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
+export default function LoginForm({ onForgotPassword, onSuccess, onRegister, form, isLoading: externalLoading }: Props) {
+  const [internalLoading, setInternalLoading] = useState(false);
+  const isLoading = externalLoading || internalLoading;
 
   const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = form;
 
@@ -32,22 +34,27 @@ export default function LoginForm({ onForgotPassword, onSuccess, onRegister, for
   const rememberMeValue = watch("rememberMe");
 
   const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
-    try {
-      console.log("Login data:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      onSuccess?.();
-    } catch (error) {
-      console.error("Login error:", error);
-    } finally {
-      setIsLoading(false);
+    if (onSuccess) {
+      // Pass data to parent to handle submission
+      onSuccess(data);
+    } else {
+      // Default mock behavior
+      setInternalLoading(true);
+      try {
+        console.log("Login data:", data);
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      } catch (error) {
+        console.error("Login error:", error);
+      } finally {
+        setInternalLoading(false);
+      }
     }
   };
 
   const handleGoogleLogin = () => {
-    setIsLoading(true);
+    setInternalLoading(true);
     setTimeout(() => {
-      setIsLoading(false);
+      setInternalLoading(false);
     }, 1000);
   };
 

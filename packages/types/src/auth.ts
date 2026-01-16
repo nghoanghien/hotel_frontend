@@ -31,6 +31,7 @@ export interface AuthResponseDto {
   accessToken: string;
   refreshToken: string;
   expiresAt: string;
+  user?: UserDto;
 }
 
 export interface ChangePasswordDto {
@@ -48,4 +49,16 @@ export interface ResetPasswordDto {
   token: string;
   newPassword?: string;
   confirmPassword?: string;
+}
+
+export interface UserDto {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber?: string;
+  role: UserRole;
+  status?: string;
+  brandId?: string;
+  hotelId?: string;
 }

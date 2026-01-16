@@ -6,9 +6,12 @@ import { useZodForm, loginSchema, type LoginFormData } from "@repo/lib";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { useEffect } from "react";
 
+import { useLogin } from "../../../features/auth/hooks/useLogin";
+
 export default function LoginPageContent() {
   const router = useRouter();
   const { show, hide } = useLoading();
+  const { mutate, isPending } = useLogin();
 
   // Show loading on page load, then hide after 2 seconds
   useEffect(() => {
@@ -26,13 +29,6 @@ export default function LoginPageContent() {
     mode: "onChange",
     defaultValues: { email: "", password: "", rememberMe: false },
   });
-
-  const handleSuccess = () => {
-    show("Đăng nhập thành công, chuyển hướng đến Dashboard...");
-    document.cookie = "admin_auth=1; path=/";
-    router.push("/overview");
-    // Note: Loading will be hidden in overview page after 1.5s
-  };
 
   return (
     <AnimatePresence mode="wait">
@@ -67,7 +63,17 @@ export default function LoginPageContent() {
                 <LoginForm
                   form={form}
                   onForgotPassword={() => router.push("/forgot-password")}
-                  onSuccess={handleSuccess}
+                  onSuccess={(data) => {
+                    show("Đang đăng nhập...");
+                    mutate(data, {
+                      onSuccess: () => {
+                        show("Đăng nhập thành công, chuyển hướng đến Dashboard...");
+                        router.push("/dashboard");
+                      },
+                      onError: () => hide()
+                    });
+                  }}
+                  isLoading={isPending}
                 />
               </div>
             </div>
