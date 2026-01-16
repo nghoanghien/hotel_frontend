@@ -29,8 +29,6 @@ export interface Restaurant {
   rating?: number;
 }
 
-// Export all models
-export * from './restaurant';
 
 
 
