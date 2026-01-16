@@ -1,4 +1,4 @@
-import { BookingDto, AdditionalChargeDto, LateCheckoutCalculation } from '@repo/types';
+import { BookingDto, AdditionalChargeDto, LateCheckoutCalculation, CreateBookingDto } from '@repo/types';
 
 export const mockBookings: BookingDto[] = [
   {
@@ -148,5 +148,22 @@ export const receptionService = {
   cancelBooking: async (id: string): Promise<void> => {
     await new Promise(resolve => setTimeout(resolve, 600));
     console.log(`Booking ${id} cancelled`);
+  },
+
+  // New methods for Walk-in Booking
+  getAvailableRooms: async (hotelId: string, filter: { checkIn: string, checkOut: string, type?: string }): Promise<any[]> => {
+    await new Promise(resolve => setTimeout(resolve, 800));
+    // Mock return available rooms
+    return [
+      { id: 'r-101', number: '101', type: 'Standard', price: 500000, capacity: 2, image: 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&q=80&w=300' },
+      { id: 'r-202', number: '202', type: 'Deluxe', price: 900000, capacity: 2, image: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&q=80&w=300' },
+      { id: 'r-305', number: '305', type: 'Suite', price: 1500000, capacity: 4, image: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=300' },
+    ];
+  },
+
+  createBooking: async (data: CreateBookingDto): Promise<void> => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('Booking created:', data);
+    // Add to mock bookings if this was a real persistent mock
   }
 };

@@ -91,7 +91,7 @@ const RoomSearchPopup: React.FC<RoomSearchPopupProps> = ({
                 <div className="w-10 h-10 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center border border-gray-100">
                   <Search className="w-5 h-5" />
                 </div>
-                SEARCH ROOMS
+                SEARCH BOOKINGS
               </h2>
 
               <div className="flex items-center gap-2">

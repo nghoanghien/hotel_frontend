@@ -436,10 +436,10 @@ export default function RoomForm({ initialData, onClose, onSuccess }: RoomFormPr
           ) : (
             <button
               onClick={handleSubmit(onSubmit)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSaving}
               className="px-8 py-3 rounded-xl bg-[#1A1A1A] text-white font-bold hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-gray-200 disabled:opacity-70"
             >
-              {isSubmitting ? <LoadingSpinner size={20} color="white" /> : <><Save size={18} /> Save Configuration</>}
+              {isSubmitting || isSaving ? <LoadingSpinner size={20} color="white" /> : <><Save size={18} /> Save Configuration</>}
             </button>
           )}
         </div>

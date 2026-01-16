@@ -1,6 +1,6 @@
 import { DataTable, ColumnDef, useNotification } from '@repo/ui';
 import { motion } from '@repo/ui/motion';
-import { Search, Filter, Download, X, Clock, CheckCircle, Key, LogOut, Ban, Eye, MoreVertical, UserCheck, AlertCircle, RotateCcw } from '@repo/ui/icons';
+import { Search, Filter, Download, X, Clock, CheckCircle, Key, LogOut, Ban, Eye, MoreVertical, UserCheck, AlertCircle, RotateCcw, ArrowLeftRight } from '@repo/ui/icons';
 import { useState, useMemo, useEffect } from 'react';
 import { BookingDto, BookingStatus } from '@repo/types';
 import { receptionService } from '../services/receptionService';
@@ -71,12 +71,35 @@ const columns: ColumnDef<BookingDto>[] = [
     label: 'SCHEDULE',
     key: 'checkInDate',
     className: 'min-w-[200px]',
-    formatter: (value: any, item: BookingDto) => (
-      <div className="text-xs">
-        <div className="text-gray-600">In: <span className="font-medium">{formatDate(item.checkInDate)}</span></div>
-        <div className="text-gray-400">Out: {formatDate(item.checkOutDate)}</div>
-      </div>
-    )
+    formatter: (value: any, item: BookingDto) => {
+      const checkIn = new Date(item.checkInDate);
+      const checkOut = new Date(item.checkOutDate);
+      const nights = Math.max(1, Math.round((checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24)));
+
+      return (
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-lime-500 shadow-[0_0_6px_rgba(132,204,22,0.6)]"></div>
+              <span className="text-xs font-bold text-gray-900 tracking-tight">{checkIn.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+              <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">{checkIn.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+              <span className="text-xs font-bold text-gray-500 tracking-tight">{checkOut.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+              <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">{checkOut.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+          </div>
+
+          <div className="h-8 w-px bg-gray-100"></div>
+
+          <div className="min-w-[50px] px-2 py-1.5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col items-center justify-center group hover:bg-[#1A1A1A] hover:border-[#1A1A1A] transition-colors duration-300">
+            <span className="text-xs font-black text-[#1A1A1A] group-hover:text-white transition-colors">{nights}</span>
+            <span className="text-[8px] font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-400 transition-colors">Nights</span>
+          </div>
+        </div>
+      )
+    }
   },
   {
     label: 'STATUS',
@@ -201,9 +224,9 @@ export default function ReceptionOperationsTable() {
     try {
       await receptionService.confirmBooking(bookingId);
       loadData();
-      showNotification({ message: 'Booking confirmed successfully!', type: 'success' });
+      showNotification({ message: 'Booking confirmed successfully!', type: 'success', format: "Đã xác nhận đặt phòng thành công!" });
     } catch (e) {
-      showNotification({ message: 'Failed to confirm booking', type: 'error' });
+      showNotification({ message: 'Failed to confirm booking', type: 'error', format: "Đã xác nhận đặt phòng thất bại!" });
     }
   };
 
@@ -217,6 +240,12 @@ export default function ReceptionOperationsTable() {
     e.stopPropagation();
     setSelectedBooking(booking);
     setIsCheckOutModalOpen(true);
+  };
+
+  const handleChangeRoom = (e: React.MouseEvent, booking: BookingDto) => {
+    e.stopPropagation();
+    setSelectedBooking(booking);
+    setIsChangeRoomModalOpen(true);
   };
 
   const handleExport = async (format: 'pdf' | 'excel', scope: 'current' | 'all', columns: string[]) => {
@@ -362,14 +391,36 @@ export default function ReceptionOperationsTable() {
       {isFiltered && (
         <div className="px-8 pt-4 pb-0 flex flex-wrap items-center gap-2 animate-in slide-in-from-top-2 duration-300">
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mr-1">Active Filters:</span>
+
           {filterFields.status && (
-            <button onClick={() => setFilterFields(prev => ({ ...prev, status: '' }))} className="bg-white border text-xs px-2 py-1 rounded-full flex items-center gap-1 hover:bg-red-50 hover:border-red-200 hover:text-red-500">
-              Status: <span className="font-bold">{filterFields.status}</span> <X size={12} />
+            <button
+              onClick={() => setFilterFields(prev => ({ ...prev, status: '' }))}
+              className="group flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border bg-white border-gray-200 text-gray-600 shadow-sm hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition-all"
+            >
+              <span>Status: <span className="text-lime-600 font-extrabold group-hover:text-red-500 transition-colors uppercase">{filterFields.status}</span></span>
+              <X className="w-3 h-3 opacity-0 w-0 group-hover:opacity-100 group-hover:w-3 transition-all duration-300 ease-out" />
             </button>
           )}
+
           {filterFields.paymentStatus.length > 0 && (
-            <button onClick={() => setFilterFields(prev => ({ ...prev, paymentStatus: [] }))} className="bg-white border text-xs px-2 py-1 rounded-full flex items-center gap-1 hover:bg-red-50 hover:border-red-200 hover:text-red-500">
-              Payment: <span className="font-bold">{filterFields.paymentStatus.join(', ')}</span> <X size={12} />
+            <button
+              onClick={() => setFilterFields(prev => ({ ...prev, paymentStatus: [] }))}
+              className="group flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border bg-white border-gray-200 text-gray-600 shadow-sm hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition-all"
+            >
+              <span>Payment: <span className="text-lime-600 font-extrabold group-hover:text-red-500 transition-colors">{filterFields.paymentStatus.join(', ')}</span></span>
+              <X className="w-3 h-3 opacity-0 w-0 group-hover:opacity-100 group-hover:w-3 transition-all duration-300 ease-out" />
+            </button>
+          )}
+
+          {filterFields.dateRange.from && (
+            <button
+              onClick={() => setFilterFields(prev => ({ ...prev, dateRange: { from: null, to: null } }))}
+              className="group flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border bg-white border-gray-200 text-gray-600 shadow-sm hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition-all"
+            >
+              <span>Date: <span className="text-lime-600 font-extrabold group-hover:text-red-500 transition-colors">
+                {new Date(filterFields.dateRange.from).toLocaleDateString('vi-VN')} {filterFields.dateRange.to ? `- ${new Date(filterFields.dateRange.to).toLocaleDateString('vi-VN')}` : ''}
+              </span></span>
+              <X className="w-3 h-3 opacity-0 w-0 group-hover:opacity-100 group-hover:w-3 transition-all duration-300 ease-out" />
             </button>
           )}
         </div>
@@ -424,6 +475,19 @@ export default function ReceptionOperationsTable() {
                 </motion.button>
               )}
 
+              {/* Change Room Action */}
+              {item.status === 'CheckedIn' && (
+                <motion.button
+                  onClick={(e) => handleChangeRoom(e, item)}
+                  className="p-2 rounded-xl bg-purple-50 text-purple-600 hover:bg-purple-100 shadow-sm transition-colors"
+                  whileHover={{ scale: 1.12 }}
+                  whileTap={{ scale: 0.92 }}
+                  title="Change Room"
+                >
+                  <ArrowLeftRight size={18} />
+                </motion.button>
+              )}
+
               {/* View Detail Action */}
               <motion.button
                 onClick={(e) => handleViewDetail(e, item)}
@@ -465,7 +529,7 @@ export default function ReceptionOperationsTable() {
       <BookingDetailModal
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
-        bookingId={selectedBooking?.id || null}
+        booking={selectedBooking}
       />
 
       <BookingActionModal
@@ -475,6 +539,7 @@ export default function ReceptionOperationsTable() {
         onRefresh={loadData}
         onCheckIn={() => setIsCheckInModalOpen(true)}
         onCheckOut={() => setIsCheckOutModalOpen(true)}
+        onChangeRoom={() => setIsChangeRoomModalOpen(true)}
       />
 
       <BookingExportModal
