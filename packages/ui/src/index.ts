@@ -30,6 +30,7 @@ export { default as BookingHistoryCardShimmer } from "./feedback/shimmer/Booking
 export { default as BookingDetailDrawerShimmer } from "./feedback/shimmer/BookingDetailDrawerShimmer";
 export { MagazineLayout1Shimmer } from "./feedback/shimmer/MagazineLayout1Shimmer";
 export { default as CurrentBookingsDrawerShimmer } from "./feedback/shimmer/CurrentBookingsDrawerShimmer";
+export { default as RoomDetailModalShimmer } from "./feedback/shimmer/RoomDetailModalShimmer";
 export { default as NumberInput } from "./forms/NumberInput";
 export { default as DateRangePicker } from "./forms/DateRangePicker";
 export { default as StatusBadge } from "./feedback/StatusBadge";

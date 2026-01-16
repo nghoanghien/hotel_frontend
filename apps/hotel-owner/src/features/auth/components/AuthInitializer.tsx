@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useNotification } from "@repo/ui";
 import { useAuth } from "../hooks/useAuth";
 
-const PUBLIC_PATHS = ["/login", "/register", "/forgot-password"];
+// DEV MODE: All routes are public (remove "/" when enabling auth)
+const PUBLIC_PATHS = ["/", "/login", "/register", "/forgot-password"];
 
 export default function AuthInitializer() {
   const { isError, isLoading } = useAuth();

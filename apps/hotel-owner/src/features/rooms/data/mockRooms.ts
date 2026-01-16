@@ -61,6 +61,8 @@ export const mockRooms: RoomDto[] = Array.from({ length: 50 }).map((_, index) =>
   else if (rand < 0.95) status = 'Maintenance';
   else status = 'OutOfOrder';
 
+  const hasConnecting = Math.random() > 0.95;
+
   return {
     id: `room-${index}`,
     hotelId: 'hotel-1',
@@ -78,9 +80,19 @@ export const mockRooms: RoomDto[] = Array.from({ length: 50 }).map((_, index) =>
     hasView: Math.random() > 0.3, // 70% have view
     viewDescription: Math.random() > 0.5 ? 'City View' : 'Garden View',
     isAccessible: Math.random() > 0.9, // 10% accessible
+
+    // Extended props matching updated RoomDto
     smokingAllowed: Math.random() > 0.8, // 20% smoking
     isPetFriendly: Math.random() > 0.9, // 10% pet friendly
-    hasConnectingRoom: Math.random() > 0.95, // 5% have connecting room
+    hasConnectingRoom: hasConnecting,
+    connectingRoomId: hasConnecting ? `room-${index === 49 ? 0 : index + 1}` : undefined,
+    weekendPrice: basePrice * 1.2,
+    holidayPrice: basePrice * 1.5,
+    accessibilityFeatures: Math.random() > 0.9 ? 'Wheelchair Accessible, Grab Bars' : undefined,
+    // Mock Images string array
+    images: [
+      `https://images.unsplash.com/photo-${['1611892440504-42a792e24d32', '1582719508461-905c673771fd', '1590490818610-4a8a25a3a2a2', '1566665528-fdbfb4ca30c1'][index % 4]}?auto=format&fit=crop&q=80&w=800`
+    ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };

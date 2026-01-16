@@ -28,6 +28,7 @@ export interface CreateRoomDto {
   isAccessible: boolean;
   accessibilityFeatures?: string;
   amenityIds: string[];
+  images?: string[]; // Temp support for UI Gallery
 }
 
 export interface UpdateRoomDto {
@@ -61,14 +62,23 @@ export interface RoomDto extends BaseDto {
   numberOfBeds: number;
   maxOccupancy: number;
   basePrice: number;
-  weekendPrice?: number;
-  holidayPrice?: number;
   sizeInSquareMeters: number;
   status: RoomStatus;
   description?: string;
   hasView: boolean;
   viewDescription?: string;
   isAccessible: boolean;
+
+  // Extended properties
+  weekendPrice?: number;
+  holidayPrice?: number;
+  smokingAllowed?: boolean;
+  isPetFriendly?: boolean;
+  hasConnectingRoom?: boolean;
+  connectingRoomId?: string;
+  accessibilityFeatures?: string;
+  images?: string[];
+  amenityIds?: string[]; // For form editing support
 }
 
 export interface RoomImageDto {
@@ -79,7 +89,7 @@ export interface RoomImageDto {
   isPrimary: boolean;
 }
 
-export interface RoomDetailDto extends RoomDto {
+export interface RoomDetailDto extends Omit<RoomDto, 'images'> {
   imageUrl?: string;
   smokingAllowed: boolean;
   isPetFriendly: boolean;

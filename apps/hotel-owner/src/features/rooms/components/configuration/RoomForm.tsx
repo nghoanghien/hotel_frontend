@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { CreateRoomDto, RoomType, BedType, RoomDto } from '@repo/types';
-import { InputField, CustomSelect, LoadingSpinner, useNotification } from '@repo/ui';
+import { InputField, CustomSelect, LoadingSpinner, useNotification, getAmenityIcon, useSwipeConfirmation } from '@repo/ui';
 import Switch from './Switch';
 import { motion, AnimatePresence } from '@repo/ui/motion';
 import { X, Save, ArrowRight, ArrowLeft } from '@repo/ui/icons';
 import { roomConfigService } from '../../services/roomConfigService';
+import RoomGallery from './RoomGallery';
 
 interface RoomFormProps {
   initialData?: RoomDto | null;
@@ -43,12 +44,15 @@ export default function RoomForm({ initialData, onClose, onSuccess }: RoomFormPr
       hasConnectingRoom: false,
       isAccessible: false,
       amenityIds: [],
-      hotelId: 'hotel-1'
+      hotelId: 'hotel-1',
+      images: []
     }
   });
 
   const { showNotification } = useNotification();
+  const { confirm } = useSwipeConfirmation();
   const [step, setStep] = React.useState(1);
+  const [isSaving, setIsSaving] = React.useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -57,30 +61,43 @@ export default function RoomForm({ initialData, onClose, onSuccess }: RoomFormPr
         // Map types safely
         type: initialData.type as RoomType,
         bedType: initialData.bedType as BedType,
-        amenityIds: []
+        amenityIds: initialData.amenityIds || [],
+        images: initialData.images || []
       });
     }
   }, [initialData, reset]);
 
-
-  const onSubmit = async (data: CreateRoomDto) => {
-    try {
-      if (initialData) {
-        await roomConfigService.updateRoom(initialData.id, data);
-        showNotification({ message: 'Room configuration updated successfully!', type: 'success' });
-      } else {
-        await roomConfigService.createRoom(data);
-        showNotification({ message: 'New room created successfully!', type: 'success' });
+  const onSubmit = (data: CreateRoomDto) => {
+    confirm({
+      title: initialData ? "Update Room Configuration" : "Create New Room",
+      description: initialData
+        ? `Are you sure you want to update the configuration for Room ${initialData.roomNumber}?`
+        : "Are you sure you want to create this new room configuration?",
+      confirmText: "Swipe to Save",
+      type: "info",
+      onConfirm: async () => {
+        setIsSaving(true);
+        try {
+          if (initialData) {
+            await roomConfigService.updateRoom(initialData.id, data);
+            showNotification({ message: 'Room configuration updated successfully!', type: 'success', format: "Dữ liệu được cập nhật thành công!" });
+          } else {
+            await roomConfigService.createRoom(data);
+            showNotification({ message: 'New room created successfully!', type: 'success', format: "Dữ liệu được tạo thành công!" });
+          }
+          onSuccess();
+          onClose();
+        } catch (error) {
+          console.error(error);
+          showNotification({ message: 'Failed to save room configuration.', type: 'error', format: "Lỗi khi lưu dữ liệu!" });
+        } finally {
+          setIsSaving(false);
+        }
       }
-      onSuccess();
-      onClose();
-    } catch (error) {
-      console.error(error);
-      showNotification({ message: 'Failed to save room configuration.', type: 'error' });
-    }
+    });
   };
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 3));
+  const nextStep = () => setStep(s => Math.min(s + 1, 4));
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   return (
@@ -105,9 +122,10 @@ export default function RoomForm({ initialData, onClose, onSuccess }: RoomFormPr
           <div className={`h-1.5 flex-1 rounded-full transition-colors duration-500 ${step >= 1 ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`} />
           <div className={`h-1.5 flex-1 rounded-full transition-colors duration-500 ${step >= 2 ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`} />
           <div className={`h-1.5 flex-1 rounded-full transition-colors duration-500 ${step >= 3 ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`} />
+          <div className={`h-1.5 flex-1 rounded-full transition-colors duration-500 ${step >= 4 ? 'bg-[#1A1A1A]' : 'bg-gray-100'}`} />
         </div>
 
-        <form id="room-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <form id="room-form" onSubmit={handleSubmit(onSubmit)} className="space-y-8 h-full">
           <AnimatePresence mode='wait'>
             {step === 1 && (
               <motion.div
@@ -296,9 +314,101 @@ export default function RoomForm({ initialData, onClose, onSuccess }: RoomFormPr
 
                 <div className="pt-8">
                   <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Amenities</h4>
-                  <div className="p-8 bg-gray-50 rounded-2xl border border-dashed border-gray-300 text-center text-gray-400">
-                    Amenity selection UI will go here (requires Amenity List API)
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <Controller
+                      name="amenityIds"
+                      control={control}
+                      render={({ field }) => {
+                        // Mock Amenities List (In real app, fetch from API)
+                        const AMENITIES_LIST = [
+                          { id: 'am-1', name: 'Free Wi-Fi' },
+                          { id: 'am-2', name: 'Air Conditioning' },
+                          { id: 'am-3', name: 'Flat-screen TV' },
+                          { id: 'am-4', name: 'Private Bathroom' },
+                          { id: 'am-5', name: 'Mini Bar' },
+                          { id: 'am-6', name: 'Coffee Maker' },
+                          { id: 'am-7', name: 'Hair Dryer' },
+                          { id: 'am-8', name: 'Work Desk' },
+                          { id: 'am-9', name: 'Safe Box' },
+                          { id: 'am-10', name: 'Ironing Facilities' },
+                          { id: 'am-11', name: 'Balcony' },
+                          { id: 'am-12', name: 'Soundproofing' }
+                        ];
+
+                        const selectedIds = field.value || [];
+
+                        const toggleAmenity = (id: string) => {
+                          if (selectedIds.includes(id)) {
+                            field.onChange(selectedIds.filter(aid => aid !== id));
+                          } else {
+                            field.onChange([...selectedIds, id]);
+                          }
+                        };
+
+                        return (
+                          <>
+                            {AMENITIES_LIST.map((amenity) => {
+                              const isSelected = selectedIds.includes(amenity.id);
+                              // We use the helper to get icon component dynamically
+                              const Icon = getAmenityIcon(amenity.name);
+
+                              return (
+                                <div
+                                  key={amenity.id}
+                                  onClick={() => toggleAmenity(amenity.id)}
+                                  className={`
+                                    cursor-pointer px-4 py-3 rounded-xl border flex items-center gap-3 transition-all duration-200 select-none
+                                    ${isSelected
+                                      ? 'bg-gray-900 border-gray-900 text-white shadow-md'
+                                      : 'bg-white border-gray-100 text-gray-600 hover:border-gray-200 hover:bg-gray-50'}
+                                  `}
+                                >
+                                  <div className={`
+                                    w-8 h-8 rounded-full flex items-center justify-center transition-colors
+                                    ${isSelected ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}
+                                  `}>
+                                    <Icon size={16} />
+                                  </div>
+                                  <span className="font-medium text-sm">{amenity.name}</span>
+                                </div>
+                              );
+                            })}
+                          </>
+                        );
+                      }}
+                    />
                   </div>
+                </div>
+              </motion.div>
+            )}
+
+            {step === 4 && (
+              <motion.div
+                key="step4"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6 h-full flex flex-col"
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-gray-900 border-l-4 border-[#1A1A1A] pl-3">Room Gallery</h3>
+                  <span className="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    Recommended: 4+ Photos
+                  </span>
+                </div>
+
+                <div className="flex-1 min-h-[400px]">
+                  <Controller
+                    name="images"
+                    control={control}
+                    render={({ field }) => (
+                      <RoomGallery
+                        images={field.value || []}
+                        onChange={(newImages) => field.onChange(newImages)}
+                      />
+                    )}
+                  />
                 </div>
               </motion.div>
             )}
@@ -316,7 +426,7 @@ export default function RoomForm({ initialData, onClose, onSuccess }: RoomFormPr
         </button>
 
         <div className="flex gap-4">
-          {step < 3 ? (
+          {step < 4 ? (
             <button
               onClick={nextStep}
               className="px-8 py-3 rounded-xl bg-gray-900 text-white font-bold hover:bg-black transition-all flex items-center gap-2 shadow-lg shadow-gray-200"
