@@ -5,3 +5,5 @@ export * from './room';
 export * from './booking';
 export * from './wishlist';
 export * from './dashboard';
+export * from './brand';
+export * from './onboarding';

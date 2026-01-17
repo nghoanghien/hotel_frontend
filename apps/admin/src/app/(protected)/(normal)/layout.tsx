@@ -8,18 +8,21 @@ import {
   LayoutDashboard,
   Building2,
   Users,
-  Settings,
+  Database,
   User,
-  LogOut
+  LogOut,
+  Settings
 } from '@repo/ui/icons';
 import RestaurantNavItem from '../../../components/RestaurantNavItem';
 import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation, useLoading } from '@repo/ui';
 
+// Updated menu structure mapping to existing routes where possible
+// hotels -> Partners, customers -> Users, settings -> Master Data
 const adminMenuItems = [
   { id: 'overview', icon: LayoutDashboard, text: 'Tổng quan', title: 'OVERVIEW' },
-  { id: 'hotels', icon: Building2, text: 'Quản lý khách sạn', title: 'HOTEL MANAGEMENT' },
-  { id: 'customers', icon: Users, text: 'Quản lý khách hàng', title: 'CUSTOMER MANAGEMENT' },
-  { id: 'settings', icon: Settings, text: 'Thông số hệ thống', title: 'SYSTEM SETTINGS' }
+  { id: 'brand-partners', icon: Building2, text: 'Quản lý đối tác', title: 'PARTNER MANAGEMENT' },
+  { id: 'users', icon: Users, text: 'Quản trị người dùng', title: 'USER MANAGEMENT' },
+  { id: 'settings', icon: Settings, text: 'Master Data', title: 'MASTER DATA' }
 ];
 
 export default function NormalLayout({ children }: { children: ReactNode }) {
@@ -252,14 +255,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
       </div >
 
       <div className="flex-1 ml-28 flex flex-col">
-        {/* Header */}
-        <div className="border-b border-gray-200 px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-anton font-bold text-[#1A1A1A]">
-              {activeItem.title}
-            </h1>
-          </div>
-        </div>
+        {/* Header Removed as requested */}
 
         {/* Page Content */}
         <div className="flex-1">{children}</div>
