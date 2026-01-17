@@ -43,7 +43,7 @@ const adminMenuItems: MenuItem[] = [
     ]
   },
   { id: 'reception', icon: ConciergeBell, text: 'Lễ tân', title: 'RECEPTION' },
-  { id: 'hotel-info', icon: Building2, text: 'Thông tin khách sạn', title: 'HOTEL INFORMATION' },
+  { id: 'hotel-profile', icon: Building2, text: 'Thông tin khách sạn', title: 'HOTEL INFORMATION' },
   { id: 'staff', icon: Users, text: 'Quản lý nhân viên', title: 'STAFF MANAGEMENT' },
   { id: 'reports', icon: BarChart, text: 'Báo cáo', title: 'REPORTS' }
 ];
