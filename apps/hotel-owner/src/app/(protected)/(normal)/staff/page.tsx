@@ -1,7 +1,11 @@
-export default function Page() {
+'use client';
+
+import StaffOperationsTable from '../../../../features/staff/components/StaffOperationsTable';
+
+export default function StaffPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh]">
-      <h1 className="text-2xl font-bold text-gray-400">Staff Management - Under Construction</h1>
+    <div className="h-full p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <StaffOperationsTable />
     </div>
-  )
+  );
 }
