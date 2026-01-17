@@ -7,3 +7,4 @@ export * from './wishlist';
 export * from './dashboard';
 export * from './brand';
 export * from './onboarding';
+export * from './amenity';
