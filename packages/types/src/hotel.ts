@@ -132,6 +132,72 @@ export interface HotelDetailDto extends HotelDto {
   brand?: BrandDto; // Optional full brand details
 }
 
+// Request DTOs
+export interface CreateHotelDto {
+  brandId: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  phoneNumber?: string;
+  email?: string;
+  website?: string;
+  starRating: number;
+  taxId?: string;
+
+  // Time Config
+  checkInTime?: string;
+  checkOutTime?: string;
+
+  // Guest Config
+  maxAdultsPerRoom?: number;
+  maxChildrenPerRoom?: number;
+  maxGuestsPerRoom?: number;
+  allowExtraBed?: boolean;
+  extraBedPrice?: number;
+
+  // Policies
+  cancellationPolicy?: string;
+  childPolicy?: string;
+  petPolicy?: string;
+  smokingPolicy?: string;
+}
+
+export interface UpdateHotelDto {
+  name?: string;
+  description?: string;
+  imageUrl?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  phoneNumber?: string;
+  email?: string;
+  website?: string;
+  starRating?: number;
+  isActive?: boolean;
+  isVerified?: boolean;
+
+  // Time Config
+  checkInTime?: string;
+  checkOutTime?: string;
+
+  // Policies
+  cancellationPolicy?: string;
+  childPolicy?: string;
+  petPolicy?: string;
+  smokingPolicy?: string;
+}
+
 export interface HotelSearchResultDto extends HotelDto {
   availableRooms: number;
   lowestAvailablePrice?: number;
