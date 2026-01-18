@@ -176,13 +176,9 @@ export const brandPartnersService = {
   getStats: async (): Promise<OnboardingStats> => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return {
-      totalApplications: 152,
-      draftApplications: 45,
-      pendingReview: 12,
-      documentsRequired: 8,
-      approvedThisMonth: 24,
-      rejectedThisMonth: 3,
-      activePartners: 89
+      pending: 12,
+      approved: 24,
+      rejected: 3
     };
   }
 };

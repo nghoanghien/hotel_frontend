@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import RoomOperationsTable from '@/features/rooms/components/RoomOperationsTable';
-import { useLoading } from '@repo/ui';
+import { Hotel, useLoading } from '@repo/ui';
 
 export default function RoomsPage() {
   const { hide } = useLoading();
@@ -23,9 +23,17 @@ export default function RoomsPage() {
   return (
     <div className="min-h-screen pb-20 px-6 pt-8 w-full max-w-full overflow-x-hidden">
       {/* Header Section */}
-      <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-        <h1 className="text-4xl font-anton font-bold text-[#1A1A1A] mb-2">Room Operations</h1>
-        <p className="text-gray-500 font-medium text-lg">Manage room status, availability and maintenance.</p>
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <span className="px-2.5 py-0.5 rounded-lg bg-lime-100 text-lime-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+            <Hotel size={12} />
+            Room List
+          </span>
+        </div>
+        <h1 className="text-4xl font-anton text-gray-900 uppercase tracking-tight">
+          Room Operations
+        </h1>
+        <p className="text-gray-500 font-medium mt-1">Manage room status, availability and maintenance.</p>
       </div>
 
       {/* Main Table Content - Full Width */}

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import ReceptionOperationsTable from '../../../../features/reception/components/ReceptionOperationsTable';
 import CreateBookingModal from '../../../../features/reception/components/CreateBookingModal';
 import { useLoading, useNotification } from '@repo/ui';
-import { Plus } from '@repo/ui/icons';
+import { ConciergeBell, Plus } from '@repo/ui/icons';
 import { motion } from '@repo/ui/motion';
 
 export default function ReceptionPage() {
@@ -30,8 +30,16 @@ export default function ReceptionPage() {
       {/* Header Section */}
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
         <div>
-          <h1 className="text-4xl font-anton font-bold text-[#1A1A1A] mb-2">Reception Desk</h1>
-          <p className="text-gray-500 font-medium text-lg">Manage bookings, check-ins, check-outs and guest requests.</p>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-2.5 py-0.5 rounded-lg bg-lime-100 text-lime-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <ConciergeBell size={12} />
+              Reception Desk
+            </span>
+          </div>
+          <h1 className="text-4xl font-anton text-gray-900 uppercase tracking-tight">
+            Reception Desk
+          </h1>
+          <p className="text-gray-500 font-medium mt-1">Manage bookings, check-ins, check-outs and guest requests.</p>
         </div>
 
         <motion.button

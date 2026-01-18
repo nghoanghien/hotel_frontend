@@ -114,11 +114,7 @@ export type OnboardingSummary = {
 };
 
 export type OnboardingStats = {
-  totalApplications: number;
-  draftApplications: number;
-  pendingReview: number;
-  documentsRequired: number;
-  approvedThisMonth: number;
-  rejectedThisMonth: number;
-  activePartners: number;
+  pending: number;
+  approved: number;
+  rejected: number;
 };

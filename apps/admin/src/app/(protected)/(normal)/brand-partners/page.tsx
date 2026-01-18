@@ -24,7 +24,7 @@ export default function BrandPartnersPage() {
   const fetchStats = async () => {
     try {
       const stats = await brandPartnersService.getStats();
-      setPendingCount(stats.pendingReview);
+      setPendingCount(stats.pending);
     } catch (e) { }
   }
 

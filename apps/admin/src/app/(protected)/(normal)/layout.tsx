@@ -19,7 +19,7 @@ import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation, useLoading } from
 // Updated menu structure mapping to existing routes where possible
 // hotels -> Partners, customers -> Users, settings -> Master Data
 const adminMenuItems = [
-  { id: 'overview', icon: LayoutDashboard, text: 'Tổng quan', title: 'OVERVIEW' },
+  { id: 'dashboard', icon: LayoutDashboard, text: 'Tổng quan', title: 'OVERVIEW' },
   { id: 'brand-partners', icon: Building2, text: 'Quản lý đối tác', title: 'PARTNER MANAGEMENT' },
   { id: 'users', icon: Users, text: 'Quản trị người dùng', title: 'USER MANAGEMENT' },
   { id: 'settings', icon: Settings, text: 'Master Data', title: 'MASTER DATA' }
