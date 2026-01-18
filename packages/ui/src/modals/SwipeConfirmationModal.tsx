@@ -157,10 +157,11 @@ export function SwipeConfirmationModal({
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          key="swipe-confirmation-backdrop"
           className="fixed inset-0 bg-black/50 backdrop-blur-md z-[100] flex items-end sm:items-center justify-center"
           initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
           animate={{ opacity: 1, backdropFilter: 'blur(8px)' }}
-          exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+          exit={{ opacity: 0, backdropFilter: 'blur(0px)', pointerEvents: 'none' }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
           onClick={onClose}
         >
