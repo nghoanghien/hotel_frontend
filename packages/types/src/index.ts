@@ -8,3 +8,4 @@ export * from './dashboard';
 export * from './brand';
 export * from './onboarding';
 export * from './amenity';
+export * from './user';
