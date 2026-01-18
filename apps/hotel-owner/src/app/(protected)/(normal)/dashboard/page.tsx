@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from "react";
 import {
   BadgeDollarSign,
   Users,
@@ -9,6 +10,7 @@ import {
   CalendarCheck,
   LogOut
 } from "lucide-react";
+import { useLoading } from "@repo/ui";
 import { mockDashboardData, mockRevenueChartData, mockBookingChartData } from "@/data/mockDashboard";
 import { DashboardHeader } from "@/features/dashboard/components/DashboardHeader";
 import { MetricCard } from "@/features/dashboard/components/MetricCard";
@@ -19,6 +21,12 @@ import { ModernActivityList } from "@/features/dashboard/components/ModernActivi
 import { BookingTrendChart } from "@/features/dashboard/components/BookingTrendChart";
 
 export default function DashboardPage() {
+  const { hide } = useLoading();
+
+  // Tắt loading overlay khi dashboard mount (sau khi login thành công)
+  useEffect(() => {
+    hide();
+  }, [hide]);
   const data = mockDashboardData;
   const revenueChartData = mockRevenueChartData.daily;
   const bookingTrendData = mockBookingChartData.daily;

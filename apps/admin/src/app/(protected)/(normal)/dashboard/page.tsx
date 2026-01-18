@@ -3,14 +3,20 @@ import { useEffect, useState } from 'react';
 import { motion } from '@repo/ui/motion';
 import { OnboardingStats } from '@repo/types';
 import { brandPartnersService } from '../../../../features/brand-partners/services/brandPartnersService';
-import { LoadingSpinner } from '@repo/ui';
+import { LoadingSpinner, useLoading } from '@repo/ui';
 import { Building2, CheckCircle, Clock, XCircle, ArrowRight } from '@repo/ui/icons';
 import Link from 'next/link';
 
 export default function DashboardPage() {
+  const { hide } = useLoading();
   const [stats, setStats] = useState<OnboardingStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
+  // Tắt loading overlay khi dashboard mount (sau khi login thành công)
+  useEffect(() => {
+    hide();
+  }, [hide]);
 
   useEffect(() => {
     fetchStats();
