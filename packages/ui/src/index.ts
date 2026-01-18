@@ -9,6 +9,7 @@ export { default as SwipeConfirmationModal } from "./modals/SwipeConfirmationMod
 export { default as ProfileModal } from "./modals/ProfileModal";
 export { default as InputField } from "./forms/InputField";
 export { default as CustomSelect } from "./forms/CustomSelect";
+export { default as Select } from "./forms/Select";
 export { default as CalendarDatePicker } from "./forms/CalendarDatePicker";
 export { default as AddressFields } from "./forms/AddressFields";
 export { default as FloatingLabelInput } from "./forms/FloatingLabelInput";
