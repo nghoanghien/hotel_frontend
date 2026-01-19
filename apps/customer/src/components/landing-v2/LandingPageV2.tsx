@@ -10,7 +10,7 @@ import { useScrollAnimation, useSectionVisibility, usePageAnimation } from "./ho
 import { ScrollIndicator, PageLoadAnimation } from "./core";
 import { useLoading } from "@repo/ui";
 import BackgroundTransition from "@/features/home/components/BackgroundTransition";
-import { getCategoryBackgroundImage } from "@/features/home/data/mockRestaurants";
+const getCategoryBackgroundImage = (category: string) => "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop";
 
 // Navigation
 import { Navbar } from "./navigation";
@@ -40,7 +40,7 @@ export default function LandingPageV2() {
   useEffect(() => {
     const handleScroll = () => {
       const currentPosition = window.scrollY;
-      
+
       // Update scroll state
       setScrollState((prev) => ({
         ...prev,
