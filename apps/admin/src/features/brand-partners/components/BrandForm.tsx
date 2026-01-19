@@ -150,6 +150,25 @@ export default function BrandForm({ data, onChange, errors = {} }: BrandFormProp
           </div>
         </div>
       </div>
+
+      {/* Business Settings */}
+      <div className="space-y-4">
+        <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2 border-b border-gray-100 pb-2">
+          <LayoutGrid size={16} /> Business Settings
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs font-bold text-gray-700 uppercase mb-1.5 block">Commission Rate (%)</label>
+            <input
+              type="text"
+              value={data.commissionRate || ''}
+              onChange={(e) => handleChange('commissionRate', e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-lime-500 focus:ring-2 focus:ring-lime-200 outline-none transition-all font-medium text-gray-900 placeholder:text-gray-400"
+              placeholder="e.g. 15"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

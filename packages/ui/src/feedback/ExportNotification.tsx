@@ -9,9 +9,18 @@ export type ExportNotificationProps = {
   message?: string;
   autoHideDuration?: number;
   type?: 'success' | 'error';
+  isExport?: boolean;
 };
 
-const ExportNotification = ({ isVisible, onClose, format = 'pdf', message = 'Export successful!', autoHideDuration = 5000, type = 'success' }: ExportNotificationProps) => {
+const ExportNotification = ({
+  isVisible,
+  onClose,
+  format = 'pdf',
+  message = 'Export successful!',
+  autoHideDuration = 5000,
+  type = 'success',
+  isExport = true
+}: ExportNotificationProps) => {
   useEffect(() => { let timer: any; if (isVisible && autoHideDuration > 0) { timer = setTimeout(() => { onClose(); }, autoHideDuration); } return () => { if (timer) clearTimeout(timer); }; }, [isVisible, autoHideDuration, onClose]);
   const getFormatIcon = () => { switch (String(format).toLowerCase()) { case 'pdf': return <FileText size={20} className="text-red-500" />; case 'excel': return <FileText size={20} className="text-green-500" />; default: return <FileText size={20} className="text-blue-500" />; } };
   const getFormatText = () => { switch (String(format).toLowerCase()) { case 'pdf': return 'PDF'; case 'excel': return 'Excel'; default: return String(format); } };
@@ -35,10 +44,12 @@ const ExportNotification = ({ isVisible, onClose, format = 'pdf', message = 'Exp
               </div>
               <div className="flex-1 min-w-0">
                 <motion.div variants={textVariants} className="text-base font-bold text-blue-900 truncate">{message}</motion.div>
-                <div className="flex items-center gap-2 mt-1">
-                  <motion.div variants={formatIconVariants} className="flex items-center">{getFormatIcon()}</motion.div>
-                  <span className="text-xs text-blue-600 font-semibold backdrop-blur-sm bg-blue-100/40 rounded-xl px-2 py-0.5 shadow-sm">{getFormatText()}</span>
-                </div>
+                {isExport && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <motion.div variants={formatIconVariants} className="flex items-center">{getFormatIcon()}</motion.div>
+                    <span className="text-xs text-blue-600 font-semibold backdrop-blur-sm bg-blue-100/40 rounded-xl px-2 py-0.5 shadow-sm">{getFormatText()}</span>
+                  </div>
+                )}
               </div>
               <button onClick={onClose} className="absolute bg-white/50 top-3 right-3 p-2 rounded-full hover:bg-blue-50 transition-colors shadow" aria-label="Đóng thông báo"><X size={20} className="text-blue-400" /></button>
             </div>

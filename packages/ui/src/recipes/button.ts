@@ -8,6 +8,7 @@ export const buttonRecipe = createRecipe({
       secondary: "text-white bg-[var(--secondary)] hover:brightness-105 focus:ring-[var(--secondary)]",
       warning: "text-white bg-[var(--warning)] hover:brightness-105 focus:ring-[var(--warning)]",
       danger: "text-white bg-[var(--danger)] hover:brightness-105 focus:ring-[var(--danger)]",
+      destructive: "text-white bg-[var(--danger)] hover:brightness-105 focus:ring-[var(--danger)]",
       outline: "bg-transparent border border-current",
       ghost: "bg-transparent",
       glass: "text-gray-800 bg-white/30 backdrop-blur-lg border border-white/40 hover:bg-white/40",

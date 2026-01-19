@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, ReactNode, useMemo, useCallback } from "react";
 import ExportNotification, { ExportNotificationProps } from "../feedback/ExportNotification";
 
-type NotificationOptions = Pick<ExportNotificationProps, 'message' | 'format' | 'type' | 'autoHideDuration'>;
+type NotificationOptions = Pick<ExportNotificationProps, 'message' | 'format' | 'type' | 'autoHideDuration' | 'isExport'>;
 
 type NotificationContextValue = {
   showNotification: (options?: NotificationOptions | string) => void;
@@ -18,7 +18,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     message: 'Operation successful!',
     type: 'success',
     format: 'pdf',
-    autoHideDuration: 5000
+    autoHideDuration: 5000,
+    isExport: false
   });
 
   const showNotification = useCallback((options?: NotificationOptions | string) => {

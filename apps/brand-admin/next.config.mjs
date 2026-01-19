@@ -5,7 +5,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5293/:path*', // Proxy to Hotel SAAS Backend
+        destination: 'http://localhost:5293/api/:path*', // Proxy to Hotel SAAS Backend
       },
     ];
   },

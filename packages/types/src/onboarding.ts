@@ -1,10 +1,12 @@
 export type OnboardingStatus =
   | 'Draft'
-  | 'PendingReview'
+  | 'Submitted'
+  | 'UnderReview'
   | 'DocumentsRequired'
-  | 'ChangesRequested'
   | 'Approved'
-  | 'Rejected';
+  | 'Rejected'
+  | 'Active'
+  | 'Suspended';
 
 export type BillingCycle = 'Monthly' | 'Yearly';
 

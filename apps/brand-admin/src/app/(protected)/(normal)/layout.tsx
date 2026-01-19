@@ -16,6 +16,7 @@ import {
 } from '@repo/ui/icons';
 import RestaurantNavItem from '../../../components/RestaurantNavItem';
 import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation, useLoading } from '@repo/ui';
+import { useAuth } from '../../../features/auth/hooks/useAuth';
 
 // Updated menu structure for Brand Admin
 const adminMenuItems = [
@@ -28,8 +29,8 @@ const adminMenuItems = [
 export default function NormalLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [activeSection, setActiveSection] = useState('overview');
-  const [profileData] = useState({ fullName: 'Super Admin', email: 'admin@hotel.com' });
   const [navHovered, setNavHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { confirm } = useSwipeConfirmation();
@@ -120,7 +121,7 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
         />
 
         {/* Profile section */}
-        {isLoading ? (
+        {isLoading || isAuthLoading ? (
           <ProfileShimmer expanded={navHovered} />
         ) : (
           <motion.div
@@ -160,13 +161,13 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
                     layoutId="profile-name"
                     className="font-semibold text-sm text-gray-800 tracking-wide drop-shadow-sm whitespace-nowrap overflow-hidden text-ellipsis"
                   >
-                    {profileData.fullName}
+                    {user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.name || user?.email || 'Brand Admin'}
                   </motion.p>
                   <motion.p
                     layoutId="profile-email"
                     className="text-xs text-gray-600 drop-shadow-sm tracking-wide whitespace-nowrap overflow-hidden text-ellipsis"
                   >
-                    {profileData.email}
+                    {user?.email || 'admin@brand.com'}
                   </motion.p>
                 </div>
               </>

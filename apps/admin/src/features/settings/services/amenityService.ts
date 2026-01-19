@@ -1,246 +1,72 @@
+import { http, ApiResponse } from '@repo/api';
 import { Amenity, CreateAmenityDto, UpdateAmenityDto, AmenityType } from '@repo/types';
 
-// Mock data
-const mockAmenities: Amenity[] = [
-  // Room Amenities
-  {
-    id: '1',
-    name: 'Air Conditioning',
-    description: 'Climate control system for optimal room temperature',
-    icon: 'Wind',
-    type: AmenityType.Room,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '2',
-    name: 'Smart TV',
-    description: '55" 4K Smart TV with streaming services',
-    icon: 'Tv',
-    type: AmenityType.Entertainment,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '3',
-    name: 'Free WiFi',
-    description: 'High-speed wireless internet access',
-    icon: 'Wifi',
-    type: AmenityType.Service,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '4',
-    name: 'Mini Bar',
-    description: 'Fully stocked mini refrigerator with beverages and snacks',
-    icon: 'Coffee',
-    type: AmenityType.Kitchen,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '5',
-    name: 'Safe',
-    description: 'In-room electronic safe for valuables',
-    icon: 'ShieldCheck',
-    type: AmenityType.Room,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  // Bathroom Amenities
-  {
-    id: '6',
-    name: 'Hair Dryer',
-    description: 'Professional hair dryer',
-    icon: 'Wind',
-    type: AmenityType.Bathroom,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '7',
-    name: 'Bathtub',
-    description: 'Luxury bathtub with premium fixtures',
-    icon: 'Droplet',
-    type: AmenityType.Bathroom,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '8',
-    name: 'Premium Toiletries',
-    description: 'Luxury bath products',
-    icon: 'Sparkles',
-    type: AmenityType.Bathroom,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  // Facilities
-  {
-    id: '9',
-    name: 'Swimming Pool',
-    description: 'Outdoor infinity pool with city view',
-    icon: 'Waves',
-    type: AmenityType.Facilities,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '10',
-    name: 'Fitness Center',
-    description: '24/7 fully equipped gym',
-    icon: 'Dumbbell',
-    type: AmenityType.Facilities,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '11',
-    name: 'Spa & Wellness',
-    description: 'Full-service spa with massage and treatments',
-    icon: 'Sparkles',
-    type: AmenityType.Facilities,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '12',
-    name: 'Restaurant',
-    description: 'On-site fine dining restaurant',
-    icon: 'UtensilsCrossed',
-    type: AmenityType.Service,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '13',
-    name: 'Room Service',
-    description: '24-hour room service',
-    icon: 'Bell',
-    type: AmenityType.Service,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '14',
-    name: 'Parking',
-    description: 'Free on-site parking',
-    icon: 'Car',
-    type: AmenityType.Facilities,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '15',
-    name: 'EV Charging Station',
-    description: 'Electric vehicle charging points',
-    icon: 'Zap',
-    type: AmenityType.Facilities,
-    isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-  {
-    id: '16',
-    name: 'Fax Machine',
-    description: 'Fax services (deprecated)',
-    icon: 'FileText',
-    type: AmenityType.Service,
-    isActive: false,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z'
-  },
-];
+// API Endpoints
+const ENDPOINTS = {
+  amenities: '/amenities',
+  amenityById: (id: string) => `/amenities/${id}`,
+  amenitiesByType: (type: AmenityType) => `/amenities/type/${type}`,
+} as const;
 
-let amenitiesData = [...mockAmenities];
-
+// Service Implementation
 export const amenityService = {
-  // GET /api/amenities
+  // GET /api/amenities - Get all amenities (including inactive)
   getAllAmenities: async (): Promise<Amenity[]> => {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    return amenitiesData.filter(a => a.isActive);
+    const response = await http.get<ApiResponse<Amenity[]>>(ENDPOINTS.amenities);
+    return (response as any).data;
   },
 
   // GET /api/amenities/{id}
   getAmenityById: async (id: string): Promise<Amenity | null> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return amenitiesData.find(a => a.id === id) || null;
+    try {
+      const response = await http.get<ApiResponse<Amenity>>(ENDPOINTS.amenityById(id));
+      return (response as any).data;
+    } catch (error) {
+      console.error('Failed to get amenity:', error);
+      return null;
+    }
   },
 
   // GET /api/amenities/type/{type}
   getAmenitiesByType: async (type: AmenityType): Promise<Amenity[]> => {
-    await new Promise(resolve => setTimeout(resolve, 600));
-    return amenitiesData.filter(a => a.type === type && a.isActive);
+    const response = await http.get<ApiResponse<Amenity[]>>(ENDPOINTS.amenitiesByType(type));
+    return (response as any).data;
   },
 
-  // POST /api/amenities
+  // POST /api/amenities - Create new amenity
   createAmenity: async (data: CreateAmenityDto): Promise<Amenity> => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const newAmenity: Amenity = {
-      id: Math.random().toString(36).substr(2, 9),
-      ...data,
-      isActive: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    amenitiesData.push(newAmenity);
-    return newAmenity;
+    const response = await http.post<ApiResponse<Amenity>>(ENDPOINTS.amenities, data);
+    return (response as any).data;
   },
 
-  // PUT /api/amenities/{id}
+  // PUT /api/amenities/{id} - Update amenity
   updateAmenity: async (id: string, data: UpdateAmenityDto): Promise<Amenity> => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const index = amenitiesData.findIndex(a => a.id === id);
-    if (index === -1) throw new Error('Amenity not found');
-
-    amenitiesData[index] = {
-      ...amenitiesData[index],
-      ...data,
-      updatedAt: new Date().toISOString()
-    };
-    return amenitiesData[index];
+    const response = await http.put<ApiResponse<Amenity>>(ENDPOINTS.amenityById(id), data);
+    return (response as any).data;
   },
 
-  // DELETE /api/amenities/{id}
+  // DELETE /api/amenities/{id} - Delete amenity
   deleteAmenity: async (id: string): Promise<boolean> => {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    const index = amenitiesData.findIndex(a => a.id === id);
-    if (index === -1) return false;
-
-    amenitiesData.splice(index, 1);
-    return true;
+    const response = await http.delete<ApiResponse<boolean>>(ENDPOINTS.amenityById(id));
+    return (response as any).data;
   },
 
-  // Get statistics
+  // Get statistics calculated locally from the full list
   getStats: async () => {
-    await new Promise(resolve => setTimeout(resolve, 400));
+    const amenities = await amenityService.getAllAmenities();
+
     return {
-      total: amenitiesData.length,
-      active: amenitiesData.filter(a => a.isActive).length,
-      inactive: amenitiesData.filter(a => !a.isActive).length,
+      total: amenities.length,
+      active: amenities.filter(a => a.isActive).length,
+      inactive: amenities.filter(a => !a.isActive).length,
       byType: {
-        general: amenitiesData.filter(a => a.type === AmenityType.General).length,
-        room: amenitiesData.filter(a => a.type === AmenityType.Room).length,
-        bathroom: amenitiesData.filter(a => a.type === AmenityType.Bathroom).length,
-        kitchen: amenitiesData.filter(a => a.type === AmenityType.Kitchen).length,
-        entertainment: amenitiesData.filter(a => a.type === AmenityType.Entertainment).length,
-        service: amenitiesData.filter(a => a.type === AmenityType.Service).length,
-        facilities: amenitiesData.filter(a => a.type === AmenityType.Facilities).length,
+        general: amenities.filter(a => a.type === AmenityType.General).length,
+        room: amenities.filter(a => a.type === AmenityType.Room).length,
+        bathroom: amenities.filter(a => a.type === AmenityType.Bathroom).length,
+        kitchen: amenities.filter(a => a.type === AmenityType.Kitchen).length,
+        entertainment: amenities.filter(a => a.type === AmenityType.Entertainment).length,
+        service: amenities.filter(a => a.type === AmenityType.Service).length,
+        facilities: amenities.filter(a => a.type === AmenityType.Facilities).length,
       }
     };
   }
