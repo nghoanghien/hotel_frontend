@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Bỏ qua lỗi ESLint khi build (cho phép deploy dù có warning/error nhỏ)
+  // Bỏ qua lỗi ESLint kiugihi build (cho phép deploy dù có warning/error nhỏ)
   eslint: {
     ignoreDuringBuilds: true,
   },
