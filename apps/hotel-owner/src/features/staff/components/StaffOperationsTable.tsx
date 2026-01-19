@@ -1,3 +1,5 @@
+'use client';
+
 import { DataTable, ColumnDef, useNotification, StatusBadge, useSwipeConfirmation } from '@repo/ui';
 import { motion } from '@repo/ui/motion';
 import { Search, Plus, Trash2, Edit2, Shield, User, Smartphone, UserCog, Filter, Download, X, Check, CheckCircle, Ban, Clock, AlertCircle } from 'lucide-react';
@@ -43,7 +45,7 @@ export default function StaffOperationsTable() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const res = await staffService.getStaffs('hotel-1');
+      const res = await staffService.getStaffs('hotel-kh-001');
       setData(res);
     } catch (e) {
       showNotification({ message: 'Failed to load staff list', type: 'error' });

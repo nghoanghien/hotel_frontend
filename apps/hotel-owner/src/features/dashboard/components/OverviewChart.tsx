@@ -6,6 +6,10 @@ interface OverviewChartProps {
 }
 
 export function OverviewChart({ data }: OverviewChartProps) {
+  // Calculate total revenue from chart data
+  const totalRevenue = data.reduce((sum, item) => sum + (item.value || 0), 0);
+  const targetRevenue = totalRevenue * 1.5; // Target is 1.5x revenue
+
   return (
     <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-100 h-full flex flex-col">
       <div className="flex justify-between items-start mb-8">
@@ -15,12 +19,16 @@ export function OverviewChart({ data }: OverviewChartProps) {
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-blue-500" />
               <span className="text-xs font-medium text-gray-500">Revenue</span>
-              <span className="text-sm font-bold text-gray-900">$20,000</span>
+              <span className="text-sm font-bold text-gray-900">
+                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', notation: 'compact' }).format(totalRevenue)}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-orange-400" />
               <span className="text-xs font-medium text-gray-500">Target</span>
-              <span className="text-sm font-bold text-gray-900">$40,000</span>
+              <span className="text-sm font-bold text-gray-900">
+                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', notation: 'compact' }).format(targetRevenue)}
+              </span>
             </div>
           </div>
         </div>

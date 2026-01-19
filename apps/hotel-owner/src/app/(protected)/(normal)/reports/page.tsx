@@ -16,22 +16,36 @@ type ReportTab = 'full' | 'revenue' | 'occupancy' | 'bookings' | 'inventory';
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<ReportTab>('full');
-  const [startDate, setStartDate] = useState(new Date(new Date().setDate(new Date().getDate() - 30)));
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [reportData, setReportData] = useState<any>(null);
 
   const { showNotification } = useNotification();
-  const hotelId = 'hotel-1'; // Should be from context
+  const hotelId = 'hotel-kh-001'; // Vinpearl Resort & Spa Nha Trang Bay
+
+  // Initialize dates on client mount to avoid hydration mismatch
+  useEffect(() => {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    setStartDate(thirtyDaysAgo);
+    setEndDate(now);
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
+    if (!isMounted || !startDate || !endDate) return;
     // Reset data immediately when tab or filters change to prevent type mismatch
     setReportData(null);
     fetchReportData();
   }, [activeTab, startDate, endDate]);
 
   const fetchReportData = async () => {
+    if (!startDate || !endDate) return; // Guard clause for null dates
+
     setIsLoading(true);
     try {
       let data;
@@ -100,6 +114,15 @@ export default function ReportsPage() {
       </motion.div>
     );
   };
+
+  // Don't render until client-mounted and dates initialized
+  if (!isMounted || !startDate || !endDate) {
+    return (
+      <div className="min-h-screen bg-white p-8 flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-lime-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white p-8 pb-32">

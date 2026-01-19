@@ -1,6 +1,9 @@
-'use client';
+import dynamic from 'next/dynamic';
 
-import StaffOperationsTable from '../../../../features/staff/components/StaffOperationsTable';
+const StaffOperationsTable = dynamic(
+  () => import('../../../../features/staff/components/StaffOperationsTable'),
+  { ssr: false }
+);
 
 export default function StaffPage() {
   return (
