@@ -19,7 +19,7 @@ export default function PromotionsPage() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const result = await promotionService.getPromotions('brand-1');
+      const result = await promotionService.getPromotions('brand-vinpearl');
       setData(result);
     } catch (error) {
       showNotification({ message: 'Failed to load campaigns', type: 'error' });
@@ -35,10 +35,10 @@ export default function PromotionsPage() {
   const handleDelete = async (id: string) => {
     try {
       await promotionService.deletePromotion(id);
-      showNotification({ message: 'Campaign deleted successfully', type: 'success' });
+      showNotification({ message: 'Campaign deleted successfully', type: 'success', format: "Chiến dịch đã được xóa thành công" });
       fetchData();
     } catch (error) {
-      showNotification({ message: 'Failed to delete campaign', type: 'error' });
+      showNotification({ message: 'Failed to delete campaign', type: 'error', format: "Xóa chiến dịch thất bại" });
     }
   };
 

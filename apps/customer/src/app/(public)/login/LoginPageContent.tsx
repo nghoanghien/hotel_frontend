@@ -14,7 +14,7 @@ import { useEffect } from "react";
 export default function LoginPageContent() {
   const router = useRouter();
   const { show, hide } = useLoading();
-  const { mutate, isPending, error, reset } = useLogin();
+  const { handleLogin, isPending, error, reset } = useLogin();
 
   const form = useZodForm<LoginFormData>({
     schema: loginSchema,
@@ -33,6 +33,25 @@ export default function LoginPageContent() {
 
   const handleRegisterClick = () => {
     router.push("/register");
+  };
+
+  const onSubmit = async (data: LoginFormData) => {
+    reset(); // Clear previous errors
+    show("Đang đăng nhập...");
+
+    const success = await handleLogin({
+      email: data.email,
+      password: data.password
+    });
+
+    if (success) {
+      show("Đăng nhập thành công! Đang chuyển hướng...");
+      setTimeout(() => {
+        router.push("/home");
+      }, 500);
+    } else {
+      hide();
+    }
   };
 
   return (
@@ -63,19 +82,7 @@ export default function LoginPageContent() {
                 <LoginForm
                   form={form}
                   onForgotPassword={() => router.push("/forgot-password")}
-                  onSuccess={(data) => {
-                    reset(); // Clear previous errors
-                    show("Đang đăng nhập...");
-                    mutate(data, {
-                      onSuccess: () => {
-                        show("Đăng nhập thành công! Đang chuyển hướng...");
-                        router.push("/home");
-                      },
-                      onError: () => {
-                        hide();
-                      }
-                    });
-                  }}
+                  onSuccess={onSubmit}
                   onRegister={handleRegisterClick}
                   isLoading={isPending}
                   error={error}
@@ -88,3 +95,4 @@ export default function LoginPageContent() {
     </AnimatePresence>
   );
 }
+

@@ -16,6 +16,8 @@ import {
 } from '@repo/ui/icons';
 import RestaurantNavItem from '../../../components/RestaurantNavItem';
 import { ProfileShimmer, NavItemShimmer, useSwipeConfirmation, useLoading } from '@repo/ui';
+import { useAuth } from '../../../features/auth/hooks/useAuth';
+import { useLogout } from '../../../features/auth/hooks/useLogout';
 
 // Updated menu structure for Brand Admin
 const adminMenuItems = [
@@ -29,11 +31,19 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [activeSection, setActiveSection] = useState('overview');
-  const [profileData] = useState({ fullName: 'Super Admin', email: 'admin@hotel.com' });
   const [navHovered, setNavHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { confirm } = useSwipeConfirmation();
   const { show } = useLoading();
+  const { user } = useAuth();
+  const { mutate: logout } = useLogout();
+
+  // Profile data from auth or default mock
+  const profileData = {
+    fullName: user ? `${user.lastName} ${user.firstName}` : 'Trần Thị Linh',
+    email: user?.email || 'admin@vinpearl.com',
+    brandName: 'Vinpearl' // Brand admin manages Vinpearl
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -57,18 +67,8 @@ export default function NormalLayout({ children }: { children: ReactNode }) {
       confirmText: "Vuốt để đăng xuất",
       type: "danger",
       onConfirm: async () => {
-        // Simulate 2 second loading
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        // Show loading overlay
         show("Đang đăng xuất...");
-
-        // Clear any auth data (if needed)
-        // localStorage.removeItem('authToken');
-        // sessionStorage.clear();
-
-        // Redirect to login page
-        router.replace('/login');
+        logout();
       }
     });
   };

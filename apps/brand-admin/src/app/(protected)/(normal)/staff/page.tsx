@@ -24,7 +24,7 @@ export default function StaffPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const res = await staffService.getBrandStaff('brand-1');
+      const res = await staffService.getBrandStaff('brand-vinpearl');
       setData(res);
     } catch (e) {
       showNotification({ message: 'Failed to load staff list', type: 'error' });
@@ -80,7 +80,7 @@ export default function StaffPage() {
       <CreateStaffModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        brandId="brand-1"
+        brandId="brand-vinpearl"
         onSuccess={handleRefresh}
       />
 

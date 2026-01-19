@@ -1,44 +1,79 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { setAccessToken } from "@repo/api";
 import { useAuthStore } from "@repo/store";
-import { login } from "../api";
-import { LoginDto } from "@repo/types";
+import { LoginDto, UserDto } from "@repo/types";
+
+// Mock Brand Admin - Vinpearl
+// This user manages Vinpearl hotel chain
+const mockBrandAdmin: UserDto = {
+  id: "brand-admin-001",
+  email: "admin@vinpearl.com",
+  firstName: "Linh",
+  lastName: "Trần Thị",
+  phoneNumber: "+84 28 3827 8888",
+  role: "HotelOwner", // Brand admin role
+  brandId: "brand-vinpearl"
+};
+
+// Mock access token
+const mockAccessToken = "mock-access-token-brand-admin-vinpearl-12345";
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
   const { setUser } = useAuthStore();
+  const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const mutation = useMutation({
-    mutationFn: (data: LoginDto) => login(data),
-    onSuccess: (response) => {
-      // response is already unwrapped by http interceptor
-      // Structure: { success: true, message: "...", data: { accessToken, refreshToken, user } }
+  const handleLogin = async (data: LoginDto): Promise<boolean> => {
+    setIsPending(true);
+    setError(null);
 
-      if (response && response.success && response.data) {
-        // 1. Set Access Token in Memory (Http Client)
-        setAccessToken(response.data.accessToken);
+    try {
+      // Simulate network delay for realistic feel
+      await new Promise(resolve => setTimeout(resolve, 800));
 
-        // 2. Update Store (User info only)
-        if (response.data.user) {
-          setUser(response.data.user);
-        }
-
-        // 3. Invalidate auth query to ensure fresh state
-        queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+      // Simple validation (any non-empty email/password works for demo)
+      if (!data.email || !data.password) {
+        setError("Vui lòng nhập email và mật khẩu");
+        setIsPending(false);
+        return false;
       }
-    },
-    onError: (error) => {
-      console.error("Login failed:", error);
+
+      // Set mock access token
+      setAccessToken(mockAccessToken);
+
+      // Set mock brand admin in store
+      setUser({
+        ...mockBrandAdmin,
+        email: data.email // Use provided email but keep mock info
+      });
+
+      // Invalidate auth query
+      queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+
+      setIsPending(false);
+      return true;
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Đăng nhập thất bại");
+      setIsPending(false);
+      return false;
     }
-  });
+  };
+
+  const reset = () => {
+    setError(null);
+    setIsPending(false);
+  };
 
   return {
-    handleLogin: (data: LoginDto) => mutation.mutateAsync(data).then(() => true).catch(() => false),
-    mutate: mutation.mutate,
-    mutateAsync: mutation.mutateAsync,
-    isPending: mutation.isPending,
-    isLoading: mutation.isPending,
-    error: mutation.error ? (mutation.error as any).message || "Đăng nhập thất bại" : null,
-    reset: mutation.reset,
+    handleLogin,
+    mutate: (data: LoginDto) => { handleLogin(data); },
+    mutateAsync: handleLogin,
+    isPending,
+    isLoading: isPending,
+    error,
+    reset,
   };
 };

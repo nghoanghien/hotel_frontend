@@ -103,7 +103,7 @@ export default function HotelsPage() {
       <CreateHotelModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        brandId="brand-1"
+        brandId="brand-vinpearl"
         onSuccess={handleCreateSuccess}
       />
 

@@ -1,12 +1,12 @@
 import type { BookingDetailDto } from '@repo/types';
 import { mockHotels } from './hotels';
 
-// Mock user info
+// Mock user info - Nguyễn Văn An
 export const mockUser = {
   id: 'user-001',
   name: 'Nguyễn Văn An',
-  email: 'nguyen.vanan@example.com',
-  phone: '+84 901 234 567'
+  email: 'nguyenvanan@gmail.com',
+  phone: '+84 912 345 678'
 };
 
 // Generate booking history referencing real hotels
