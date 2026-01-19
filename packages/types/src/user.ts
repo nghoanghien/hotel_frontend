@@ -29,6 +29,18 @@ export interface User {
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
+  // Additional guest profile fields
+  preferredLanguage?: string;
+  preferredCurrency?: string;
+  emailNotificationsEnabled?: boolean;
+  smsNotificationsEnabled?: boolean;
+  dateOfBirth?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  totalBookings?: number;
+  completedStays?: number;
+  totalReviews?: number;
 }
 
 export interface CreateUserDto {

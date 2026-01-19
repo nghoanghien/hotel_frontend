@@ -10,7 +10,7 @@ import { useScrollAnimation, useSectionVisibility, usePageAnimation } from "./ho
 import { ScrollIndicator, PageLoadAnimation } from "./core";
 import { useLoading } from "@repo/ui";
 import BackgroundTransition from "@/features/home/components/BackgroundTransition";
-import { getCategoryBackgroundImage } from "@/features/home/data/mockRestaurants";
+import { getCategoryBackgroundImage } from "@/features/home/hooks/useHomePage";
 
 // Navigation
 import { Navbar } from "./navigation";

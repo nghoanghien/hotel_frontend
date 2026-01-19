@@ -74,22 +74,28 @@ http.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // IMPORTANT: This Frontend implementation relies on the Backend supporting HttpOnly Cookies for Refresh Tokens.
-        // If the Backend does not support this (i.e., returns refreshToken only in the JSON body), you must:
-        // 1. Modify `useLogin` to store the refreshToken in `localStorage`.
-        // 2. Modify this interceptor to retrieve `localStorage.getItem('refresh_token')` and send it in the request body below.
+        // Get refreshToken from localStorage
+        const refreshToken = typeof window !== "undefined" ? localStorage.getItem("refresh_token") : null;
 
-        // Backend expects RefreshToken in body if not in cookie, but we prefer cookie.
-        // We send empty object or simplified DTO to trigger the prioritized Cookie check we added.
-        const res = await axios.post<ApiResponse<{ accessToken: string }>>(
-          `${process.env.NEXT_PUBLIC_API_URL || "/api"}/auth/refresh-token`,
-          { refreshToken: "" }, // Send empty to force cookie check
-          { withCredentials: true } // Crucial for sending the HttpOnly cookie
+        if (!refreshToken) {
+          throw new Error("No refresh token available");
+        }
+
+        // Send refreshToken in request body
+        const res = await axios.post<ApiResponse<{ accessToken: string; refreshToken?: string }>>(
+          `${process.env.NEXT_PUBLIC_API_URL || "/api"}/Auth/refresh-token`,
+          { refreshToken }, // Send actual refresh token
+          { withCredentials: true } // Keep for cookie support
         );
 
         if (res.data.success && res.data.data.accessToken) {
           const newToken = res.data.data.accessToken;
           setAccessToken(newToken);
+
+          // Update refresh token if backend returns a new one
+          if (res.data.data.refreshToken && typeof window !== "undefined") {
+            localStorage.setItem("refresh_token", res.data.data.refreshToken);
+          }
 
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
@@ -103,6 +109,10 @@ http.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         setAccessToken(null);
+        // Clear refresh token on failure
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("refresh_token");
+        }
         // Optional: Redirect to login or let the app handle the failure
         return Promise.reject(refreshError);
       } finally {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "@repo/lib/form";
 import { zodResolver } from "@repo/lib/form";
 import { motion, AnimatePresence } from "@repo/ui/motion";
@@ -16,6 +16,9 @@ import {
   // type OTPData,
   type UserInfoData,
 } from "./schemas/registerSchema";
+import { register, getHotels } from "@/features/auth/api";
+import { setAccessToken } from "@repo/api";
+import { useAuthStore } from "@repo/store";
 
 interface RegisterFormProps {
   onBack: () => void;
@@ -24,14 +27,42 @@ interface RegisterFormProps {
 
 type Step = "email" | "otp" | "info" | "success";
 
+interface Hotel {
+  id: string;
+  name: string;
+  brandId: string;
+  brandName: string;
+  city: string;
+}
+
 export default function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
-  const [currentStep, setCurrentStep] = useState<Step>("email");
+  // Skip email/OTP steps - go directly to info
+  const [currentStep, setCurrentStep] = useState<Step>("info");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [otpError, setOtpError] = useState("");
+  const [hotels, setHotels] = useState<Hotel[]>([]);
+  const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
+  const [error, setError] = useState("");
+  const { setUser } = useAuthStore();
 
-  // Email form
+  // Fetch hotels on mount
+  useEffect(() => {
+    const fetchHotels = async () => {
+      try {
+        const response = await getHotels();
+        if (response.success && response.data) {
+          setHotels(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch hotels:", error);
+      }
+    };
+    fetchHotels();
+  }, []);
+
+  // Email form (Hidden)
   const emailForm = useForm<EmailVerificationData>({
     resolver: zodResolver(emailVerificationSchema),
     mode: "onChange",
@@ -41,6 +72,16 @@ export default function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
   const infoForm = useForm<UserInfoData>({
     resolver: zodResolver(userInfoSchema),
     mode: "onChange",
+    defaultValues: {
+      email: "",
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      password: "",
+      confirmPassword: "",
+      hotelId: "",
+      brandId: "",
+    },
   });
 
   const handleEmailSubmit = async (data: EmailVerificationData) => {
@@ -78,28 +119,63 @@ export default function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
 
   const handleInfoSubmit = async (data: UserInfoData) => {
     setIsLoading(true);
+    setError("");
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const registerData = {
+        email: data.email,
+        password: data.password,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        phoneNumber: data.phoneNumber,
+        role: 0, // Customer role
+        brandId: data.brandId || selectedHotel?.brandId || "00000000-0000-0000-0000-000000000000",
+        hotelId: data.hotelId,
+      };
 
-    console.log("Registration data:", { email, ...data });
+      const response = await register(registerData);
 
-    setIsLoading(false);
-    setCurrentStep("success");
+      if (response.success && response.data) {
+        // Set access token
+        setAccessToken(response.data.accessToken);
+        
+        // Store refresh token
+        if (response.data.refreshToken) {
+          localStorage.setItem("refresh_token", response.data.refreshToken);
+        }
+        
+        // Update store with user info
+        if (response.data.userId) {
+          setUser({
+            id: response.data.userId,
+            email: response.data.email,
+            firstName: response.data.firstName,
+            lastName: response.data.lastName,
+            role: response.data.role,
+          } as any);
+        }
+
+        setIsLoading(false);
+        setCurrentStep("success");
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      setError(error?.response?.data?.message || error?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+    }
+  };
+
+  const handleHotelChange = (hotelId: string) => {
+    const hotel = hotels.find(h => h.id === hotelId);
+    setSelectedHotel(hotel || null);
+    infoForm.setValue("hotelId", hotelId, { shouldValidate: true });
+    if (hotel) {
+      infoForm.setValue("brandId", hotel.brandId);
+    }
   };
 
   const getStepNumber = () => {
-    switch (currentStep) {
-      case "email":
-      case "otp":
-        return 1;
-      case "info":
-        return 2;
-      case "success":
-        return 2;
-      default:
-        return 1;
-    }
+    // Only 1 step now since we skip email/OTP
+    return 1;
   };
 
   return (
@@ -117,19 +193,19 @@ export default function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
         </div>
       )}
 
-      {/* Progress Bar */}
-      {currentStep !== "success" && (
+      {/* Progress Bar - Hidden since we only have 1 step */}
+      {false && currentStep !== "success" && (
         <div className="px-6 py-4">
-          <ProgressBar currentStep={getStepNumber()} totalSteps={2} steps={["Xác thực Email", "Thông tin cá nhân"]} />
+          <ProgressBar currentStep={getStepNumber()} totalSteps={1} steps={["Đăng ký tài khoản"]} />
         </div>
       )}
 
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center px-6 py-8">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-2xl">
           <AnimatePresence mode="wait">
-            {/* Step 1: Email Input */}
-            {currentStep === "email" && (
+            {/* Email & OTP Steps - Hidden */}
+            {false && currentStep === "email" && (
               <motion.div
                 key="email"
                 initial={{ opacity: 0, x: 50 }}
@@ -137,105 +213,17 @@ export default function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
                 exit={{ opacity: 0, x: -50 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="text-center mb-8">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-                    className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] rounded-2xl flex items-center justify-center"
-                  >
-                    <Mail size={32} className="text-white" />
-                  </motion.div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Đăng ký tài khoản</h2>
-                  <p className="text-gray-600">Nhập email của bạn để bắt đầu</p>
-                </div>
-
-                <form onSubmit={emailForm.handleSubmit(handleEmailSubmit)} className="space-y-6">
-                  <FloatingLabelInput
-                    label="Email"
-                    type="email"
-                    value={emailForm.watch("email")}
-                    error={emailForm.formState.errors.email?.message}
-                    {...emailForm.register("email")}
-                  />
-
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full h-14 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white font-semibold rounded-full hover:shadow-lg active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Đang gửi OTP...</span>
-                      </div>
-                    ) : (
-                      "Tiếp tục"
-                    )}
-                  </button>
-                </form>
+                {/* Email step content - kept for reference but hidden */}
               </motion.div>
             )}
 
-            {/* Step 2: OTP Input */}
-            {currentStep === "otp" && (
-              <motion.div
-                key="otp"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="text-center mb-8">
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-                    className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[var(--primary)] to-[var(--secondary)] rounded-2xl flex items-center justify-center"
-                  >
-                    <Mail size={32} className="text-white" />
-                  </motion.div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Xác thực Email</h2>
-                  <p className="text-gray-600">
-                    Mã OTP đã được gửi đến <span className="font-semibold text-[var(--primary)]">{email}</span>
-                  </p>
-                  <button
-                    onClick={() => setCurrentStep("email")}
-                    className="mt-2 text-sm text-gray-500 hover:text-[var(--primary)] transition-colors"
-                  >
-                    Thay đổi email
-                  </button>
-                </div>
-
-                <div className="space-y-6">
-                  <OTPInput length={6} value={otp} onChange={setOtp} error={otpError} />
-
-                  <div className="text-center text-sm text-gray-600">
-                    Không nhận được mã?{" "}
-                    <button className="text-[var(--primary)] font-semibold hover:underline">Gửi lại</button>
-                  </div>
-
-                  <button
-                    onClick={handleOTPVerify}
-                    disabled={isLoading || otp.length !== 6}
-                    className="w-full h-14 bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] text-white font-semibold rounded-full hover:shadow-lg active:scale-[0.98] transition-all duration-200 disabled:opacity-50"
-                  >
-                    {isLoading ? (
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Đang xác thực...</span>
-                      </div>
-                    ) : (
-                      "Xác nhận"
-                    )}
-                  </button>
-                </div>
-
-                <p className="mt-6 text-center text-xs text-gray-500">Mã OTP test: 123456</p>
+            {false && currentStep === "otp" && (
+              <motion.div key="otp">
+                {/* OTP step content - kept for reference but hidden */}
               </motion.div>
             )}
 
-            {/* Step 3: User Info */}
+            {/* Step 3: User Info - Now the first and only step */}
             {currentStep === "info" && (
               <motion.div
                 key="info"
@@ -253,27 +241,41 @@ export default function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
                   >
                     <User size={32} className="text-white" />
                   </motion.div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Thông tin cá nhân</h2>
-                  <p className="text-gray-600">Hoàn tất thông tin để tạo tài khoản</p>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">Đăng ký tài khoản</h2>
+                  <p className="text-gray-600">Điền thông tin để tạo tài khoản mới</p>
                 </div>
 
                 <form onSubmit={infoForm.handleSubmit(handleInfoSubmit)} className="space-y-5">
-                  <FloatingLabelInput
-                    label="Họ và tên"
-                    type="text"
-                    value={infoForm.watch("fullName")}
-                    error={infoForm.formState.errors.fullName?.message}
-                    {...infoForm.register("fullName")}
-                  />
+                  {error && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+                      {error}
+                    </div>
+                  )}
 
-                  <CalendarDatePicker
-                    label="Ngày sinh"
-                    value={infoForm.watch("dateOfBirth")}
-                    onChange={(date) => infoForm.setValue("dateOfBirth", date as string, { shouldValidate: true })}
-                    error={infoForm.formState.errors.dateOfBirth?.message}
-                    placeholder="DD/MM/YYYY"
-                    allowFutureDates={false}
-                    required
+                  <div className="grid grid-cols-2 gap-4">
+                    <FloatingLabelInput
+                      label="Họ"
+                      type="text"
+                      value={infoForm.watch("lastName")}
+                      error={infoForm.formState.errors.lastName?.message}
+                      {...infoForm.register("lastName")}
+                    />
+
+                    <FloatingLabelInput
+                      label="Tên"
+                      type="text"
+                      value={infoForm.watch("firstName")}
+                      error={infoForm.formState.errors.firstName?.message}
+                      {...infoForm.register("firstName")}
+                    />
+                  </div>
+
+                  <FloatingLabelInput
+                    label="Email"
+                    type="email"
+                    value={infoForm.watch("email")}
+                    error={infoForm.formState.errors.email?.message}
+                    {...infoForm.register("email")}
                   />
 
                   <FloatingLabelInput
@@ -283,6 +285,28 @@ export default function RegisterForm({ onBack, onSuccess }: RegisterFormProps) {
                     error={infoForm.formState.errors.phoneNumber?.message}
                     {...infoForm.register("phoneNumber")}
                   />
+
+                  {/* Hotel Selection */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Khách sạn <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={infoForm.watch("hotelId")}
+                      onChange={(e) => handleHotelChange(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent transition-all"
+                    >
+                      <option value="">Chọn khách sạn</option>
+                      {hotels.map((hotel) => (
+                        <option key={hotel.id} value={hotel.id}>
+                          {hotel.name} - {hotel.city} ({hotel.brandName})
+                        </option>
+                      ))}
+                    </select>
+                    {infoForm.formState.errors.hotelId && (
+                      <p className="text-red-500 text-sm mt-1">{infoForm.formState.errors.hotelId.message}</p>
+                    )}
+                  </div>
 
                   <FloatingLabelInput
                     label="Mật khẩu"

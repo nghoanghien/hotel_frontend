@@ -13,6 +13,10 @@ export const useLogout = () => {
     mutationFn: logout,
     onSuccess: () => {
       setAccessToken(null);
+      // Clear refresh token from localStorage
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("refresh_token");
+      }
       clearStore();
       queryClient.clear();
       router.push("/login");

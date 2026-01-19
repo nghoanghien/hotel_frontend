@@ -18,12 +18,17 @@ export const useLogin = () => {
         // 1. Set Access Token in Memory (Http Client)
         setAccessToken(response.data.accessToken);
 
-        // 2. Update Store (User info only)
+        // 2. Store Refresh Token in localStorage (for refresh mechanism)
+        if (response.data.refreshToken) {
+          localStorage.setItem("refresh_token", response.data.refreshToken);
+        }
+
+        // 3. Update Store (User info only)
         if (response.data.user) {
           setUser(response.data.user);
         }
 
-        // 3. Invalidate auth query to ensure fresh state
+        // 4. Invalidate auth query to ensure fresh state
         queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
       }
     },
