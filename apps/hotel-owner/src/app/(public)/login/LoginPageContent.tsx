@@ -11,15 +11,15 @@ import { useLogin } from "../../../features/auth/hooks/useLogin";
 export default function LoginPageContent() {
   const router = useRouter();
   const { show, hide } = useLoading();
-  const { mutate, isPending, error, reset } = useLogin();
+  const { handleLogin, isPending, error, reset } = useLogin();
 
-  // Show loading on page load, then hide after 2 seconds
+  // Show loading on page load, then hide after 1 second
   useEffect(() => {
     show("Đang tải trang đăng nhập...");
 
     const timer = setTimeout(() => {
       hide();
-    }, 2000);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [show, hide]);
@@ -29,6 +29,25 @@ export default function LoginPageContent() {
     mode: "onChange",
     defaultValues: { email: "", password: "", rememberMe: false },
   });
+
+  const onSubmit = async (data: LoginFormData) => {
+    reset(); // Clear previous errors
+    show("Đang đăng nhập...");
+
+    const success = await handleLogin({
+      email: data.email,
+      password: data.password
+    });
+
+    if (success) {
+      show("Đăng nhập thành công, chuyển hướng đến Dashboard...");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 500);
+    } else {
+      hide();
+    }
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -63,17 +82,7 @@ export default function LoginPageContent() {
                 <LoginForm
                   form={form}
                   onForgotPassword={() => router.push("/forgot-password")}
-                  onSuccess={(data) => {
-                    reset(); // Clear previous errors
-                    show("Đang đăng nhập...");
-                    mutate(data, {
-                      onSuccess: () => {
-                        show("Đăng nhập thành công, chuyển hướng đến Dashboard...");
-                        router.push("/dashboard");
-                      },
-                      onError: () => hide()
-                    });
-                  }}
+                  onSuccess={onSubmit}
                   isLoading={isPending}
                   error={error}
                 />

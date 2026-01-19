@@ -204,14 +204,35 @@ const RoomConfigurationTable = forwardRef<RoomConfigurationTableRef, {}>((props,
   };
 
   const handleDelete = (id: string) => {
+    const room = data.find(r => r.id === id);
+
+    // Quick check for occupied room before even showing confirm
+    if (room?.status === 'Occupied') {
+      showNotification({
+        message: 'Cannot delete occupied room',
+        type: 'error',
+        format: "Không thể xóa phòng đang có khách. Vui lòng chờ khách trả phòng."
+      });
+      return;
+    }
+
     confirm({
       title: "Delete Room",
       description: "Are you sure you want to delete this room? This action cannot be undone.",
       confirmText: "Swipe to Delete",
       type: "danger",
       onConfirm: async () => {
-        setData(prev => prev.filter(r => r.id !== id));
-        showNotification({ message: 'Room deleted successfully', type: 'success', format: "Phòng đã được xóa thành công." });
+        try {
+          // Simulating service call - in real app would use roomConfigService.deleteRoom(id)
+          setData(prev => prev.filter(r => r.id !== id));
+          showNotification({ message: 'Room deleted successfully', type: 'success', format: "Phòng đã được xóa thành công." });
+        } catch (error: any) {
+          showNotification({
+            message: error.message || 'Failed to delete room',
+            type: 'error',
+            format: "Xóa phòng thất bại."
+          });
+        }
       }
     });
   };
