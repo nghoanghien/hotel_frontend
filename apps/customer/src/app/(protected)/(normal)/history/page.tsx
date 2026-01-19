@@ -1,55 +1,65 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLoading, BookingHistoryCardShimmer } from "@repo/ui";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { ArrowLeft, Receipt, Filter, Search, X } from "@repo/ui/icons";
-import { getBookingHistory } from "@/features/history/data/mockBookingHistory";
 import BookingHistoryCard from "@/features/history/components/BookingHistoryCard";
 import BookingDetailDrawer from "@/features/history/components/BookingDetailDrawer";
-import type { BookingDetailDto, BookingStatus } from "@repo/types";
+import { useMyBookings } from "@/features/history/hooks/useMyBookings";
+
+// Status mapping from backend (number) to frontend (string)
+const statusMap: Record<number, string> = {
+  0: "Pending",
+  1: "Confirmed",
+  2: "CheckedIn",
+  3: "CheckedOut",
+  4: "Cancelled",
+  5: "NoShow",
+};
 
 // Filter configuration
-const statusFilters: { value: BookingStatus | "The_Rest" | "ALL"; label: string }[] = [
+const statusFilters: { value: number | "ALL"; label: string }[] = [
   { value: "ALL", label: "Tất cả" },
-  { value: "CheckedOut", label: "Hoàn thành" },
-  { value: "Cancelled", label: "Đã hủy" },
+  { value: 3, label: "Hoàn thành" }, // CheckedOut
+  { value: 4, label: "Đã hủy" }, // Cancelled
 ];
 
 export default function HistoryPage() {
   const router = useRouter();
   const { hide } = useLoading();
-  const [bookings, setBookings] = useState<BookingDetailDto[]>([]);
   const [searchInputValue, setSearchInputValue] = useState("");
   const [actualSearchQuery, setActualSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<BookingStatus | "The_Rest" | "ALL">("ALL");
-  const [selectedBooking, setSelectedBooking] = useState<BookingDetailDto | null>(null);
+  const [statusFilter, setStatusFilter] = useState<number | "ALL">("ALL");
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Scroll detection not strictly needed if we don't have bottom nav hiding logic here, but keeping structure
+  // Fetch bookings from API
+  const { data: bookings = [], isLoading, error } = useMyBookings();
+
+  // Hide loading overlay when data is ready
+  useEffect(() => {
+    if (!isLoading) {
+      hide();
+    }
+  }, [isLoading, hide]);
+
+  // Log for debugging
+  console.log("Bookings:", bookings, "isLoading:", isLoading, "error:", error);
+
+  // Scroll detection
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      hide();
-      setIsLoading(false);
-    }, 1500); // Simulate network
-    return () => clearTimeout(timer);
-  }, [hide]);
-
-  useEffect(() => {
-    const fetchedBookings = getBookingHistory();
-    setBookings(fetchedBookings);
-  }, []);
-
   const filteredBookings = useMemo(() => {
+    if (!bookings) return [];
+    
     return bookings.filter((booking) => {
-      // 1. GLOBAL FILTER: Only show Completed (CheckedOut) or Cancelled
-      if (booking.status !== "CheckedOut" && booking.status !== "Cancelled") {
-        return false;
-      }
+      // TODO: Uncomment when backend has proper data with status 3 or 4
+      // 1. GLOBAL FILTER: Only show Completed (CheckedOut=3) or Cancelled (Cancelled=4)
+      // if (booking.status !== 3 && booking.status !== 4) {
+      //   return false;
+      // }
 
       // 2. Status Filter
       let matchesStatus = false;
@@ -69,23 +79,19 @@ export default function HistoryPage() {
     });
   }, [bookings, statusFilter, actualSearchQuery]);
 
-  const handleBookingClick = (booking: BookingDetailDto) => {
-    setSelectedBooking(booking);
+  const handleBookingClick = (bookingId: string) => {
+    setSelectedBookingId(bookingId);
     setDrawerOpen(true);
   };
 
-  const handleFilterChange = (newFilter: BookingStatus | "The_Rest" | "ALL") => {
+  const handleFilterChange = (newFilter: number | "ALL") => {
     if (newFilter === statusFilter) return;
     setStatusFilter(newFilter);
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 800);
   };
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       setActualSearchQuery(searchInputValue);
-      setIsLoading(true);
-      setTimeout(() => setIsLoading(false), 800);
     }
   };
 
@@ -188,8 +194,11 @@ export default function HistoryPage() {
                     layout
                   >
                     <BookingHistoryCard
-                      booking={booking}
-                      onClick={() => handleBookingClick(booking)}
+                      booking={{
+                        ...booking,
+                        status: statusMap[booking.status] as any,
+                      } as any}
+                      onClick={() => handleBookingClick(booking.id)}
                     />
                   </motion.div>
                 ))}
@@ -222,8 +231,11 @@ export default function HistoryPage() {
       {/* Drawer */}
       <BookingDetailDrawer
         open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        booking={selectedBooking}
+        onClose={() => {
+          setDrawerOpen(false);
+          setSelectedBookingId(null);
+        }}
+        bookingId={selectedBookingId}
       />
     </div>
   );

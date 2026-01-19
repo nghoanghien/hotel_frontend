@@ -1,2 +1,2 @@
-export { http, setAccessToken, getAccessToken, type ApiResponse } from "./http";
+export { http, setAccessToken, getAccessToken, restoreAccessToken, type ApiResponse } from "./http";
 export * as authApi from "./auth";

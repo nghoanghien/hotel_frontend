@@ -13,14 +13,21 @@ export const useLogin = () => {
     onSuccess: (response) => {
       // response is already unwrapped by http interceptor
       // Structure: { success: true, message: "...", data: { accessToken, refreshToken, user } }
+      console.log("[useLogin] Full response:", response);
+      console.log("[useLogin] response.data:", response?.data);
 
       if (response && response.success && response.data) {
         // 1. Set Access Token in Memory (Http Client)
+        console.log("[useLogin] accessToken:", response.data.accessToken ? "exists" : "not found");
         setAccessToken(response.data.accessToken);
 
         // 2. Store Refresh Token in localStorage (for refresh mechanism)
+        console.log("[useLogin] refreshToken:", response.data.refreshToken ? "exists" : "not found");
         if (response.data.refreshToken) {
           localStorage.setItem("refresh_token", response.data.refreshToken);
+          console.log("[useLogin] Saved refresh_token to localStorage");
+        } else {
+          console.warn("[useLogin] No refreshToken in response!");
         }
 
         // 3. Update Store (User info only)

@@ -8,6 +8,24 @@ import {
 import type { BookingDetailDto } from "@repo/types";
 import { motion } from "@repo/ui/motion";
 
+// Room type mapping
+const roomTypeMap: Record<number, string> = {
+  0: "Standard",
+  1: "Deluxe",
+  2: "Suite",
+  3: "Executive",
+  4: "Presidential",
+};
+
+// Payment status mapping
+const paymentStatusMap: Record<number, string> = {
+  0: "Pending",
+  1: "Completed",
+  2: "Failed",
+  3: "Refunded",
+  4: "Cancelled",
+};
+
 interface BookingDetailInfoProps {
   booking: BookingDetailDto;
 }
@@ -122,7 +140,7 @@ export function BookingDetailInfo({ booking }: BookingDetailInfoProps) {
                       <div>
                         <div className="text-[#1A1A1A] font-medium line-clamp-1">
                           {room.roomNumber && <span className="font-bold text-[var(--primary)] mr-1">#{room.roomNumber}</span>}
-                          {room.roomType} Room
+                          {typeof room.roomType === 'number' ? roomTypeMap[room.roomType] || 'Standard' : room.roomType} Room
                         </div>
                         {room.guestName && room.guestName !== booking.guestName && (
                           <div className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
@@ -396,9 +414,25 @@ export function BookingDetailInfo({ booking }: BookingDetailInfoProps) {
             </div>
             <div className="space-y-4">
               {booking.payments.map((payment, idx) => {
-                const isCash = payment.method === 'Cash';
-                const PaymentIcon = isCash ? Banknote : (payment.method === 'BankTransfer' || payment.method === 'EWallet' ? Wallet : CreditCard);
-                const methodName = payment.method.replace(/([A-Z])/g, ' $1').trim();
+                // Handle method as string or number (enum)
+                const methodMap: Record<number, string> = {
+                  0: 'Cash',
+                  1: 'CreditCard',
+                  2: 'BankTransfer',
+                  3: 'EWallet',
+                };
+                const methodStr = typeof payment.method === 'number' 
+                  ? (methodMap[payment.method] || 'Unknown') 
+                  : (payment.method || 'Unknown');
+                
+                const isCash = methodStr === 'Cash';
+                const PaymentIcon = isCash ? Banknote : (methodStr === 'BankTransfer' || methodStr === 'EWallet' ? Wallet : CreditCard);
+                const methodName = methodStr.replace(/([A-Z])/g, ' $1').trim();
+                
+                // Handle payment status as string or number
+                const statusStr = typeof payment.status === 'number' 
+                  ? (paymentStatusMap[payment.status] || 'Unknown') 
+                  : (payment.status || 'Unknown');
 
                 return (
                   <div key={payment.id || idx} className="relative group overflow-hidden bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
@@ -415,7 +449,7 @@ export function BookingDetailInfo({ booking }: BookingDetailInfoProps) {
                           <div>
                             <div className="font-bold text-[#1A1A1A] text-sm">{methodName}</div>
                             <div className="text-[10px] text-gray-500 font-medium mt-0.5">
-                              {payment.paidAt ? formatDate(payment.paidAt) : "Date N/A"}
+                              {payment.paidAt ? formatDate(payment.paidAt) : (payment.processedAt ? formatDate(payment.processedAt) : "Date N/A")}
                             </div>
                           </div>
                           <div className="text-right">
@@ -425,11 +459,11 @@ export function BookingDetailInfo({ booking }: BookingDetailInfoProps) {
 
                         <div className="flex flex-col gap-2 pt-2 border-t border-gray-50">
                           <div className="flex items-center justify-between">
-                            <div className={`text-[9px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${payment.status === 'Completed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
-                              payment.status === 'Refunded' ? 'bg-red-50 text-red-600 border border-red-100' :
+                            <div className={`text-[9px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${statusStr === 'Completed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
+                              statusStr === 'Refunded' ? 'bg-red-50 text-red-600 border border-red-100' :
                                 'bg-gray-100 text-gray-600 border border-gray-200'
                               }`}>
-                              {payment.status}
+                              {statusStr}
                             </div>
                             {payment.transactionId ? (
                               <div className="text-[9px] font-mono text-gray-400 flex items-center gap-1 bg-gray-50 px-1.5 py-1 rounded border border-gray-100">
@@ -443,7 +477,7 @@ export function BookingDetailInfo({ booking }: BookingDetailInfoProps) {
                           </div>
 
                           {/* Refund Details */}
-                          {payment.status === 'Refunded' && (payment.refundAmount || payment.refundedAt) && (
+                          {statusStr === 'Refunded' && (payment.refundAmount || payment.refundedAt) && (
                             <div className="text-[10px] bg-red-50/50 p-2 rounded-lg border border-red-100/50 mt-1">
                               <div className="flex justify-between font-bold text-red-700 mb-0.5">
                                 <span>Refunded Amount</span>
@@ -457,7 +491,7 @@ export function BookingDetailInfo({ booking }: BookingDetailInfoProps) {
                           )}
 
                           {/* Unrefunded Cancelled Warning */}
-                          {booking.status === 'Cancelled' && booking.isPaid && payment.status === 'Completed' && (
+                          {booking.status === 'Cancelled' && booking.isPaid && statusStr === 'Completed' && (
                             <div className="text-[10px] bg-orange-50 p-2.5 rounded-lg border border-orange-100 mt-2 flex items-start gap-2">
                               <div className="w-4 h-4 rounded-full bg-orange-100 flex items-center justify-center shrink-0">
                                 <Clock className="w-2.5 h-2.5 text-orange-600" />

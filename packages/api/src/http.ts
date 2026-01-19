@@ -9,6 +9,8 @@ export interface ApiResponse<T = any> {
 
 let accessToken: string | null = null;
 let isRefreshing = false;
+let isRestoring = false;
+let restorePromise: Promise<boolean> | null = null;
 let failedQueue: any[] = [];
 
 const processQueue = (error: any, token: string | null = null) => {
@@ -28,6 +30,58 @@ export const setAccessToken = (token: string | null) => {
 };
 
 export const getAccessToken = () => accessToken;
+
+// Try to restore accessToken from refreshToken (for page refresh)
+export const restoreAccessToken = async (): Promise<boolean> => {
+  if (typeof window === "undefined") return false;
+  
+  // If already restoring, wait for the existing promise
+  if (isRestoring && restorePromise) {
+    console.log("[restoreAccessToken] Already restoring, waiting for existing promise...");
+    return restorePromise;
+  }
+  
+  const refreshToken = localStorage.getItem("refresh_token");
+  if (!refreshToken) return false;
+  
+  isRestoring = true;
+  restorePromise = (async () => {
+    try {
+      const res = await axios.post<ApiResponse<{ accessToken: string; refreshToken?: string }>>(
+        `${process.env.NEXT_PUBLIC_API_URL || "/api"}/Auth/refresh-token`,
+        { refreshToken },
+        { withCredentials: true }
+      );
+
+      console.log("[restoreAccessToken] API response:", res.data);
+
+      if (res.data.success && res.data.data.accessToken) {
+        setAccessToken(res.data.data.accessToken);
+        console.log("[restoreAccessToken] Set new accessToken");
+        
+        // Update refresh token if backend returns a new one (rotation)
+        if (res.data.data.refreshToken) {
+          localStorage.setItem("refresh_token", res.data.data.refreshToken);
+          console.log("[restoreAccessToken] Updated refresh_token in localStorage");
+        } else {
+          console.warn("[restoreAccessToken] No new refreshToken returned - token may be one-time use!");
+        }
+        
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Failed to restore access token:", error);
+      localStorage.removeItem("refresh_token");
+      return false;
+    } finally {
+      isRestoring = false;
+      restorePromise = null;
+    }
+  })();
+  
+  return restorePromise;
+};
 
 export const http = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
