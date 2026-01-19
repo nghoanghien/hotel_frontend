@@ -13,6 +13,7 @@
     "@repo/api": "workspace:*",
     "@repo/fonts": "workspace:*",
     "@repo/lib": "workspace:*",
+    "@repo/mock-data": "workspace:*",
     "@repo/store": "workspace:*",
     "@repo/types": "workspace:*",
     "@repo/ui": "workspace:*",

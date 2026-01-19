@@ -1,5 +1,8 @@
 "use client";
 
+import NationalitySelect from "./NationalitySelect";
+import { countries } from "@repo/mock-data";
+
 interface GuestInfoFormProps {
   guestName: string;
   guestEmail: string;
@@ -61,13 +64,12 @@ export default function GuestInfoForm({
         </div>
         {onNationalityChange && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Nationality</label>
-            <input
-              type="text"
+            <NationalitySelect
+              label="Nationality"
+              options={countries}
               value={guestNationality}
-              onChange={(e) => onNationalityChange(e.target.value)}
-              placeholder="Vietnamese"
-              className="w-full px-4 py-3 bg-transparent border-b-2 border-gray-200 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 outline-none transition-all"
+              placeholder="Select your nationality"
+              onChange={onNationalityChange}
             />
           </div>
         )}

@@ -67,7 +67,7 @@ export default function CurrentBookingsDrawer({ open, onClose }: { open: boolean
         showNotification({
           message: "Hủy đặt phòng thành công!",
           type: "success",
-          format: "Bạn sẽ nhận được email xác nhận trong giây lát.",
+          format: "Hủy đặt phòng thành công.",
           autoHideDuration: 4000,
         });
       }

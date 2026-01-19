@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "@repo/ui/icons";
-import { useLoading, useHoverHighlight, HoverHighlightOverlay, ImageWithFallback } from "@repo/ui";
+import { useLoading, useHoverHighlight, HoverHighlightOverlay, ImageWithFallback, useSwipeConfirmation, useNotification } from "@repo/ui";
 import { useBookingCheckout } from "@/features/booking/hooks/useBookingCheckout";
 import GuestInfoForm from "@/features/booking/components/GuestInfoForm";
 import SpecialRequestsInput from "@/features/booking/components/SpecialRequestsInput";
@@ -14,6 +14,8 @@ import { formatVnd } from "@repo/lib";
 export default function BookingCheckoutPage() {
   const router = useRouter();
   const { hide } = useLoading();
+  const { confirm: showSwipeConfirmation } = useSwipeConfirmation();
+  const { showNotification } = useNotification();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -101,23 +103,50 @@ export default function BookingCheckoutPage() {
   };
 
   const handleConfirmBooking = () => {
-    // TODO: Implement booking confirmation API call
-    console.log("Booking Confirmed:", {
-      hotelName,
-      checkInDate,
-      checkOutDate,
-      items: checkoutItems,
-      guest: {
-        name: guestName,
-        email: guestEmail,
-        phone: guestPhone,
-        nationality: guestNationality,
-        address: guestAddress
+    showSwipeConfirmation({
+      title: "Xác nhận đặt phòng",
+      description: `Bạn đang đặt phòng tại ${hotelName}. Vui lòng vuốt để xác nhận thanh toán.`,
+      confirmText: "Vuốt để xác nhận",
+      type: "success",
+      confirmDetails: {
+        "Khách sạn": hotelName,
+        "Số đêm": nights,
+        "Tổng tiền": formatVnd(total),
+        "Phương thức thanh toán": paymentMethod === "CreditCard" ? "Thẻ tín dụng" :
+          paymentMethod === "BankTransfer" ? "Chuyển khoản" :
+            paymentMethod === "EWallet" ? "Ví điện tử" : "Tiền mặt"
       },
-      paymentMethod
+      onConfirm: async () => {
+        // TODO: Implement booking confirmation API call
+        console.log("Booking Confirmed:", {
+          hotelName,
+          checkInDate,
+          checkOutDate,
+          items: checkoutItems,
+          guest: {
+            name: guestName,
+            email: guestEmail,
+            phone: guestPhone,
+            nationality: guestNationality,
+            address: guestAddress
+          },
+          paymentMethod
+        });
+
+        // Show success notification
+        showNotification({
+          type: "success",
+          message: "Đặt phòng thành công!",
+          format: `Đã đặt phòng tại ${hotelName}.`,
+          autoHideDuration: 5000
+        });
+
+        // Navigate to home after a short delay
+        setTimeout(() => {
+          router.push("/home");
+        }, 1500);
+      }
     });
-    alert("Booking confirmed! (Demo)");
-    router.push("/home");
   };
 
   const canConfirm =

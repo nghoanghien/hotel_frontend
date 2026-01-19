@@ -83,15 +83,15 @@ export function RoomsTab({ rooms, onRoomClick, getHotelImage }: Props) {
               <div className="p-5 flex flex-col flex-1">
                 {/* Amenities */}
                 <div className="flex items-center gap-2 mb-4">
-                  {room.amenities.slice(0, 1).map((amenity) => (
+                  {(room.amenities ?? []).slice(0, 1).map((amenity) => (
                     <div key={amenity.id} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-100 border border-gray-100/50">
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500/80"></div>
                       <span className="text-[11px] font-semibold text-gray-600 truncate max-w-[150px]">{amenity.name}</span>
                     </div>
                   ))}
-                  {room.amenities.length > 1 && (
+                  {(room.amenities?.length ?? 0) > 1 && (
                     <div className="px-2 py-1 text-[11px] font-semibold text-gray-500 bg-gray-50 rounded-lg border border-gray-100/50 flex items-center">
-                      +{room.amenities.length - 1}
+                      +{(room.amenities?.length ?? 0) - 1}
                     </div>
                   )}
                 </div>

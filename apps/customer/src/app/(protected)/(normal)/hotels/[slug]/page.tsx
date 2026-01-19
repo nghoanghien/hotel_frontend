@@ -7,7 +7,7 @@ import { Star, MapPin, ArrowLeft, ChevronLeft, ChevronRight, Heart } from "@repo
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { useLoading, useNotification, useHoverHighlight, HoverHighlightOverlay } from "@repo/ui";
 import type { HotelDetailDto as Hotel, RoomAvailabilityDto } from "@repo/types";
-import { getHotelBySlug, getRoomsByHotelId } from "@/features/search/data/mockHotelData";
+import { getHotelBySlug, getRoomAvailability } from "@/features/search/data/mockHotelData";
 import RoomDetailDrawer from "@/features/cart/components/RoomDetailDrawer";
 import FloatingHotelCart from "@/features/cart/components/FloatingHotelCart";
 import { useBookingStore } from "@/features/booking/store/bookingStore";
@@ -43,7 +43,34 @@ export default function HotelDetailPage() {
   }, [hide]);
 
   const hotel = useMemo(() => getHotelBySlug(params.slug), [params.slug]);
-  const rooms = useMemo(() => hotel ? getRoomsByHotelId(hotel.id) : [], [hotel]);
+
+  // Read search parameters from URL (must come before using checkInParam/checkOutParam)
+  const searchParams = useSearchParams();
+  const checkInParam = searchParams.get('checkIn');
+  const checkOutParam = searchParams.get('checkOut');
+  const adultsParam = searchParams.get('adults');
+  const childrenParam = searchParams.get('children');
+  const roomsParam = searchParams.get('rooms');
+
+  // Generate default check-in/out dates if not provided
+  const defaultCheckIn = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    return date.toISOString().split('T')[0];
+  }, []);
+
+  const defaultCheckOut = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 3);
+    return date.toISOString().split('T')[0];
+  }, []);
+
+  const rooms = useMemo(() => {
+    if (!hotel) return [];
+    const checkIn = checkInParam || defaultCheckIn;
+    const checkOut = checkOutParam || defaultCheckOut;
+    return getRoomAvailability(hotel.id, checkIn!, checkOut!);
+  }, [hotel, checkInParam, checkOutParam, defaultCheckIn, defaultCheckOut]);
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -62,16 +89,6 @@ export default function HotelDetailPage() {
 
   const nextImage = () => setCurrentImageIndex(prev => (prev + 1) % galleryImages.length);
   const prevImage = () => setCurrentImageIndex(prev => (prev === 0 ? galleryImages.length - 1 : prev - 1));
-
-
-
-  // Read search parameters from URL
-  const searchParams = useSearchParams();
-  const checkInParam = searchParams.get('checkIn');
-  const checkOutParam = searchParams.get('checkOut');
-  const adultsParam = searchParams.get('adults');
-  const childrenParam = searchParams.get('children');
-  const roomsParam = searchParams.get('rooms');
 
   // Parse dates and guest info
   const bookingInfo = useMemo(() => ({
