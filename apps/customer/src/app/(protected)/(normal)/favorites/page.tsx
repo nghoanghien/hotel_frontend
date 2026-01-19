@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "@repo/ui/motion";
-import { ArrowLeft, Heart, Search, X, SlidersHorizontal, Grid3x3, List, Building2 as Store } from "@repo/ui/icons"; // Using Building2 as Store equivalent for Hotel
+import { ArrowLeft, Heart, Search, X, Building2 as Store } from "@repo/ui/icons";
 import { useLoading, useNotification, HotelCardShimmer } from "@repo/ui";
-import { mockWishlist } from "@/features/favorites/data/mockFavorites";
 import FavoriteHotelCard from "@/features/favorites/components/FavoriteHotelCard";
-import type { WishlistDto } from "@repo/types";
+import { useWishlist } from "@/features/favorites/hooks/useWishlist";
+import { useRemoveFromWishlist } from "@/features/favorites/hooks/useRemoveFromWishlist";
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -15,59 +15,61 @@ export default function FavoritesPage() {
   const { showNotification } = useNotification();
   const [searchInputValue, setSearchInputValue] = useState("");
   const [actualSearchQuery, setActualSearchQuery] = useState("");
-  const [removedIds, setRemovedIds] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // Data state
-  // Initial data from mockWishlist
-  const wishlistItems = useMemo(() => mockWishlist.items, []);
+  // Fetch wishlist from API
+  const { data: wishlistData, isLoading, error } = useWishlist();
+  const removeFromWishlistMutation = useRemoveFromWishlist();
 
+  // Log for debugging
+  console.log("Wishlist:", wishlistData, "isLoading:", isLoading, "error:", error);
+
+  // Hide loading overlay when data is ready
   useEffect(() => {
-    const timer = setTimeout(() => {
+    if (!isLoading) {
       hide();
-      setIsLoading(false);
-    }, 1500); // Simulate loading
-    return () => clearTimeout(timer);
-  }, [hide]);
+    }
+  }, [isLoading, hide]);
 
-  // Filtered items
-  const displayItems = useMemo(() => {
-    return wishlistItems.filter((item) =>
-      !removedIds.includes(item.hotelId)
-    );
-  }, [wishlistItems, removedIds]);
+  // Get items from response
+  const wishlistItems = useMemo(() => wishlistData?.items || [], [wishlistData]);
 
   // Search logic
   const filteredItems = useMemo(() => {
-    if (!actualSearchQuery) return displayItems;
+    if (!actualSearchQuery) return wishlistItems;
     const query = actualSearchQuery.toLowerCase();
-    return displayItems.filter((item) =>
+    return wishlistItems.filter((item) =>
       item.hotel.name.toLowerCase().includes(query) ||
       item.hotel.city?.toLowerCase().includes(query) ||
       item.hotel.country?.toLowerCase().includes(query) ||
       item.note?.toLowerCase().includes(query)
     );
-  }, [displayItems, actualSearchQuery]);
+  }, [wishlistItems, actualSearchQuery]);
 
   const handleHotelClick = (hotelId: string) => {
     show("Loading hotel details...");
     router.push(`/hotels/${hotelId}`);
   };
 
-  const handleRemoveFavorite = (hotelId: string, hotelName: string) => {
-    setRemovedIds((prev) => [...prev, hotelId]);
-    showNotification({
-      type: "success",
-      message: "Removed from favorites",
-      format: `Removed ${hotelName} from your favorites`,
-    });
+  const handleRemoveFavorite = async (hotelId: string, hotelName: string) => {
+    try {
+      await removeFromWishlistMutation.mutateAsync(hotelId);
+      showNotification({
+        type: "success",
+        message: "Removed from favorites",
+        format: `Removed ${hotelName} from your favorites`,
+      });
+    } catch (error) {
+      showNotification({
+        type: "error",
+        message: "Failed to remove",
+        format: "Could not remove from favorites. Please try again.",
+      });
+    }
   };
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       setActualSearchQuery(searchInputValue);
-      setIsLoading(true);
-      setTimeout(() => setIsLoading(false), 800);
     }
   };
 
@@ -101,7 +103,7 @@ export default function FavoritesPage() {
               </div>
             </div>
 
-            {displayItems.length > 0 && (
+            {wishlistItems.length > 0 && (
               <div className="flex items-center gap-3 w-full md:w-auto">
                 <div className="relative w-full">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -159,7 +161,7 @@ export default function FavoritesPage() {
                 ))}
               </AnimatePresence>
             </div>
-          ) : displayItems.length === 0 ? (
+          ) : wishlistItems.length === 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

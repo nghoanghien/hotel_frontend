@@ -1,12 +1,12 @@
 "use client";
-import type { HotelDto, HotelDetailDto } from "@repo/types";
+import type { WishlistHotel } from "../api";
 import { motion } from "@repo/ui/motion";
 import { ImageWithFallback, useHoverHighlight, HoverHighlightOverlay } from "@repo/ui";
 import { Star, MapPin, Heart, ArrowRight } from "@repo/ui/icons";
 import { formatVnd } from "@repo/lib";
 
 interface FavoriteHotelCardProps {
-  hotel: HotelDto;
+  hotel: WishlistHotel;
   onClick: () => void;
   onRemove?: (e: React.MouseEvent) => void;
 }
@@ -20,11 +20,8 @@ export default function FavoriteHotelCard({ hotel, onClick, onRemove }: Favorite
     clearHover,
   } = useHoverHighlight<HTMLDivElement>();
 
-  // Use type assertion to access optional rich details if available
-  const fullHotel = hotel as HotelDetailDto;
   const minPrice = hotel.minPrice || 0;
-  const address = fullHotel.address || hotel.city || "";
-  const amenities = fullHotel.amenities || [];
+  const address = hotel.city ? `${hotel.city}, ${hotel.country}` : hotel.country || "";
 
   return (
     <motion.div
@@ -115,16 +112,14 @@ export default function FavoriteHotelCard({ hotel, onClick, onRemove }: Favorite
           </span>
         </div>
 
-        {/* Amenities */}
-        <div className="flex flex-wrap gap-x-2 md:gap-x-4 gap-y-1.5 md:gap-y-2 mb-3 md:mb-4">
-          {amenities.filter(Boolean).slice(0, 3).map((amenity) => (
-            <div key={amenity.id} className="flex items-center gap-1 md:gap-1.5 text-[10px] md:text-xs text-gray-600">
-              <div className="w-1 md:w-1.5 h-1 md:h-1.5 rounded-full bg-green-500/80"></div>
-              <span className="font-medium line-clamp-1">{amenity.name}</span>
+        {/* Rating Info */}
+        <div className="flex items-center gap-2 mb-3 md:mb-4 text-[10px] md:text-xs text-gray-600">
+          {hotel.averageRating > 0 && (
+            <div className="flex items-center gap-1">
+              <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+              <span className="font-medium">{hotel.averageRating.toFixed(1)}</span>
+              <span className="text-gray-400">({hotel.reviewCount} reviews)</span>
             </div>
-          ))}
-          {amenities.length > 3 && (
-            <span className="text-[10px] md:text-xs text-gray-400 font-medium whitespace-nowrap">+{amenities.length - 3} more</span>
           )}
         </div>
 

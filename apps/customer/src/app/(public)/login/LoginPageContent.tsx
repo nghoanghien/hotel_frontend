@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useZodForm, loginSchema, type LoginFormData } from "@repo/lib";
 import { motion, AnimatePresence } from "@repo/ui/motion";
 import { useLoading } from "@repo/ui";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getAccessToken, restoreAccessToken } from "@repo/api";
 
 /**
  * Login Page Content
@@ -15,6 +16,7 @@ export default function LoginPageContent() {
   const router = useRouter();
   const { show, hide } = useLoading();
   const { mutate, isPending, error, reset } = useLogin();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   const form = useZodForm<LoginFormData>({
     schema: loginSchema,
@@ -22,18 +24,36 @@ export default function LoginPageContent() {
     defaultValues: { email: "", password: "", rememberMe: false },
   });
 
-  // Show loading on page load
+  // Check if already authenticated
   useEffect(() => {
-    show("Đang tải trang đăng nhập...");
-    const timer = setTimeout(() => {
-      hide();
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [show, hide]);
+    const checkAuth = async () => {
+      if (getAccessToken()) {
+        router.replace("/home");
+        return;
+      }
+
+      const restored = await restoreAccessToken();
+      if (restored) {
+        router.replace("/home");
+        return;
+      }
+
+      setIsCheckingAuth(false);
+      show("Đang tải trang đăng nhập...");
+      setTimeout(() => hide(), 1000);
+    };
+
+    checkAuth();
+  }, [router, show, hide]);
 
   const handleRegisterClick = () => {
     router.push("/register");
   };
+
+  // Don't render form while checking auth
+  if (isCheckingAuth) {
+    return null;
+  }
 
   return (
     <AnimatePresence mode="wait">
