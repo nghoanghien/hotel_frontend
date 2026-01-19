@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from '@repo/ui/motion';
 import { X, Building2, MapPin, Globe, Phone, Mail, Star, ShieldCheck } from '@repo/ui/icons';
 import { Brand } from '@repo/types';
@@ -9,7 +10,15 @@ interface ViewBrandModalProps {
 }
 
 export default function ViewBrandModal({ isOpen, onClose, brand }: ViewBrandModalProps) {
+  const [brokenLogo, setBrokenLogo] = useState(false);
+
+  useEffect(() => {
+    setBrokenLogo(false);
+  }, [brand?.id]);
+
   if (typeof document === 'undefined') return null;
+
+  const showPlaceholder = !brand?.logoUrl || brand.logoUrl.trim().length === 0 || brand.logoUrl.includes('ui-avatars') || brokenLogo;
 
   return (
     <AnimatePresence>
@@ -38,8 +47,13 @@ export default function ViewBrandModal({ isOpen, onClose, brand }: ViewBrandModa
                 <div className="flex items-center gap-5">
                   {/* Logo or Placeholder */}
                   <div className="w-20 h-20 rounded-2xl bg-gray-50 border border-gray-100 p-1 flex items-center justify-center shadow-sm shrink-0">
-                    {brand.logoUrl && !brand.logoUrl.includes('ui-avatars') ? (
-                      <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-cover rounded-xl bg-white" />
+                    {!showPlaceholder ? (
+                      <img
+                        src={brand.logoUrl}
+                        alt={brand.name}
+                        onError={() => setBrokenLogo(true)}
+                        className="w-full h-full object-cover rounded-xl bg-white"
+                      />
                     ) : (
                       <Building2 size={32} className="text-gray-300" />
                     )}
@@ -86,7 +100,9 @@ export default function ViewBrandModal({ isOpen, onClose, brand }: ViewBrandModa
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm flex items-center justify-between">
                       <div>
                         <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Commission Rate</div>
-                        <div className="text-4xl font-anton text-[#1A1A1A]">{brand.commissionRate || '15%'}</div>
+                        <div className="text-4xl font-anton text-[#1A1A1A]">
+                          {brand.commissionRate ? `${brand.commissionRate}%` : '0%'}
+                        </div>
                       </div>
                       <Star size={32} className="text-yellow-400" />
                     </div>

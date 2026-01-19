@@ -13,6 +13,8 @@ export type Brand = {
   isActive: boolean;
   hotelCount: number;
   commissionRate?: string;
+  subscriptionPlan?: string;
+  subscriptionStatus?: string;
 };
 
 export type CreateBrandDto = Omit<Brand, 'id' | 'isActive' | 'hotelCount'>;

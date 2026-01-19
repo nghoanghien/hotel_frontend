@@ -22,7 +22,7 @@ export default function CreateBrandModal({ isOpen, onClose, onSuccess }: CreateB
     city: '',
     country: '',
     description: '',
-    commissionRate: '15%'
+    commissionRate: '15'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -156,7 +156,7 @@ export default function CreateBrandModal({ isOpen, onClose, onSuccess }: CreateB
                         value={formData.commissionRate}
                         onChange={(e) => handleChange('commissionRate', e.target.value)}
                         className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-900 focus:bg-white focus:border-lime-500 outline-none transition-all placeholder:text-gray-300"
-                        placeholder="e.g. 15%"
+                        placeholder="e.g. 15"
                       />
                     </div>
 

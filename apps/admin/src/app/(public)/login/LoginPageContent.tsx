@@ -64,9 +64,16 @@ export default function LoginPageContent() {
                     mutate(data, {
                       onSuccess: () => {
                         show("Đăng nhập thành công! Đang chuyển hướng...");
+                        // Navigate
                         router.push("/dashboard");
+
+                        // Safety: Hide loading after 5 seconds if navigation hangs
+                        setTimeout(() => {
+                          hide();
+                        }, 5000);
                       },
-                      onError: () => {
+                      onError: (err: any) => {
+                        console.error("Login mutation error:", err);
                         hide();
                       }
                     });

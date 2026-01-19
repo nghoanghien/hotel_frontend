@@ -1,0 +1,387 @@
+# Module 12: Subscriptions & Billing
+
+## Subscription Plans
+
+| Feature | Basic | Professional | Premium |
+|---------|-------|--------------|---------|
+| **Pricing** | | | |
+| Monthly | 725,000 VND | 1,975,000 VND | 4,975,000 VND |
+| Quarterly | 1,975,000 VND | 4,975,000 VND | 12,475,000 VND |
+| Yearly | 7,250,000 VND | 19,750,000 VND | 49,750,000 VND |
+| **Limits** | | | |
+| Max Hotels | 1 | 3 | 999 |
+| Max Rooms/Hotel | 20 | 100 | 999 |
+| Max Users/Hotel | 3 | 10 | 999 |
+| Commission Rate | 15% | 12% | 8% |
+
+## Screens
+
+| Screen | Route | Mô tả |
+|--------|-------|-------|
+| Current Subscription | `/manage/subscription` | Gói hiện tại |
+| Change Plan | `/manage/subscription/change` | Đổi gói |
+| Billing History | `/manage/subscription/billing` | Lịch sử thanh toán |
+| Payment Methods | `/manage/subscription/payment-methods` | Quản lý thanh toán |
+
+---
+
+## API Endpoints
+
+### 1. Get Current Subscription
+```http
+GET /api/subscriptions/current
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "plan": {
+      "id": "uuid",
+      "name": "Professional",
+      "planType": "Professional",
+      "monthlyPrice": 1975000,
+      "maxHotels": 3,
+      "maxRoomsPerHotel": 100,
+      "maxUsersPerHotel": 10,
+      "commissionRate": 12
+    },
+    "status": "Active",
+    "billingCycle": "Monthly",
+    "price": 1975000,
+    "currency": "VND",
+    "startDate": "2024-02-01T00:00:00Z",
+    "endDate": "2024-02-29T23:59:59Z",
+    "nextBillingDate": "2024-03-01T00:00:00Z",
+    "autoRenew": true
+  }
+}
+```
+
+---
+
+### 2. Get Subscription Plans
+```http
+GET /api/subscription-plans
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "name": "Basic",
+      "description": "Hoàn hảo cho các khách sạn nhỏ độc lập",
+      "planType": "Basic",
+      "monthlyPrice": 725000,
+      "quarterlyPrice": 1975000,
+      "yearlyPrice": 7250000,
+      "currency": "VND",
+      "maxHotels": 1,
+      "maxRoomsPerHotel": 20,
+      "maxUsersPerHotel": 3,
+      "commissionRate": 15,
+      "isActive": true,
+      "isPopular": false,
+      "sortOrder": 1
+    },
+    {
+      "id": "uuid",
+      "name": "Professional",
+      "description": "Lý tưởng cho các khách sạn đang phát triển",
+      "planType": "Professional",
+      "monthlyPrice": 1975000,
+      "quarterlyPrice": 4975000,
+      "yearlyPrice": 19750000,
+      "currency": "VND",
+      "maxHotels": 3,
+      "maxRoomsPerHotel": 100,
+      "maxUsersPerHotel": 10,
+      "commissionRate": 12,
+      "isActive": true,
+      "isPopular": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "uuid",
+      "name": "Premium",
+      "description": "Dành cho các khách sạn lớn",
+      "planType": "Premium",
+      "monthlyPrice": 4975000,
+      "quarterlyPrice": 12475000,
+      "yearlyPrice": 49750000,
+      "currency": "VND",
+      "maxHotels": 999,
+      "maxRoomsPerHotel": 999,
+      "maxUsersPerHotel": 999,
+      "commissionRate": 8,
+      "isActive": true,
+      "isPopular": false,
+      "sortOrder": 3
+    }
+  ]
+}
+```
+
+---
+
+### 3. Create/Change Subscription
+```http
+POST /api/subscriptions
+Authorization: Bearer {token}
+```
+
+**Request:**
+```json
+{
+  "brandId": "uuid",
+  "planId": "uuid",
+  "billingCycle": "Monthly",
+  "autoRenew": true
+}
+```
+
+---
+
+### 4. Cancel Subscription
+```http
+POST /api/subscriptions/{id}/cancel
+Authorization: Bearer {token}
+```
+
+**Request:**
+```json
+{
+  "reason": "Đóng cửa kinh doanh",
+  "cancelImmediately": false
+}
+```
+
+---
+
+### 5. Get Invoices
+```http
+GET /api/subscriptions/{id}/invoices
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "invoiceNumber": "INV-2024-0001",
+        "periodStart": "2024-02-01",
+        "periodEnd": "2024-02-29",
+        "subtotal": 2499000,
+        "taxAmount": 249900,
+        "totalAmount": 2748900,
+        "currency": "VND",
+        "status": "Paid",
+        "dueDate": "2024-02-01",
+        "paidAt": "2024-02-01T10:00:00Z",
+        "invoicePdfUrl": "https://...",
+        "createdAt": "2024-02-01T00:00:00Z"
+      }
+    ],
+    "totalCount": 12
+  }
+}
+```
+
+---
+
+### 6. Check Subscription Limits
+```http
+GET /api/subscriptions/can-add-hotel?brandId={brandId}
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": true,
+  "message": "Bạn có thể thêm khách sạn mới"
+}
+```
+
+```http
+GET /api/subscriptions/can-add-room?hotelId={hotelId}
+Authorization: Bearer {token}
+```
+
+---
+
+## Screen Specifications
+
+### Current Subscription Screen
+```
+????????????????????????????????????????????????????
+?  ?? Subscription                                 ?
+????????????????????????????????????????????????????
+?                                                  ?
+?  ??? Gói hiện tại ?????????????????????????????  ?
+?  ?????????????????????????????????????????????? ?
+?  ?                                            ? ?
+?  ?   PROFESSIONAL              ? Ho?t ??ng    ? ?
+?  ?   1,975,000 VND/tháng                      ? ?
+?  ?                                            ? ?
+?  ?   Thanh toán tiếp: 01/03/2024              ? ?
+?  ?   Số tiền: 1,975,000 VND                   ? ?
+?  ?                                            ? ?
+?  ?   [??i gói]  [H?y subscription]            ? ?
+?  ?                                            ? ?
+?  ?????????????????????????????????????????????? ?
+?                                                  ?
+?  ??? Sử dụng ??????????????????????????????????  ?
+?  ?????????????????????????????????????????????? ?
+?  ? Khách sạn        ???????????? 2/3  (67%)   ? ?
+?  ? Phòng/KS         ???????????? 65/100 (65%) ? ?
+?  ? Người dùng/KS    ???????????? 5/10  (50%)  ? ?
+?  ?????????????????????????????????????????????? ?
+?                                                  ?
+?  ??? Lịch sử thanh toán ????? [Xem tất cả ?]???  ?
+?  ? 01/02/2024 ? INV-0002 ? 1,975,000 VND ? Paid? ?
+?  ? 01/01/2024 ? INV-0001 ? 1,975,000 VND ? Paid? ?
+?                                                  ?
+????????????????????????????????????????????????????
+```
+
+### Change Plan Screen
+```
+????????????????????????????????????????????????????????????????????????
+?  ? Quay lại              Đổi gói                                     ?
+????????????????????????????????????????????????????????????????????????
+?  Gói hiện tại: Professional (1,975,000 VND/tháng)                       ?
+?                                                                      ?
+?  Chu kỳ: [? Hàng tháng  ? Hàng quý -10%  ? Hàng năm -20%]          ?
+?                                                                      ?
+?  ???????????????????? ???????????????????? ????????????????????     ?
+?  ?     Basic        ? ?    Professional  ? ?    Premium       ?     ?
+?  ?                  ? ?   ? Hiện tại     ? ?   ? Phổ biến     ?     ?
+?  ?   725,000/tháng   ? ?  1,975,000/tháng  ? ?  4,975,000/tháng  ?     ?
+?  ?                  ? ?                  ? ?                  ?     ?
+?  ?  ? 1 Khách sạn   ? ?  ? 3 Khách sạn   ? ?  ? 999 Khách sạn ?     ?
+?  ?  ? 20 Phòng      ? ?  ? 100 Phòng     ? ?  ? 999 Phòng     ?     ?
+?  ?  ? 3 Users       ? ?  ? 10 Users      ? ?  ? 999 Users     ?     ?
+?  ?  15% hoa hồng    ? ?  12% hoa hồng    ? ?  8% hoa hồng     ?     ?
+?  ?                  ? ?                  ? ?                  ?     ?
+?  ?  [Hạ cấp]        ? ?   Gói hiện tại   ? ?    [Nâng cấp]    ?     ?
+?  ???????????????????? ???????????????????? ????????????????????     ?
+?                                                                      ?
+?  ?? Hạ cấp xuống Basic sẽ giảm giới hạn khách sạn từ 3 xuống 1.       ?
+?     Bạn hiện có 2 khách sạn.                                          ?
+?                                                                      ?
+????????????????????????????????????????????????????????????????????????
+```
+
+---
+
+## Billing Cycle Discounts
+
+| Cycle | Discount | Mô tả |
+|-------|----------|-------|
+| Monthly | 0% | Thanh toán hàng tháng |
+| Quarterly | 10% | Thanh toán 3 tháng |
+| Yearly | 20% | Thanh toán năm |
+
+---
+
+## TypeScript Types
+
+```typescript
+interface SubscriptionDto {
+  id: string;
+  brandId: string;
+  brandName: string;
+  planId: string;
+  planName: string;
+  planType: SubscriptionPlanType;
+  status: SubscriptionStatus;
+  billingCycle: BillingCycle;
+  startDate: string;
+  endDate: string;
+  price: number;
+  discountPercentage: number;
+  currency: string;
+  autoRenew: boolean;
+  nextBillingDate?: string;
+  createdAt: string;
+}
+
+interface SubscriptionPlanDto {
+  id: string;
+  name: string;
+  description?: string;
+  planType: SubscriptionPlanType;
+  monthlyPrice: number;
+  quarterlyPrice: number;
+  yearlyPrice: number;
+  currency: string;
+  maxHotels: number;
+  maxRoomsPerHotel: number;
+  maxUsersPerHotel: number;
+  commissionRate: number;
+  isActive: boolean;
+  isPopular: boolean;
+  sortOrder: number;
+}
+
+enum SubscriptionStatus {
+  Active = 0,
+  Cancelled = 1,
+  Expired = 2,
+  PastDue = 3,
+  Trialing = 4,
+  Paused = 5
+}
+
+enum SubscriptionPlanType {
+  Basic = 0,
+  Professional = 1,
+  Premium = 2
+}
+
+enum BillingCycle {
+  Monthly = 0,
+  Quarterly = 1,
+  Yearly = 2
+}
+
+enum InvoiceStatus {
+  Draft = 0,
+  Pending = 1,
+  Paid = 2,
+  Overdue = 3,
+  Cancelled = 4
+}
+```
+
+---
+
+## Subscription Limits Enforcement
+
+Backend tự động kiểm tra giới hạn khi:
+
+| Action | API | Backend Check |
+|--------|-----|---------------|
+| Tạo hotel mới | `POST /api/hotels` | `CanAddHotelAsync(brandId)` |
+| Tạo room mới | `POST /api/rooms` | `CanAddRoomAsync(hotelId)` |
+| Kiểm tra trước khi tạo | UI nên gọi `GET /api/subscriptions/can-add-hotel` | - |
+
+**Error response khi vượt limit:**
+```json
+{
+  "success": false,
+  "message": "Đã đạt giới hạn số khách sạn tối đa. Vui lòng nâng cấp gói dịch vụ."
+}
+```

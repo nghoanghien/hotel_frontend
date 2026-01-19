@@ -192,7 +192,7 @@ const BrandExportModal: React.FC<BrandExportModalProps> = ({
       showNotification({
         type: 'error',
         message: 'No Columns Selected',
-        format: 'Please select at least one column to export.'
+        isExport: true
       });
       return;
     }
@@ -200,7 +200,7 @@ const BrandExportModal: React.FC<BrandExportModalProps> = ({
       showNotification({
         type: 'error',
         message: 'No Data Available',
-        format: 'Current filters returned 0 results. Nothing to export.'
+        isExport: true
       });
       return;
     }
@@ -212,7 +212,8 @@ const BrandExportModal: React.FC<BrandExportModalProps> = ({
       showNotification({
         type: 'success',
         message: 'Export Successful',
-        format: 'Your brand list has been exported successfully.'
+        format: format,
+        isExport: true
       });
       onClose();
     } catch (error) {
@@ -220,7 +221,8 @@ const BrandExportModal: React.FC<BrandExportModalProps> = ({
       showNotification({
         type: 'error',
         message: 'Export Failed',
-        format: 'An error occurred while generating your file.'
+        format: format,
+        isExport: true
       });
     } finally {
       setIsExporting(false);
