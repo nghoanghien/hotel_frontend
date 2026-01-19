@@ -11,11 +11,12 @@ import OnboardingDetailView from './OnboardingDetailView';
 interface OnboardingListModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onStatusUpdate?: () => void;
 }
 
 type ViewState = 'list' | 'detail';
 
-export default function OnboardingListModal({ isOpen, onClose }: OnboardingListModalProps) {
+export default function OnboardingListModal({ isOpen, onClose, onStatusUpdate }: OnboardingListModalProps) {
   const [applications, setApplications] = useState<OnboardingSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<OnboardingStatus | 'All'>('PendingReview');
@@ -52,9 +53,10 @@ export default function OnboardingListModal({ isOpen, onClose }: OnboardingListM
   };
 
   const handleStatusUpdate = () => {
-    // Data will be refetched by useEffect when view changes back to 'list'
-    // or we can manually trigger it if we stay in list?
-    // useEffect deps include 'view', so going back to 'list' triggers fetch.
+    // Refetch applications in modal
+    fetchApplications();
+    // Trigger parent page refresh (brands list + stats)
+    onStatusUpdate?.();
   };
 
   const statusConfig: Record<string, { color: string, bg: string, border: string, icon: any }> = {

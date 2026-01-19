@@ -90,6 +90,7 @@ export default function BrandPartnersPage() {
       <OnboardingListModal
         isOpen={isOnboardingModalOpen}
         onClose={() => setIsOnboardingModalOpen(false)}
+        onStatusUpdate={handleRefresh}
       />
 
     </div>

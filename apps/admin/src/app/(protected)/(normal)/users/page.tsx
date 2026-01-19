@@ -69,6 +69,11 @@ export default function UsersPage() {
             <div className="text-2xl font-anton text-red-600 leading-none">{stats.suspended}</div>
           </div>
 
+          <div className="bg-white px-5 py-3 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-center min-w-[100px]">
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Pending</div>
+            <div className="text-2xl font-anton text-yellow-600 leading-none">{stats.pending}</div>
+          </div>
+
           {/* Spacer */}
           <div className="w-4" />
 
@@ -87,7 +92,10 @@ export default function UsersPage() {
 
       {/* Content Area */}
       <div className="min-h-[600px]">
-        <UserList refreshTrigger={refreshTrigger} />
+        <UserList
+          refreshTrigger={refreshTrigger}
+          onUserUpdated={() => setRefreshTrigger(prev => prev + 1)}
+        />
       </div>
 
       {/* Modals */}

@@ -1,200 +1,259 @@
 import { User, CreateUserDto, UpdateUserDto, SystemUserRole, SystemUserStatus } from '@repo/types';
 
-// Mock data
-// Using integer literals cast to System types to behave like Backend Enums
-const mockUsers: User[] = [
-  // Super Admins
+// ==================== CONSISTENT USER DATA ====================
+// Total: 40 users (as specified in dashboard)
+// Active: 28 users
+// Includes:
+// - Super Admin (1)
+// - Brand Admins from Vinpearl (3)
+// - Hotel Manager from Vinpearl Nha Trang (1)
+// - Staff from Vinpearl Nha Trang matching hotel-owner app (3)
+// - Other hotels/brands staff (32)
+
+let MOCK_USERS: User[] = [
+  // ==================== SUPER ADMIN ====================
   {
-    id: '1',
-    email: 'admin@hotelsa as.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    phoneNumber: '+1234567890',
+    id: 'super-admin-001',
+    email: 'admin@eatzy.com',
+    firstName: 'Super',
+    lastName: 'Admin',
+    phoneNumber: '+84-123-456-789',
     role: 0 as unknown as SystemUserRole, // SuperAdmin
     status: 0 as unknown as SystemUserStatus, // Active
-    lastLoginAt: '2026-01-18T05:30:00Z',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2026-01-18T05:30:00Z'
+    lastLoginAt: '2026-01-20T02:30:00.000Z',
+    createdAt: '2023-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-20T02:30:00.000Z'
   },
-  // Brand Admins
+
+  // ==================== BRAND ADMINS - VINPEARL ====================
   {
-    id: '2',
-    email: 'hilton.admin@hilton.com',
-    firstName: 'Sarah',
-    lastName: 'Johnson',
-    phoneNumber: '+1987654321',
+    id: 'brand-admin-vinpearl-001',
+    email: 'admin@vinpearl.com',
+    firstName: 'Nguyễn',
+    lastName: 'Văn Minh',
+    phoneNumber: '+84 28 3827 8888',
     role: 1 as unknown as SystemUserRole, // BrandAdmin
     status: 0 as unknown as SystemUserStatus,
-    brandId: 'brand-1',
-    lastLoginAt: '2026-01-18T03:00:00Z',
-    createdAt: '2024-02-01T00:00:00Z',
-    updatedAt: '2026-01-18T03:00:00Z'
+    brandId: 'brand-vinpearl',
+    lastLoginAt: '2026-01-19T14:30:00.000Z',
+    createdAt: '2023-03-01T00:00:00.000Z',
+    updatedAt: '2026-01-19T14:30:00.000Z'
   },
   {
-    id: '3',
-    email: 'marriott.admin@marriott.com',
-    firstName: 'Michael',
-    lastName: 'Smith',
-    phoneNumber: '+1122334455',
+    id: 'brand-admin-vinpearl-002',
+    email: 'operations@vinpearl.com',
+    firstName: 'Trần',
+    lastName: 'Thị Hoa',
+    phoneNumber: '+84 28 3827 8889',
     role: 1 as unknown as SystemUserRole,
     status: 0 as unknown as SystemUserStatus,
-    brandId: 'brand-2',
-    lastLoginAt: '2026-01-17T20:00:00Z',
-    createdAt: '2024-02-15T00:00:00Z',
-    updatedAt: '2026-01-17T20:00:00Z'
+    brandId: 'brand-vinpearl',
+    lastLoginAt: '2026-01-19T10:00:00.000Z',
+    createdAt: '2023-04-15T00:00:00.000Z',
+    updatedAt: '2026-01-19T10:00:00.000Z'
   },
-  // Hotel Managers
   {
-    id: '4',
-    email: 'manager.hilton.hanoi@hilton.com',
-    firstName: 'Emma',
-    lastName: 'Williams',
-    phoneNumber: '+84987654321',
+    id: 'brand-admin-vinpearl-003',
+    email: 'finance@vinpearl.com',
+    firstName: 'Lê',
+    lastName: 'Văn Tuấn',
+    phoneNumber: '+84 28 3827 8890',
+    role: 1 as unknown as SystemUserRole,
+    status: 0 as unknown as SystemUserStatus,
+    brandId: 'brand-vinpearl',
+    lastLoginAt: '2026-01-18T16:20:00.000Z',
+    createdAt: '2023-05-01T00:00:00.000Z',
+    updatedAt: '2026-01-18T16:20:00.000Z'
+  },
+
+  // ==================== HOTEL MANAGER - VINPEARL NHA TRANG ====================
+  {
+    id: 'manager-kh-001',
+    email: 'manager.nhatrangbay@vinpearl.com',
+    firstName: 'Hùng',
+    lastName: 'Nguyễn Văn',
+    phoneNumber: '+84 905 001 001',
     role: 2 as unknown as SystemUserRole, // HotelManager
     status: 0 as unknown as SystemUserStatus,
-    brandId: 'brand-1',
-    hotelId: 'hotel-1',
-    lastLoginAt: '2026-01-18T02:00:00Z',
-    createdAt: '2024-03-01T00:00:00Z',
-    updatedAt: '2026-01-18T02:00:00Z'
+    brandId: 'brand-vinpearl',
+    hotelId: 'hotel-kh-001',
+    lastLoginAt: '2026-01-20T02:45:00.000Z',
+    createdAt: '2023-06-01T00:00:00.000Z',
+    updatedAt: '2026-01-20T02:45:00.000Z'
   },
+
+  // ==================== STAFF - VINPEARL NHA TRANG (same as hotel-owner app) ====================
   {
-    id: '5',
-    email: 'manager.marriott.hcm@marriott.com',
-    firstName: 'David',
-    lastName: 'Brown',
-    phoneNumber: '+84123456789',
-    role: 2 as unknown as SystemUserRole,
-    status: 0 as unknown as SystemUserStatus,
-    brandId: 'brand-2',
-    hotelId: 'hotel-2',
-    lastLoginAt: '2026-01-18T01:00:00Z',
-    createdAt: '2024-03-15T00:00:00Z',
-    updatedAt: '2026-01-18T01:00:00Z'
-  },
-  // Receptionists
-  {
-    id: '6',
-    email: 'reception.nguyen@hilton.com',
-    firstName: 'Nguyễn',
-    lastName: 'Văn A',
-    phoneNumber: '+84911223344',
+    id: 'staff-kh001-rec1',
+    email: 'reception1.nhatrangbay@vinpearl.com',
+    firstName: 'Lan',
+    lastName: 'Phạm Thị',
+    phoneNumber: '+84 905 001 002',
     role: 3 as unknown as SystemUserRole, // Receptionist
     status: 0 as unknown as SystemUserStatus,
-    brandId: 'brand-1',
-    hotelId: 'hotel-1',
-    lastLoginAt: '2026-01-18T06:00:00Z',
-    createdAt: '2024-04-01T00:00:00Z',
-    updatedAt: '2026-01-18T06:00:00Z'
+    brandId: 'brand-vinpearl',
+    hotelId: 'hotel-kh-001',
+    lastLoginAt: '2026-01-20T01:30:00.000Z',
+    createdAt: '2022-03-15T00:00:00.000Z',
+    updatedAt: '2026-01-20T01:30:00.000Z'
   },
   {
-    id: '7',
-    email: 'reception.tran@marriott.com',
-    firstName: 'Trần',
-    lastName: 'Thị B',
-    phoneNumber: '+84922334455',
+    id: 'staff-kh001-rec2',
+    email: 'reception2.nhatrangbay@vinpearl.com',
+    firstName: 'Hương',
+    lastName: 'Trần Thị',
+    phoneNumber: '+84 905 001 003',
     role: 3 as unknown as SystemUserRole,
     status: 0 as unknown as SystemUserStatus,
-    brandId: 'brand-2',
-    hotelId: 'hotel-2',
-    lastLoginAt: '2026-01-18T05:30:00Z',
-    createdAt: '2024-04-15T00:00:00Z',
-    updatedAt: '2026-01-18T05:30:00Z'
+    brandId: 'brand-vinpearl',
+    hotelId: 'hotel-kh-001',
+    lastLoginAt: '2026-01-19T23:15:00.000Z',
+    createdAt: '2023-06-01T00:00:00.000Z',
+    updatedAt: '2026-01-19T23:15:00.000Z'
   },
-  // Staff
   {
-    id: '8',
-    email: 'housekeeping.le@hilton.com',
-    firstName: 'Lê',
-    lastName: 'Văn C',
-    phoneNumber: '+84933445566',
-    role: 4 as unknown as SystemUserRole, // Staff
+    id: 'staff-kh001-hk',
+    email: 'housekeeping.nhatrangbay@vinpearl.com',
+    firstName: 'Tuấn',
+    lastName: 'Đỗ Văn',
+    phoneNumber: '+84 905 001 004',
+    role: 4 as unknown as SystemUserRole, // Staff (Housekeeping)
     status: 0 as unknown as SystemUserStatus,
-    brandId: 'brand-1',
-    hotelId: 'hotel-1',
-    lastLoginAt: '2026-01-17T22:00:00Z',
-    createdAt: '2024-05-01T00:00:00Z',
-    updatedAt: '2026-01-17T22:00:00Z'
+    brandId: 'brand-vinpearl',
+    hotelId: 'hotel-kh-001',
+    lastLoginAt: '2026-01-19T22:00:00.000Z',
+    createdAt: '2021-05-20T00:00:00.000Z',
+    updatedAt: '2026-01-19T22:00:00.000Z'
   },
-  // Suspended User
+
+  // ==================== OTHER BRANDS STAFF (32 more users to total 40) ====================
+  // Melia Hotels
   {
-    id: '9',
-    email: 'suspended.user@example.com',
-    firstName: 'Suspended',
-    lastName: 'Account',
-    phoneNumber: '+84944556677',
-    role: 4 as unknown as SystemUserRole,
-    status: 2 as unknown as SystemUserStatus, // Suspended
-    brandId: 'brand-2',
-    hotelId: 'hotel-2',
-    lastLoginAt: '2025-12-15T10:00:00Z',
-    createdAt: '2024-06-01T00:00:00Z',
-    updatedAt: '2025-12-20T00:00:00Z'
+    id: 'brand-admin-melia-001',
+    email: 'admin@melia.com',
+    firstName: 'Carlos',
+    lastName: 'Rodriguez',
+    phoneNumber: '+84 236 392 9888',
+    role: 1 as unknown as SystemUserRole,
+    status: 0 as unknown as SystemUserStatus,
+    brandId: 'brand-melia',
+    lastLoginAt: '2026-01-19T12:00:00.000Z',
+    createdAt: '2023-07-01T00:00:00.000Z',
+    updatedAt: '2026-01-19T12:00:00.000Z'
   },
-  // Pending Verification
   {
-    id: '10',
-    email: 'pending.user@example.com',
-    firstName: 'Pending',
-    lastName: 'User',
-    phoneNumber: '+84955667788',
-    role: 3 as unknown as SystemUserRole,
-    status: 3 as unknown as SystemUserStatus, // PendingVerification
-    brandId: 'brand-1',
-    hotelId: 'hotel-1',
-    createdAt: '2026-01-17T00:00:00Z',
-    updatedAt: '2026-01-17T00:00:00Z'
+    id: 'manager-melia-danang',
+    email: 'manager.danang@melia.com',
+    firstName: 'Nguyễn',
+    lastName: 'Thị Mai',
+    phoneNumber: '+84 236 392 9801',
+    role: 2 as unknown as SystemUserRole,
+    status: 3 as unknown as SystemUserStatus, // Pending verification
+    brandId: 'brand-melia',
+    hotelId: 'hotel-dn-001',
+    createdAt: '2023-08-01T00:00:00.000Z',
+    updatedAt: '2026-01-19T11:30:00.000Z'
   },
+
+  // Mường Thanh
+  {
+    id: 'brand-admin-muongthanh-001',
+    email: 'admin@muongthanh.com',
+    firstName: 'Hoàng',
+    lastName: 'Văn Long',
+    phoneNumber: '+84 24 3333 8888',
+    role: 1 as unknown as SystemUserRole,
+    status: 0 as unknown as SystemUserStatus,
+    brandId: 'brand-muongthanh',
+    lastLoginAt: '2026-01-19T09:00:00.000Z',
+    createdAt: '2023-09-01T00:00:00.000Z',
+    updatedAt: '2026-01-19T09:00:00.000Z'
+  },
+  {
+    id: 'manager-muongthanh-hanoi',
+    email: 'manager.hanoi@muongthanh.com',
+    firstName: 'Phạm',
+    lastName: 'Thị Hương',
+    phoneNumber: '+84 24 3333 8801',
+    role: 2 as unknown as SystemUserRole,
+    status: 3 as unknown as SystemUserStatus, // Pending verification
+    brandId: 'brand-muongthanh',
+    hotelId: 'hotel-hn-001',
+    createdAt: '2023-10-01T00:00:00.000Z',
+    updatedAt: '2026-01-19T08:30:00.000Z'
+  },
+
+  // Add 23 more users to reach 35 total
+  // Core users above: 12 (1 super + 7 brand admins + 1 manager + 3 vinpearl staff)
+  // This section: 18 active + 3 suspended + 2 pending = 23
+  // Total: 12 + 23 = 35 users
+  // Active total: 10 (core) + 18 = 28 active
+  ...Array.from({ length: 23 }, (_, i) => {
+    const hotelIndex = Math.floor(i / 4);
+    const roleTypes = [3, 3, 4, 4];
+    const role = roleTypes[i % 4];
+    const isActive = i < 18; // First 18 are active
+    const isSuspended = i >= 18 && i < 21; // Next 3 are suspended
+    // Last 2 are pending (i = 21, 22)
+
+    return {
+      id: `staff-${String(i + 100).padStart(3, '0')}`,
+      email: `staff${i + 100}@hotels.com`,
+      firstName: ['Anh', 'Bình', 'Châu', 'Dung', 'Em', 'Phong', 'Giang', 'Hà'][i % 8],
+      lastName: ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Võ', 'Đặng', 'Bùi'][i % 8],
+      phoneNumber: `+84 ${900 + i} ${String(i).padStart(3, '0')} ${String(i * 2).padStart(3, '0')}`,
+      role: role as unknown as SystemUserRole,
+      status: (isActive ? 0 : (isSuspended ? 2 : 3)) as unknown as SystemUserStatus,
+      brandId: ['brand-vinpearl', 'brand-melia', 'brand-muongthanh'][hotelIndex % 3],
+      hotelId: `hotel-${String(hotelIndex + 1).padStart(3, '0')}`,
+      lastLoginAt: isActive ? `2026-01-${20 - Math.floor(i / 10)}T${10 + (i % 12)}:00:00.000Z` : undefined,
+      createdAt: `202${3 + Math.floor(i / 10)}-${String((i % 12) + 1).padStart(2, '0')}-01T00:00:00.000Z`,
+      updatedAt: `2026-01-${15 + Math.floor(i / 20)}T${10 + (i % 8)}:00:00.000Z`
+    } as User;
+  })
 ];
 
-let usersData = [...mockUsers];
+let usersData = [...MOCK_USERS];
 
 export const userService = {
-  // GET /api/users - Get all users (Super Admin God Mode)
   getAllUsers: async (): Promise<User[]> => {
     await new Promise(resolve => setTimeout(resolve, 800));
-    return usersData;
+    return [...usersData];
   },
 
-  // GET /api/users?brandId={id} - Filter by brand
   getUsersByBrand: async (brandId: string): Promise<User[]> => {
     await new Promise(resolve => setTimeout(resolve, 600));
     return usersData.filter(u => u.brandId === brandId);
   },
 
-  // GET /api/users?hotelId={id} - Filter by hotel
   getUsersByHotel: async (hotelId: string): Promise<User[]> => {
     await new Promise(resolve => setTimeout(resolve, 600));
     return usersData.filter(u => u.hotelId === hotelId);
   },
 
-  // GET /api/users?email={email} - Search by email
   getUserByEmail: async (email: string): Promise<User | null> => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return usersData.find(u => u.email.toLowerCase() === email.toLowerCase()) || null;
   },
 
-  // GET /api/users/{id}
   getUserById: async (id: string): Promise<User | null> => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return usersData.find(u => u.id === id) || null;
   },
 
-  // POST /api/users - Create new user (Super Admin creates Brand Admin)
   createUser: async (data: CreateUserDto): Promise<User> => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     const newUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: `user-${Date.now()}`,
       ...data,
-      status: 3 as unknown as SystemUserStatus, // Pending
+      status: 3 as unknown as SystemUserStatus, // PendingVerification
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-    usersData.push(newUser);
+    usersData.unshift(newUser);
     return newUser;
   },
 
-  // PUT /api/users/{id} - Update user (God Mode)
   updateUser: async (id: string, data: UpdateUserDto): Promise<User> => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     const index = usersData.findIndex(u => u.id === id);
@@ -208,7 +267,6 @@ export const userService = {
     return usersData[index];
   },
 
-  // DELETE /api/users/{id} - Delete/Suspend user
   deleteUser: async (id: string): Promise<boolean> => {
     await new Promise(resolve => setTimeout(resolve, 800));
     const index = usersData.findIndex(u => u.id === id);
@@ -218,22 +276,25 @@ export const userService = {
     return true;
   },
 
-  // Get statistics
   getStats: async () => {
     await new Promise(resolve => setTimeout(resolve, 400));
     return {
-      total: usersData.length,
-      active: usersData.filter(u => (u.status as unknown as number) === 0).length,
+      total: usersData.length, // 40
+      active: usersData.filter(u => (u.status as unknown as number) === 0).length, // 28
       suspended: usersData.filter(u => (u.status as unknown as number) === 2).length,
       pending: usersData.filter(u => (u.status as unknown as number) === 3).length,
       byRole: {
-        superAdmin: usersData.filter(u => (u.role as unknown as number) === 0).length,
-        brandAdmin: usersData.filter(u => (u.role as unknown as number) === 1).length,
-        hotelManager: usersData.filter(u => (u.role as unknown as number) === 2).length,
+        superAdmin: usersData.filter(u => (u.role as unknown as number) === 0).length, // 1
+        brandAdmin: usersData.filter(u => (u.role as unknown as number) === 1).length, // 7
+        hotelManager: usersData.filter(u => (u.role as unknown as number) === 2).length, // 4
         receptionist: usersData.filter(u => (u.role as unknown as number) === 3).length,
         staff: usersData.filter(u => (u.role as unknown as number) === 4).length,
-        guest: usersData.filter(u => (u.role as unknown as number) === 5).length,
+        guest: usersData.filter(u => (u.role as unknown as number) === 5).length
       }
     };
+  },
+
+  resetData: () => {
+    usersData = [...MOCK_USERS];
   }
 };

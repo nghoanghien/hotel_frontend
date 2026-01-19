@@ -42,9 +42,10 @@ const getStatusLabel = (status: SystemUserStatus) => {
 
 interface UserListProps {
   refreshTrigger?: number;
+  onUserUpdated?: () => void;
 }
 
-export default function UserList({ refreshTrigger = 0 }: UserListProps) {
+export default function UserList({ refreshTrigger = 0, onUserUpdated }: UserListProps) {
   const [data, setData] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { showNotification } = useNotification();
@@ -337,7 +338,10 @@ export default function UserList({ refreshTrigger = 0 }: UserListProps) {
         isOpen={!!selectedUserEdit}
         user={selectedUserEdit}
         onClose={() => setSelectedUserEdit(null)}
-        onSuccess={loadData}
+        onSuccess={() => {
+          loadData();
+          onUserUpdated?.();
+        }}
       />
 
     </motion.div>

@@ -1,19 +1,18 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { motion } from '@repo/ui/motion';
-import { OnboardingStats } from '@repo/types';
-import { brandPartnersService } from '../../../../features/brand-partners/services/brandPartnersService';
+import { adminDashboardService, type AdminDashboardStats } from '../../../../data/dashboardService';
 import { LoadingSpinner, useLoading } from '@repo/ui';
-import { Building2, CheckCircle, Clock, XCircle, ArrowRight } from '@repo/ui/icons';
+import { Building2, CheckCircle, Clock, XCircle, ArrowRight, Hotel, Users, Bed } from '@repo/ui/icons';
 import Link from 'next/link';
 
 export default function DashboardPage() {
   const { hide } = useLoading();
-  const [stats, setStats] = useState<OnboardingStats | null>(null);
+  const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // Tắt loading overlay khi dashboard mount (sau khi login thành công)
+  // Tắt loading overlay
   useEffect(() => {
     hide();
   }, [hide]);
@@ -24,7 +23,7 @@ export default function DashboardPage() {
 
   const fetchStats = async () => {
     try {
-      const data = await brandPartnersService.getStats();
+      const data = await adminDashboardService.getStats();
       setStats(data);
     } catch (error) {
       console.error('Failed to fetch stats', error);
@@ -36,8 +35,6 @@ export default function DashboardPage() {
 
   if (loading) return <div className="h-full flex items-center justify-center min-h-[60vh]"><LoadingSpinner /></div>;
   if (error) return <div className="h-full flex items-center justify-center min-h-[60vh] text-red-500 font-bold">Failed to load dashboard data.</div>;
-
-  const total = (stats?.pending || 0) + (stats?.approved || 0) + (stats?.rejected || 0);
 
   return (
     <div className="p-8 space-y-10 max-w-[1600px] mx-auto">
@@ -63,33 +60,76 @@ export default function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          label="Total Requests"
-          value={total}
+          label="Total Brands"
+          value={stats?.totalBrands || 0}
+          subtitle={`${stats?.activeBrands || 0} active`}
           icon={Building2}
           color="bg-indigo-50 text-indigo-600"
           delay={0.2}
         />
         <StatCard
-          label="Pending Review"
-          value={stats?.pending || 0}
-          icon={Clock}
-          color="bg-amber-50 text-amber-600"
+          label="Platform Hotels"
+          value={stats?.totalHotels || 0}
+          subtitle={`${stats?.totalRooms || 0} rooms`}
+          icon={Hotel}
+          color="bg-blue-50 text-blue-600"
           delay={0.3}
         />
         <StatCard
-          label="Approved"
-          value={stats?.approved || 0}
-          icon={CheckCircle}
-          color="bg-lime-50 text-lime-600"
+          label="Pending Review"
+          value={stats?.pendingApplications || 0}
+          subtitle="applications"
+          icon={Clock}
+          color="bg-amber-50 text-amber-600"
           delay={0.4}
         />
         <StatCard
-          label="Rejected"
-          value={stats?.rejected || 0}
-          icon={XCircle}
-          color="bg-red-50 text-red-600"
+          label="Total Users"
+          value={stats?.totalUsers || 0}
+          subtitle={`${stats?.activeUsers || 0} active`}
+          icon={Users}
+          color="bg-lime-50 text-lime-600"
           delay={0.5}
         />
+      </div>
+
+      {/* Secondary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-green-50 p-6 rounded-[24px] border border-green-100">
+          <div className="flex items-center gap-3 mb-2">
+            <CheckCircle className="text-green-600" size={20} />
+            <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Approved</span>
+          </div>
+          <div className="text-2xl font-anton text-green-700">{stats?.approvedApplications || 0}</div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="bg-red-50 p-6 rounded-[24px] border border-red-100">
+          <div className="flex items-center gap-3 mb-2">
+            <XCircle className="text-red-600" size={20} />
+            <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Rejected</span>
+          </div>
+          <div className="text-2xl font-anton text-red-700">{stats?.rejectedApplications || 0}</div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="bg-gray-50 p-6 rounded-[24px] border border-gray-100">
+          <div className="flex items-center gap-3 mb-2">
+            <Bed className="text-gray-600" size={20} />
+            <span className="text-sm font-bold text-gray-600 uppercase tracking-wide">Total Rooms</span>
+          </div>
+          <div className="text-2xl font-anton text-gray-700">{stats?.totalRooms || 0}</div>
+        </motion.div>
       </div>
 
       {/* Quick Actions / Feature Links */}
@@ -113,7 +153,7 @@ export default function DashboardPage() {
   );
 }
 
-const StatCard = ({ label, value, icon: Icon, color, delay }: any) => (
+const StatCard = ({ label, value, subtitle, icon: Icon, color, delay }: any) => (
   <motion.div
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
@@ -127,6 +167,7 @@ const StatCard = ({ label, value, icon: Icon, color, delay }: any) => (
     </div>
     <div className="text-3xl font-anton text-gray-900 mb-1">{value}</div>
     <div className="text-sm font-bold text-gray-400 uppercase tracking-wide">{label}</div>
+    {subtitle && <div className="text-xs text-gray-500 font-medium mt-1">{subtitle}</div>}
   </motion.div>
 );
 

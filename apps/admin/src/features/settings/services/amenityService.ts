@@ -165,6 +165,66 @@ const mockAmenities: Amenity[] = [
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z'
   },
+  {
+    id: '17',
+    name: 'Private Beach Access',
+    description: 'Direct access to private beach area with sunbeds',
+    icon: 'Umbrella',
+    type: AmenityType.Facilities,
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '18',
+    name: 'Golf Course',
+    description: '18-hole championship golf course',
+    icon: 'Trophy',
+    type: AmenityType.Facilities,
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '19',
+    name: 'Kids Club',
+    description: 'Supervised activities and play area for children',
+    icon: 'Gamepad2',
+    type: AmenityType.Facilities,
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '20',
+    name: 'Executive Lounge',
+    description: 'Exclusive lounge access with complimentary refreshments',
+    icon: 'Crown',
+    type: AmenityType.Service,
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '21',
+    name: 'Butler Service',
+    description: '24/7 personal butler service',
+    icon: 'UserCheck',
+    type: AmenityType.Service,
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '22',
+    name: 'Infinity Pool',
+    description: 'Rooftop infinity pool with panoramic views',
+    icon: 'Waves',
+    type: AmenityType.Facilities,
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  }
 ];
 
 let amenitiesData = [...mockAmenities];
@@ -173,7 +233,7 @@ export const amenityService = {
   // GET /api/amenities
   getAllAmenities: async (): Promise<Amenity[]> => {
     await new Promise(resolve => setTimeout(resolve, 800));
-    return amenitiesData.filter(a => a.isActive);
+    return [...amenitiesData]; // Return ALL for admin management
   },
 
   // GET /api/amenities/{id}

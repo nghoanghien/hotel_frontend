@@ -65,7 +65,7 @@ export default function OnboardingDetailView({ applicationId, onBack, onStatusUp
   const executeApproveApplication = async () => {
     try {
       await brandPartnersService.approveApplication(applicationId);
-      showNotification({ message: 'Application Approved Successfully. Brand & User created.', type: 'success' });
+      showNotification({ message: 'Application Approved Successfully. Brand & User created.', type: 'success', format: "Dữ liệu cập nhật thành công" });
       onStatusUpdate();
       onBack();
     } catch (e) {
